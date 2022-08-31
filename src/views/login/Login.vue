@@ -6,7 +6,7 @@ import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
     <LoginBackground />
     <div class="container">
         <div class="login-window">
-            <img src="@/assets/logo/logo.svg" alt="" class="logo">
+            <img src="@/assets/logo/uoa.svg" alt="" class="logo">
 
             <div class="title">Login</div>
             <form>
@@ -23,103 +23,16 @@ import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
 </template>
 
 <style scoped lang="scss">
-@media only screen and (max-width: 600px) {
-    .container {
-        min-height: 900px;
-
-        .login-window {
-            margin-left: 0;
-            margin-top: 0;
-
-            img {
-                width: 300px;
-                height: 300px;
-            }
-
-            .title {
-                font-size: 128.83px;
-                font-weight: 600;
-                margin: 30px 0;
-                /* Primary */
-                color: #003867;
-            }
-
-            form {
-                row-gap: 50px;
-
-                input {
-                    padding-left: 40px;
-                    font-size: 44px;
-                    width: 850px;
-                    height: 105px;
-                    border-radius: 16px;
-                    background: rgba(255, 255, 255, 0.2);
-                    border: 1px solid #003867;
-                    
-                }
-
-                input::placeholder {
-                    color: inherit;
-                }
-
-                input:focus {
-                    outline: none;
-                    border: none;
-                    background: rgba(0, 128, 167, 0.2);
-                }
-
-                .keep-login {
-                    display: flex;
-                    align-items: center;
-                    span {
-                        display: block;
-                        font-size: 40px;
-                        margin-left: 40px;
-                    }
-                }
-
-                input[type="checkbox"] {
-                    -webkit-appearance: none;
-                    border: 1px solid #003867;
-                    background-color: transparent;
-                    width: 50px;
-                    height: 50px;
-                    border-radius: 16px;
-                    box-sizing: border-box;
-                    position: relative;
-                }
-
-
-                input[type="checkbox"]:checked::after {
-                    top:-10px;
-                    position: absolute;
-                }
-
-                button {
-                    width: 850px;
-                    height: 100px;
-                    border-radius: 16px;
-                    font-family: Poppins-SemiBold;
-                    font-size: 56px;
-                    font-weight: 600;
-                }
-
-                
-            }
-        }
-    }
-}
-
 .container {
     display: flex;
     width: 100%;
     height: 100%;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
 }
 
 .login-window {
-    margin-left: 400px;
+    margin-right: 20vw;
     margin-top: 100px;
     display: flex;
     flex-direction: column;
@@ -127,8 +40,11 @@ import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
     align-items: center;
 
     img {
-        width: 71px;
-        height: 82px;
+        position: absolute;
+        width: 160px;
+        height: 160px;
+        left: 0;
+        top: 0;
     }
 
     .title {
@@ -218,4 +134,39 @@ import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
         }
     }
 }
+
+@media only screen and (max-width: 770px) { // ipad mini 768 * 1024
+    .container {
+        justify-content: center;
+
+        .login-window {
+            margin-right: 0;
+            margin-top: 1rem;
+
+            img {
+                position: static;
+                width: 4rem;
+                height: 4rem;
+            }
+
+            input {
+                width: 9rem;
+                height: 1.2rem;
+                align-self: center;
+                background-color: white;
+                border: 1px solid rgb(187, 187, 187);
+            }
+
+            input::placeholder {
+                font-size: 0.35rem;
+                font-weight: 300;
+            }
+
+            button {
+                width: 9rem;
+            }
+        }
+    }
+}
+
 </style>

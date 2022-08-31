@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
-import { postCssPxToRem } from 'postcss-pxtorem'
 
 const pathResolve = (dir: string): any => {
   return resolve(__dirname, '.', dir)
@@ -21,7 +20,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@import '@/theme.scss';`
+        additionalData: `@use '@/theme.scss';`
       },
     }
   },
