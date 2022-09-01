@@ -15,7 +15,6 @@ import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
                 <div class="keep-login"><input type="checkbox" class="login-options"><span>Keep me logged in</span>
                 </div>
                 <button type="submit" @click.prevent="">Login</button>
-                <div class="login-with"></div>
             </form>
 
         </div>
@@ -141,29 +140,29 @@ import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
 
         .login-window {
             margin-right: 0;
-            margin-top: 1rem;
+            margin-top: 10vw;
 
             img {
                 position: static;
-                width: 4rem;
-                height: 4rem;
+                width: 40vw;
+                height: 40vw;
             }
 
             input {
-                width: 9rem;
-                height: 1.2rem;
+                width: 90vw;
+                height: 12vw;
                 align-self: center;
                 background-color: white;
                 border: 1px solid rgb(187, 187, 187);
             }
 
             input::placeholder {
-                font-size: 0.35rem;
+                font-size: 3.5vw;
                 font-weight: 300;
             }
 
             button {
-                width: 9rem;
+                width: 90vw;
             }
         }
     }

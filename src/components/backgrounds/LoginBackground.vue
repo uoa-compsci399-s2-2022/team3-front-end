@@ -18,23 +18,23 @@
 
 .bg-container::before {
     content: "";
-    width: 12rem;
-    height: 12rem;
+    width: 120vw;
+    height: 120vw;
     background-image: url('@/assets/backgrounds/shape1.svg');
     background-repeat: no-repeat;
     position: absolute;
-    background-position: right 6rem  top -3rem;
+    background-position: right 60vw  top -30vw;
 }
 
 .bg-container::after {
     content: "";
-    width: 10rem;
-    height: 3rem;
+    width: 100vw;
+    height: 30vw;
     background-image: url('@/assets/backgrounds/shape2.svg');
     background-repeat: no-repeat;
     position: absolute;
 
-    background-position: left 8rem top -0.8rem;
+    background-position: left 80vw top -8vw;
 }
 
 @media only screen and (max-width: 770px) {
@@ -49,25 +49,25 @@
     .bg-container-mobile {
         position: absolute;
         height: 100%;
-        width: 10rem;
+        width: 100vw;
         z-index: -99;
         overflow: hidden;
     }
 
     .bg-container-mobile::after {
         content: "";
-        width: 10rem;
-        height: 10rem;  
+        width: 100vw;
+        height: 100vw;  
         background-image: url('@/assets/backgrounds/shape2.svg');
         background-repeat: no-repeat;
         position: absolute;
-        bottom: 0rem;
+        bottom: 00vw;
         transform: rotate(-150deg) translatey(-80px);
-        background-position: right -2rem top -2rem;
+        background-position: right -20vw top -20vw;
     }
     .bg-container::after {
         height: 100%;
-        background-position: right -5rem top -1rem;
+        background-position: right -50vw top -10vw;
     }
 }
 
