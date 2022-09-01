@@ -7,6 +7,6 @@ console.log(window.innerWidth)
 <router-view/>
 </template>
 
-<style scoped>
-
+<style lang="scss">
+@import '@/styles/scrollbar.scss' // set the scrollbar style
 </style>

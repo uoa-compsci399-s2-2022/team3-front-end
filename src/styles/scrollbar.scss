@@ -1,0 +1,25 @@
+::-webkit-scrollbar {
+    width: 1vw;
+    height: 1vw;
+}
+
+::-webkit-scrollbar-track {
+    background: rgb(239, 239, 239);
+    border-radius: 100vw;
+    margin-block: .2em;
+}
+
+::-webkit-scrollbar-thumb {
+    background: changeOpacity($uoa-primary, 0.3);
+    border-radius: 100vw;
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+    background: changeOpacity($uoa-primary, 0.6);
+}
+
+html {
+    scrollbar-width: thin;
+    scrollbar-color: changeOpacity($uoa-primary, 0.3) rgb(239, 239, 239);
+}

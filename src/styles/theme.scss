@@ -1,0 +1,10 @@
+$uoa-primary:#003867;
+
+
+@function changeOpacity($clr, $n: 1) {
+    @if $n > 1 {
+        $n: calc($n / 100)
+    }
+
+    @return rgba(red($clr), green($clr), blue($clr), $n)
+}
