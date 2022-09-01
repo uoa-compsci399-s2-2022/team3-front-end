@@ -36,7 +36,7 @@ const login = () => {
 
             <div class="title">Login</div>
             <form>
-                <input type="text" placeholder="Username" v-model="data.username">
+                <input type="text" placeholder="Username" v-model="data.userID">
                 <input type="password" placeholder="Password" v-model="data.password">
                 <div class="keep-login"><input type="checkbox" class="login-options"><span>Keep me logged in</span>
                 </div>
