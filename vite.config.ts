@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 const pathResolve = (dir: string): any => {
   return resolve(__dirname, '.', dir)
@@ -12,10 +15,18 @@ const alias: Record<string, string> = {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    AutoImport({
+      resolvers: [ElementPlusResolver()],
+    }),
+    Components({
+      resolvers: [ElementPlusResolver()],
+    }),
+  ],
   resolve: {
     alias,
-    extensions:['.js', '.ts', '.jsx', '.d.ts', 'json']
+    extensions: ['.js', '.ts', '.jsx', '.d.ts', 'json']
   },
   css: {
     preprocessorOptions: {
@@ -24,7 +35,14 @@ export default defineConfig({
       },
     }
   },
-  server:{
-    host:true
+  
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
   }
 })

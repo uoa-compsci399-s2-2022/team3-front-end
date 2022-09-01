@@ -8,5 +8,6 @@ console.log(window.innerWidth)
 </template>
 
 <style lang="scss">
-@import '@/styles/scrollbar.scss' // set the scrollbar style
+@import '@/styles/scrollbar.scss'; // set the scrollbar style
+
 </style>

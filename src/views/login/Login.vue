@@ -1,5 +1,31 @@
 <script setup lang="ts">
 import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
+import { reactive, ref } from 'vue';
+import { post } from '@/utils/request'
+import { useUserStore } from '@/store/index'
+import { useRouter } from 'vue-router';
+
+
+const data = reactive({
+    userID: "hzha556",
+    password: "123"
+})
+
+const store = useUserStore()
+
+// hzha556
+// 123
+const router = useRouter()
+const login = () => {
+    post("/api/login", data).then(
+        responce => {
+            store.setToken(responce.token);
+            router.push('/application')
+        }
+    ).catch(
+        err => console.error(err)
+    )
+}
 </script>
 
 <template>
@@ -10,11 +36,11 @@ import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
 
             <div class="title">Login</div>
             <form>
-                <input type="text" placeholder="Username">
-                <input type="password" placeholder="Password">
+                <input type="text" placeholder="Username" v-model="data.username">
+                <input type="password" placeholder="Password" v-model="data.password">
                 <div class="keep-login"><input type="checkbox" class="login-options"><span>Keep me logged in</span>
                 </div>
-                <button type="submit" @click.prevent="">Login</button>
+                <button type="submit" @click.prevent="login">Login</button>
             </form>
 
         </div>
@@ -108,7 +134,7 @@ import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
         input[type="checkbox"]:checked::after {
             content: "✓";
             left: 5px;
-            top:-1px;
+            top: -1px;
             position: absolute;
         }
 
@@ -134,7 +160,9 @@ import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
     }
 }
 
-@media only screen and (max-width: 770px) { // ipad mini 768 * 1024
+@media only screen and (max-width: 770px) {
+
+    // ipad mini 768 * 1024
     .container {
         justify-content: center;
 
@@ -167,5 +195,4 @@ import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
         }
     }
 }
-
 </style>

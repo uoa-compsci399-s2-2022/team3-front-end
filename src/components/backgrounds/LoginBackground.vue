@@ -38,9 +38,6 @@
 }
 
 @media only screen and (max-width: 770px) {
-    .bg-container {
-        //display: none;
-    }
 
     .bg-container::before {
         display: none;
