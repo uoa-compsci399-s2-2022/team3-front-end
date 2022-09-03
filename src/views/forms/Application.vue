@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { get } from '@/utils/request'
 import { UploadFilled } from '@element-plus/icons-vue'
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, onBeforeMount, reactive, ref, watch } from 'vue';
 import { ElMessage, FormInstance, FormRules } from 'element-plus'
 import { useThrottleFn } from '@vueuse/core'
 import { } from 'element-plus'
@@ -16,11 +16,13 @@ import { } from 'element-plus'
 const step = ref(0); // current step
 const atFirst = ref(true); // at first step?
 const atLast = ref(false) // at last step?
+const stepArr = reactive([true, false, false, false]) // represents which step you are currently at. You are at the index of [true]
 const statusArr = reactive<('process' | 'wait' | 'finish' | 'error' | 'success')[]>(['process', 'wait', 'wait', 'wait']) // status of each step
 // throttled version next function in case of too many clicks at the same time.
 // the callback function will only be excuted once every 0.8s
 const next = useThrottleFn(() => {
     step.value++;
+    saveSession(); // save the data to sessionStorage
     if (step.value >= 3) {
         atLast.value = true;
     } else {
@@ -32,6 +34,7 @@ const next = useThrottleFn(() => {
 // throttled version prev function in case of too many clicks at the same time.
 const prev = useThrottleFn(() => {
     step.value--;
+    saveSession(); // save the data to sessionStorage
     if (step.value <= 0) {
         atFirst.value = true;
     } else {
@@ -39,6 +42,16 @@ const prev = useThrottleFn(() => {
     }
 }, 800)
 
+// once step changed, load the next step AFTER the current step vanish animation finishes
+// 如果不设置延迟加载的化，下一个界面会在当前界面消失前就显示到下面，造成一瞬的卡顿影响用户体验.
+watch(step, (newStep, oldStep) => {
+    stepArr[oldStep] = false; // 使当前步骤先显示消失动画
+    setTimeout(() => {
+        statusArr[newStep] = 'process'; // 使上方的步骤条当前步骤显示处理中颜色
+        stepArr[newStep] = true;
+    }, 600); // 在0.6秒后显示新的步骤的出现动画
+
+})
 
 const formRef = ref<FormInstance>(); // Form DOM instance
 // 申请表单数据
@@ -56,8 +69,30 @@ type applicationData = {
     otherContractDesc: string;
     maxWorkingHours: number;
 }
-
+// initialize data
 const data = reactive({} as applicationData);
+
+// 加载前先从sessionStorage里找，如果sessionStorage里面没有再从localStorage里找
+onBeforeMount(() => {
+    let localData: applicationData;
+    localData = reactive(JSON.parse(sessionStorage.getItem('applicationData')!))
+    if (localData) {
+        Object.entries(localData).forEach(
+            // @ts-ignore
+            ([key, value]) => { data[key] = value; }
+        );
+        return;
+    }
+    localData = reactive(JSON.parse(localStorage.getItem('applicationData')!))
+    if (localData) {
+        Object.entries(localData).forEach(
+            // @ts-ignore
+            ([key, value]) => { data[key] = value; }
+        );
+        return;
+    }
+})
+
 
 //-----表单验证相关------start-----------------------------------------------
 const validateWillComeBackToNZ = (rule: any, value: any, callback: any) => {
@@ -118,22 +153,11 @@ const dataRules = reactive<FormRules>({
         { required: true, message: 'Please select one option', trigger: 'change' },
     ],
     maxWorkingHours: [
-    { required: true, message: 'Please enter your preffered working hours', trigger: 'change' },
+        { required: true, message: 'Please enter your preffered working hours', trigger: 'change' },
     ]
 })
 
-
-
-const stepArr = reactive([true, false, false, false])
-watch(step, (newStep, oldStep) => {
-    statusArr[newStep] = 'process'; // 使上方的步骤条当前步骤显示处理中颜色
-    stepArr[oldStep] = false; // 使当前步骤先显示消失动画
-    setTimeout(() => {
-        stepArr[newStep] = true;
-    }, 600); // 在0.6秒后显示新的步骤的出现动画
-
-})
-
+// once the step changed, validate invoke validateStep() function to validate data of previous step.
 watch(step, async (newStep, oldStep) => {
     // if there exists invalid fields
     let valid = await validateStep(oldStep)
@@ -163,7 +187,7 @@ const validateStep = async (step: number) => {
     } else if (step === 1) {
         await formRef.value?.validateField(
             ['isCurrentlyOverseas', 'willComeBackToNZ', 'isCitizen',
-             'hasWorkVisa', 'degree', 'hasOtherContract', 'maxWorkingHours'],
+                'hasWorkVisa', 'degree', 'hasOtherContract', 'maxWorkingHours'],
             (valid) => {
                 flag = valid;
             })
@@ -182,6 +206,24 @@ const validateStep = async (step: number) => {
 }
 //---------表单验证相关------end--------------------------------------
 
+//---------保存数据相关------start------------------------------------
+const save = () => {
+    saveLocal()
+    ElMessage({
+        showClose: true,
+        message: 'Your changes has been saved',
+        type: 'success',
+    })
+}
+const saveLocal = () => {
+    localStorage.setItem('applicationData', JSON.stringify(data));
+}
+const saveSession = () => {
+    sessionStorage.setItem('applicationData', JSON.stringify(data));
+}
+
+
+//---------保存数据相关------end
 </script>
 
 <template>
@@ -327,8 +369,9 @@ const validateStep = async (step: number) => {
 
         <div class="application-control-btns">
             <el-button @click="prev()" :disabled="atFirst">Previous Step</el-button>
-            <el-button type="success" plain v-if="step <= 2">Save</el-button>
-            <el-button type="primary" v-else>Submit</el-button>
+            <el-button @click="save" class="application-control-btns-main" type="success" plain v-if="step <= 2">Save
+            </el-button>
+            <el-button @click="" class="application-control-btns-main" type="primary" v-else>Submit</el-button>
             <el-button @click="next()" :disabled="atLast">Next Step</el-button>
         </div>
 
@@ -414,6 +457,11 @@ const validateStep = async (step: number) => {
 
     .el-button:last-child {
         margin-left: auto;
+    }
+
+    &-main {
+        position: relative;
+        left: -18px;
     }
 }
 
