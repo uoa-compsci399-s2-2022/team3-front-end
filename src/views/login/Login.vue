@@ -7,14 +7,12 @@ import { useRouter } from 'vue-router';
 
 
 const data = reactive({
-    userID: "hzha556",
-    password: "123"
+    userID: "admin",
+    password: "admin"
 })
 
 const store = useUserStore()
 
-// hzha556
-// 123
 const router = useRouter()
 const login = () => {
     post("/api/login", data).then(
