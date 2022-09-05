@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
 import { reactive, ref } from 'vue';
-import { post } from '@/utils/request'
-import { useUserStore } from '@/store/index'
+import { get, post } from '@/utils/request'
+import { useUserStore, usePermissionStore } from '@/store/index'
 import { useRouter } from 'vue-router';
 
 
@@ -11,14 +11,25 @@ const data = reactive({
     password: "admin"
 })
 
-const store = useUserStore()
-
+const userStore = useUserStore()
+const permissionStore = usePermissionStore()
 const router = useRouter()
 const login = () => {
     post("/api/login", data).then(
         responce => {
-            store.setToken(responce.token);
+            userStore.setToken(responce.token);
             router.push('/application')
+        }
+    ).then(
+        () => {
+            get('/api/currentUser').then(
+                responce => {
+                    console.log(responce)
+                    permissionStore.setKeyFromGroups(responce.groups);
+                    sessionStorage.setItem('mtms_keys', JSON.stringify(permissionStore.getKey))
+                }
+            )
+            
         }
     ).catch(
         err => console.error(err)
