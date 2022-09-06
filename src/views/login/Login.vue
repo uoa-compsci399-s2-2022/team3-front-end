@@ -18,20 +18,21 @@ const login = () => {
     post("/api/login", data).then(
         responce => {
             userStore.setToken(responce.token);
-            router.push('/application')
         }
     ).then(
         () => {
             get('/api/currentUser').then(
                 responce => {
-                    console.log(responce)
                     permissionStore.setKeyFromGroups(responce.groups);
                     sessionStorage.setItem('mtms_keys', JSON.stringify(permissionStore.getKey))
                 }
             )
             
         }
-    ).catch(
+    ).then( () => {
+        router.push('/dashboard')
+    })
+    .catch(
         err => console.error(err)
     )
 }

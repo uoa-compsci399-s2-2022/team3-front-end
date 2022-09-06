@@ -58,20 +58,26 @@ router.beforeEach((to, from, next) => {
     const store = usePermissionStore();
     // if the page permission id exists, but the user doesn't have the permission to this page
     // redirect to 403
-    let loggedIn: boolean = false
-    get('/api/loginStatus').then(
-        res => {
-            loggedIn = (res === "Login");
-        }
-    )
-    if (to.meta.permission &&!loggedIn) {
-        next('/login')
-    } else if (to.meta.permission && !store.getKey.includes((to.meta.permission as string))) {
-        next('/403')
-    } else {
+    let loggedIn: boolean = true
+    if (to.path === '/404') {
         next()
+    } else {
+        get('/api/loginStatus').then(
+            res => {
+                loggedIn = (res === "Login");
+            }
+        ).then(() => {
+            if (!loggedIn && to.path !== '/login') {
+                next('/login')
+            } else if (to.meta.permission && !store.getKey.includes((to.meta.permission as string))) {
+                next('/403')
+            } else {
+                next()
+            }
+        }).catch(() => {
+            next('/404')
+        })    
     }
-    
 })
 
 router.afterEach((to, from) => {
