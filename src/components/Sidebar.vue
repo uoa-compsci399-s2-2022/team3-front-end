@@ -21,6 +21,18 @@ const items: sidebarTree = [
         permission: '1',
     },
     {
+        icon: 'Collection',
+        index: '',
+        title: 'Course',
+        permission: '999',
+    },
+    {
+        icon: 'MessageBox',
+        index: '',
+        title: 'Message',
+        permission: '999',
+    },
+    {
         icon: 'DocumentAdd',
         index: '/application',
         title: 'Application',

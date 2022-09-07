@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { get } from '@/utils/request'
+
 import { UploadFilled } from '@element-plus/icons-vue'
 import { computed, onBeforeMount, reactive, ref, watch } from 'vue';
 import { ElMessage, FormInstance, FormRules } from 'element-plus'
@@ -7,11 +7,6 @@ import { useThrottleFn } from '@vueuse/core'
 import { } from 'element-plus'
 
 
-// const logout = () => {
-//     get('/api/logout').then(res => {
-//         console.log(res);
-//     })
-// }
 
 const step = ref(0); // current step
 const atFirst = ref(true); // at first step?
@@ -374,10 +369,6 @@ const saveSession = () => {
             <el-button @click="" class="application-control-btns-main" type="primary" v-else>Submit</el-button>
             <el-button @click="next()" :disabled="atLast">Next Step</el-button>
         </div>
-
-        <!-- <div class="qwq">
-            <el-button @click="logout">Logout</el-button>
-        </div> -->
     </div>
 </template>
 

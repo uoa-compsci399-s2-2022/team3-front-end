@@ -1,11 +1,11 @@
-<script lang="ts">
+<script setup lang="ts">
 
 </script>
 
 <template>
-  <dev class="background">
+  <div class="background">
 
-  </dev>
+  </div>
 </template>
 
 <style lang="scss">

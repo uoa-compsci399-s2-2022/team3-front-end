@@ -1,5 +1,6 @@
 $uoa-primary:#003867;
-
+$uoa-dark:#002a4d;
+$fs-title: 30px;
 
 @function changeOpacity($clr, $n: 1) {
     @if $n > 1 {

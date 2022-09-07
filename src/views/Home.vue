@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { get } from '@/utils/request';
 import Sidebar from '@/components/Sidebar.vue';
+import Header from '@/components/header/Header.vue';
 get('api/currentUser').then(res => {
     console.log(res);
 }).catch((err) => {
@@ -10,18 +11,24 @@ get('api/currentUser').then(res => {
 <template>
     <div class="container">
         <Sidebar />
-        Home
+        <div class="container-main">
+            <Header />
+            <router-view />
+        </div>
 
-        <router-view />
     </div>
 </template>
 
 <style lang="scss">
-    .container {
+.container {
+    display: flex;
+    position: relative;
+    align-items: flex-start;
+
+    &-main {
         display: flex;
-        position:relative;
-        align-items: flex-start;  
+        flex-direction: column;
+        width: 100%;
     }
-
-
+}
 </style>
