@@ -20,6 +20,16 @@ get('api/currentUser').then(res => {
 </template>
 
 <style lang="scss">
+@media (max-width: 730px) {
+    .container-main {
+        margin-left: 50px;
+    }
+}
+@media (max-width: 540px) {
+    .container-main {
+        margin-left: 0;
+    }
+}
 .container {
     display: flex;
     position: relative;

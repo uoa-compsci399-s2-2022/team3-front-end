@@ -2,8 +2,7 @@
 import { useSidebarStore } from '@/store/modules/sidebar/sidebar';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { Odometer } from '@element-plus/icons-vue'
-
+import People from '@/components/icons/People.vue'
 
 type sidebarTree = {
     icon?: any;
@@ -32,6 +31,13 @@ const items: sidebarTree = [
         title: 'Message',
         permission: '999',
     },
+
+    {
+        icon: People,
+        index: '',
+        title: 'People',
+        permission: '999',
+    },
     {
         icon: 'DocumentAdd',
         index: '/application',
@@ -44,6 +50,12 @@ const sidebar = useSidebarStore();
 const onRoutes = computed(() => {
     return useRoute().path;
 })
+
+const modalDisplay = computed(() => {
+    console.log(sidebar.collapse);
+    return { "display": `${sidebar.collapse ? "none" : "block"}` };
+})
+
 </script>
 
 <template>
@@ -78,9 +90,44 @@ const onRoutes = computed(() => {
 
         </el-menu>
     </div>
+
+        <div class="model" :style="modalDisplay" @click="sidebar.handleCollase"></div>
+
+
 </template>
 
 <style lang="scss">
+@media (max-width: 730px) {
+    .sidebar {
+        position: fixed !important;
+        z-index: 999;
+    }
+}
+
+@media (min-width: 730px) {
+    .model {
+        display: none !important;
+    }
+}
+
+.model {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100vw;
+    backdrop-filter: blur(4px);
+    z-index: 1;
+    background-color: rgba($color: #000000, $alpha: 0.1);
+}
+
+@media (max-width: 540px) {
+    .sidebar {
+        display: none;
+    }
+}
+
 .sidebar {
     position: sticky;
     top: 0;
@@ -96,25 +143,26 @@ const onRoutes = computed(() => {
     }
 
     .menu:not(.el-menu--collapse) {
-        width: 280px;
+        width: 260px;
     }
+
     .menu:not(.el-menu--collapse) {
-        .el-menu-item{
+        .el-menu-item {
             &.is-active:before {
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 4px;
-            content: "";
-            background-color: #8ecaff;
-        }
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: 4px;
+                content: "";
+                background-color: #8ecaff;
+            }
         }
     }
-    
+
 
     .el-menu-item {
-        
+
 
         &.is-active {
             background-color: #ffffff;
@@ -165,6 +213,7 @@ const onRoutes = computed(() => {
             cursor: pointer;
         }
     }
+
 
 
 }
