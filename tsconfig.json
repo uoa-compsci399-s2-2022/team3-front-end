@@ -19,7 +19,8 @@
       "components/*":["src/components/*"],
       "assets/*":["src/assets/*"]
     },
-    "types": ["element-plus/global"]
+    "types": ["element-plus/global"],
+    "allowJs": true
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
   "references": [{ "path": "./tsconfig.node.json" }]

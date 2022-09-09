@@ -53,30 +53,78 @@ const router = createRouter({
 const Vnode = createVNode(LoadingBar)
 render(Vnode, document.body)
 router.beforeEach((to, from, next) => {
+    console.log("going to", to.path)
     document.title = `${to.meta.title}`;
     Vnode.component?.exposed?.startLoading(); // start the loading bar animation
     const store = usePermissionStore();
+
     // if the page permission id exists, but the user doesn't have the permission to this page
     // redirect to 403
-    let loggedIn: boolean = true
+    
     if (to.path === '/404') {
-        next()
+        console.log('404')
+        next();
+        return;
+    }
+
+    // if the user has token, but he don't have the permitted page list
+    // then send a request to get the user's groups.
+    if (localStorage.getItem('mtms_token') && store.key.size === 0) {
+        console.log('redirectBasedOnLoginStatus without key');
+        restoreUserKey().then(
+            () => redirectBasedOnLoginStatus()
+        ).catch(() => {
+            next();
+            return;
+        })
     } else {
+        console.log('redirectBasedOnLoginStatus with key');
+        redirectBasedOnLoginStatus();
+    }
+   
+    function redirectBasedOnLoginStatus() {
+        let loggedIn: boolean = false;
+        if (!localStorage.getItem('mtms_token')) {
+            console.log('no token');
+            if (to.path !== '/login') {
+                next('/login');
+                return;
+            }  else {
+                next();
+                return
+            }  
+        }
         get('/api/loginStatus').then(
             res => {
                 loggedIn = (res === "Login");
             }
         ).then(() => {
             if (!loggedIn && to.path !== '/login') {
+                console.log('token expired');
                 next('/login')
             } else if (to.meta.permission && !store.getKey.includes((to.meta.permission as string))) {
+                console.log("to.meata.permission:", to.meta.permission)
+                console.log("store.getKey:", store.getKey)
                 next('/403')
+            } else if (loggedIn && to.path === '/login') {
+                next('/dashboard')
             } else {
+                console.log("permitted.")
                 next()
             }
-        }).catch(() => {
+        }).catch((err) => {
+            console.log(err)
             next('/404')
-        })    
+        }) 
+    }
+
+    function restoreUserKey(): Promise<any> {
+        return get('/api/currentUser').then(
+            responce => {
+                store.setKeyFromGroups(responce.groups);
+                sessionStorage.setItem('mtms_keys', JSON.stringify(store.getKey))
+            }
+        )
     }
 })
 
