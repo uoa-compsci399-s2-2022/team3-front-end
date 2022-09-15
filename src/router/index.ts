@@ -18,6 +18,13 @@ const routes = [
                 alias: [''],
                 component: () => import('@/views/dashborad/Dashborad.vue')
             },
+
+            {
+                path: "profile",
+                name: "profile",
+                meta: { title:'Profile', permission: '3' },
+                component: () => import('@/views/profile/Profile.vue')
+            }
         ]
     },
     {
@@ -74,8 +81,7 @@ router.beforeEach((to, from, next) => {
         restoreUserKey().then(
             () => redirectBasedOnLoginStatus()
         ).catch(() => {
-            next();
-            return;
+            redirectBasedOnLoginStatus();
         })
     } else {
         console.log('redirectBasedOnLoginStatus with key');

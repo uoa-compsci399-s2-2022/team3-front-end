@@ -9,11 +9,11 @@ export const usePermissionStore = defineStore('permission', () => {
     type identityGroups = 'student' | 'courseCoordinator' |  'tutorCoordinator' | 'markerCoodinator' | 'admin'
 
     const defaultList = ref<{[K in identityGroups] : Set<string>}>({
-        student: new Set(['1', '2']),
-        courseCoordinator: new Set(['1', '2']),
-        tutorCoordinator: new Set(['1', '2']),
-        markerCoodinator: new Set(['1', '2']),
-        admin: new Set(['1', '2'])
+        student: new Set(['1', '2', '3']),
+        courseCoordinator: new Set(['1', '2', '3']),
+        tutorCoordinator: new Set(['1', '2', '3']),
+        markerCoodinator: new Set(['1', '2', '3']),
+        admin: new Set(['1', '2', '3'])
     })
 
     const getKey = computed(() => { return Array.from(key.value).sort()})

@@ -48,7 +48,8 @@ const items: sidebarTree = [
 
 const sidebar = useSidebarStore();
 const onRoutes = computed(() => {
-    return useRoute().path;
+    const route = useRoute();
+    return route.path == '/' ? '/dashboard' : route.path;
 })
 
 const modalDisplay = computed(() => {
