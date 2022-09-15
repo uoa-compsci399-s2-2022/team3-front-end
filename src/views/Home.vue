@@ -2,6 +2,7 @@
 import { get } from '@/utils/request';
 import Sidebar from '@/components/Sidebar.vue';
 import Header from '@/components/header/Header.vue';
+import BreadCrumb from '@/components/BreadCrumb.vue';
 get('api/currentUser').then(res => {
     console.log(res);
 }).catch((err) => {
@@ -13,6 +14,7 @@ get('api/currentUser').then(res => {
         <Sidebar />
         <div class="container-main">
             <Header />
+            <BreadCrumb/>
             <router-view />
         </div>
 
