@@ -28,9 +28,9 @@ import CourseCard from '@/components/cards/CourseCard.vue'
     .course-container {
         margin: 20px 30px;
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
         // grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        grid-auto-rows: 200px;
+        grid-auto-rows: 250px;
         gap: 20px;
     }
 </style>

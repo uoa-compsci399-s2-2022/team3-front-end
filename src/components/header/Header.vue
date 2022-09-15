@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { get } from '@/utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-const router = useRouter()
+const router = useRouter();
+const name = ref<string>();
+const email = ref<string>();
+
 const logout = () => {
 
     ElMessageBox.confirm(
@@ -38,6 +42,17 @@ const logout = () => {
         })
 }
 
+async function getUserProfile() {
+    let user = await get(`api/currentUser`);
+    name.value = user.name;
+    email.value = user.email;
+    
+}
+
+getUserProfile()
+
+
+
 </script>
 
 <template>
@@ -53,7 +68,7 @@ const logout = () => {
                     <img src="@/assets/avatar.svg" alt="">
                     <template #dropdown>
                         <el-dropdown-menu>
-                            <el-dropdown-item>Profile</el-dropdown-item>
+                            <el-dropdown-item @click="$router.push('/profile')">Profile</el-dropdown-item>
                             <el-dropdown-item divided @click="logout">logout</el-dropdown-item>
                         </el-dropdown-menu>
                     </template>
@@ -61,8 +76,8 @@ const logout = () => {
 
             </div>
             <div class="info-card-general">
-                <div>Ran Chen</div>
-                <div>rche596@auckland.ac.nz</div>
+                <div>{{name}}</div>
+                <div>{{email}}</div>
             </div>
         </div>
     </section>
@@ -94,8 +109,8 @@ section {
             img {
                 border-radius: 100px;
                 border: 1px solid rgb(210, 210, 210);
-                width: 100%;
-                height: 100%;
+                width: 45px;
+                height: 45px;
             }
 
             width: 45px;
