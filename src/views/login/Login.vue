@@ -83,7 +83,6 @@ const login = () => {
     }
 
     .title {
-        font-family: Poppins-SemiBold;
         font-size: 28.83px;
         font-weight: 600;
         letter-spacing: 0px;
@@ -152,7 +151,6 @@ const login = () => {
             width: 350px;
             height: 41px;
             border-radius: 8px;
-            font-family: Poppins-SemiBold;
             font-size: 15px;
             font-weight: 600;
             line-height: 22.5px;

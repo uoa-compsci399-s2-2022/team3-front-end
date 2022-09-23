@@ -50,12 +50,10 @@ getUserProfile()
 
 <style scoped lang="scss">
 .profile-update{
-    position: absolute;
-    top: 70%;
-    left: 50%;
-    transform: translateX(-50%);
     padding: 20px 60px;
     font-size: 20px;
+    width: 160px;
+    margin-left: 180px;
 }
 .profile-container {
     margin: 40px 60px;
