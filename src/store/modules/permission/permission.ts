@@ -13,7 +13,7 @@ export const usePermissionStore = defineStore('permission', () => {
         courseCoordinator: new Set(['1', '2', '3']),
         tutorCoordinator: new Set(['1', '2', '3']),
         markerCoodinator: new Set(['1', '2', '3']),
-        admin: new Set(['1', '2', '3'])
+        admin: new Set(['1', '2', '3', '4', '5'])
     })
 
     const getKey = computed(() => { return Array.from(key.value).sort()})

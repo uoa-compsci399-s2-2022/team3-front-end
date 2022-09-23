@@ -24,7 +24,15 @@ const routes = [
                 name: "profile",
                 meta: { title:'Profile', permission: '3' },
                 component: () => import('@/views/profile/Profile.vue')
-            }
+            },
+
+            //managecourse
+            {
+                path: "managecourse",
+                name: "managecourse",
+                meta: { title:'Manage Course', permission: '5' },
+                component: () => import('@/views/management/ManageCourse.vue')
+            },
         ]
     },
     {

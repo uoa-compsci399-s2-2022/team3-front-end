@@ -4,15 +4,21 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import People from '@/components/icons/People.vue'
 
-type sidebarTree = {
+type sidebarSubMenu = {
+    index: string;
+    title: string;
+    permission: string;
+}
+
+type sidebarMenu = {
     icon?: any;
     index: string;
     title: string;
     permission?: string;
-    subs?: sidebarTree[]
+    subs?: sidebarSubMenu[]
 }[]
 
-const items: sidebarTree = [
+const items: sidebarMenu = [
     {
         icon: 'Odometer',
         index: '/dashboard',
@@ -20,30 +26,44 @@ const items: sidebarTree = [
         permission: '1',
     },
     {
-        icon: 'Collection',
-        index: '',
-        title: 'Course',
-        permission: '999',
-    },
-    {
-        icon: 'MessageBox',
-        index: '',
-        title: 'Message',
-        permission: '999',
-    },
-
-    {
-        icon: People,
-        index: '',
-        title: 'People',
-        permission: '999',
-    },
-    {
         icon: 'DocumentAdd',
         index: '/application',
         title: 'Application',
         permission: '2',
-    }
+    },
+    {
+        icon: 'Management',
+        index: '4',
+        title: 'Management',
+        permission: '4',
+        subs: [
+            {
+                index: '/managecourse',
+                title: 'Manage Course',
+                permission: '5',
+            },
+
+        ]
+    },
+    // {
+    //     icon: 'Collection',
+    //     index: '',
+    //     title: 'Course',
+    //     permission: '999',
+    // },
+    // {
+    //     icon: 'MessageBox',
+    //     index: '',
+    //     title: 'Message',
+    //     permission: '999',
+    // },
+
+    // {
+    //     icon: People,
+    //     index: '',
+    //     title: 'People',
+    //     permission: '999',
+    // },
 ]
 
 const sidebar = useSidebarStore();
@@ -78,7 +98,22 @@ const modalDisplay = computed(() => {
                 </a>
             </div>
             <template v-for="item in items">
-                <template v-if="item.subs"></template>
+                <template v-if="item.subs">
+                    <el-sub-menu :index="item.index" :key="item.index" v-permission="item.permission">
+                        <template #title>
+                            <el-icon>
+                                <component :is="item.icon"></component>
+                            </el-icon>
+                            <span>{{ item.title }}</span>
+                        </template>
+
+                        <template v-for="subItem in item.subs">
+                            <el-menu-item :index="subItem.index" v-permission="item.permission">
+                                {{ subItem.title }}
+                            </el-menu-item>
+                        </template>
+                    </el-sub-menu>
+                </template>
                 <template v-else>
                     <el-menu-item :index="item.index" :key="item.index" v-permission="item.permission">
                         <el-icon>
@@ -92,7 +127,7 @@ const modalDisplay = computed(() => {
         </el-menu>
     </div>
 
-        <div class="model" :style="modalDisplay" @click="sidebar.handleCollase"></div>
+    <div class="model" :style="modalDisplay" @click="sidebar.handleCollase"></div>
 
 
 </template>
@@ -141,6 +176,20 @@ const modalDisplay = computed(() => {
         --el-menu-text-color: white;
         --el-menu-hover-text-color: white;
         --el-menu-active-color: #002c52;
+
+        .el-sub-menu__title:hover {
+            background-color: #00396b;
+        }
+
+    }
+
+    .menu.el-menu--collapse {
+        .el-sub-menu.is-active {
+            .el-sub-menu__title {
+                background-color: white;
+            }
+        }
+
     }
 
     .menu:not(.el-menu--collapse) {
@@ -214,8 +263,6 @@ const modalDisplay = computed(() => {
             cursor: pointer;
         }
     }
-
-
 
 }
 </style>
