@@ -59,3 +59,25 @@ export function post(url: string, data: any=null): Promise<any>{
     console.log(config)
     return instance(config);
 }
+
+
+export function put(url: string, params: {params?: any, data?: any}): Promise<any>{
+    
+    const config: AxiosRequestConfig = {
+        method: 'put',
+        url: url,
+        data:params.data,
+        params: params.params,
+    }
+    console.log(config)
+    return instance(config);
+}
+
+export function Delete(url: string, params: any=null): Promise<any> {
+    const config: AxiosRequestConfig = {
+        method: 'delete',
+        url: url,
+        params: params
+    }
+    return instance(config);
+}
