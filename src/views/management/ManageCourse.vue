@@ -16,12 +16,12 @@ type term = {
 
 const terms: term[] = reactive<term[]>([])
 
-const search = ref('')
+const searchTerm = ref('')
 const filterterms = computed(() =>
     terms.filter(
         (data) =>
-            !search.value ||
-            data.termName.toLowerCase().includes(search.value.toLowerCase())
+            !searchTerm.value ||
+            data.termName.toLowerCase().includes(searchTerm.value.toLowerCase())
     )
 )
 
@@ -113,6 +113,29 @@ const handleTermAdd = () => {
     }
 
 }
+//--------course------------
+const courseModalOpened = ref(false);
+// course type
+type course = {
+    canPreAssign:          boolean;
+    courseName:            string;
+    courseNum:             string;
+    currentlyNumOfStudent: number;
+    deadLine:              string;
+    estimatedNumOfStudent: number;
+    markerResponsibility:  string;
+    needMarkers:           boolean;
+    needTutors:            boolean;
+    numOfAssignments:      number;
+    numOfLabsPerWeek:      number;
+    numOfTutorialsPerWeek: number;
+    termID:                number;
+    totalAvailableHours:   number;
+    tutorResponsibility:   string;
+}
+
+const courses: course[] = reactive<course[]>([])
+
 </script>
 
 <template>
@@ -138,7 +161,7 @@ const handleTermAdd = () => {
                     <el-table-column label="End Date" prop="endDate" />
                     <el-table-column align="right">
                         <template #header>
-                            <el-input v-model="search" size="small" placeholder="Type to search" />
+                            <el-input v-model="searchTerm" size="small" placeholder="Type to search" />
                         </template>
                         <template #default="scope">
                             <el-button size="small" @click="() => {edit = handleTermEdit(scope.$index, scope.row)}">Edit
@@ -159,13 +182,34 @@ const handleTermAdd = () => {
         <section>
             <div class="manage-course-subtitle">
                 <h2>Courses</h2>
-                <el-button type="primary" plain @click="() => {termModalOpened = true}">Add Course</el-button>
+                <el-button type="primary" plain @click="() => {courseModalOpened = true}">Add Course</el-button>
             </div>
             <article>
-                
+                <el-table :data="courses" style="width: 100%" :height="courses.length > 0 ? 600 : 150" empty-text="Please select one term from above.">
+                    <el-table-column prop="courseName" label="Course name" width="120" />
+                    <el-table-column prop="courseNum" label="Course number" width="120" />
+                    <el-table-column prop="canPreAssign" label="pre-assignable" width="120" />
+                    <el-table-column prop="currentlyNumOfStudent" label="Number of students" width="120" />
+                    <el-table-column prop="deadLine" label="Deadline" width="120" />
+                    <el-table-column prop="estimatedNumOfStudent" label="Estimate Number of students" width="120" />
+                    <el-table-column prop="needMarkers" label="Need Markers" width="120" />
+                    <el-table-column prop="needTutors" label="Need Tutors" width="120" />
+                    <el-table-column prop="numOfAssignments" label="Assignments" width="120" />
+                    <el-table-column prop="numOfLabsPerWeek" label="Labs" width="120" />
+                    <el-table-column prop="numOfTutorialsPerWeek" label="Tutorials" width="120" />
+                    <el-table-column prop="totalAvailableHours" label="Available Hours" width="120" />
+                    <el-table-column prop="markerResponsibility" label="Marker Responsibility" width="120" />
+                    <el-table-column prop="tutorResponsibility" label="Tutor Responsibility" width="120" />
+                </el-table>
             </article>
         </section>
     </div>
+
+
+
+
+
+
 
     <teleport to="body">
         <div class="add-term-container" v-if="termModalOpened">
@@ -322,12 +366,10 @@ const handleTermAdd = () => {
 
     }
 
-    .el-table {
-        width: calc(100% - 10px);
-    }
 
     >section:last-child {
-        
+        display: flex;
+        flex-direction: column;
     }
 
 
