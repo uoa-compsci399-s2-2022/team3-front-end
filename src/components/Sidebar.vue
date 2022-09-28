@@ -2,7 +2,6 @@
 import { useSidebarStore } from '@/store/modules/sidebar/sidebar';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import People from '@/components/icons/People.vue'
 
 type sidebarSubMenu = {
     index: string;
@@ -26,10 +25,10 @@ const items: sidebarMenu = [
         permission: '1',
     },
     {
-        icon: 'DocumentAdd',
-        index: '/application',
-        title: 'Application',
-        permission: '2',
+      icon: 'Document',
+      index: '/applicationList',
+      title: 'Application List',
+      permission: '1',
     },
     {
         icon: 'Management',
@@ -45,6 +44,8 @@ const items: sidebarMenu = [
 
         ]
     },
+
+
     // {
     //     icon: 'Collection',
     //     index: '',
@@ -92,11 +93,11 @@ const modalDisplay = computed(() => {
                 </el-icon>
             </div>
 
-            <div class="sidebar-logo">
-                <a href="https://www.auckland.ac.nz">
-                    <img src="@/assets/logo/uoa.svg" alt="UoA logo" />
-                </a>
-            </div>
+<!--            <div class="sidebar-logo">-->
+<!--                <a href="https://www.auckland.ac.nz">-->
+<!--                    <img src="@/assets/logo/uoa.svg" alt="UoA logo" />-->
+<!--                </a>-->
+<!--            </div>-->
             <template v-for="item in items">
                 <template v-if="item.subs">
                     <el-sub-menu :index="item.index" :key="item.index" v-permission="item.permission">
@@ -172,13 +173,13 @@ const modalDisplay = computed(() => {
     background: red;
 
     .menu {
-        --el-menu-bg-color: #00467f;
+        --el-menu-bg-color: #222F3D;
         --el-menu-text-color: white;
         --el-menu-hover-text-color: white;
-        --el-menu-active-color: #002c52;
+        --el-menu-active-color: #222F3D;
 
         .el-sub-menu__title:hover {
-            background-color: #00396b;
+            background-color: #0099ff;
         }
 
     }
@@ -205,7 +206,7 @@ const modalDisplay = computed(() => {
                 bottom: 0;
                 width: 4px;
                 content: "";
-                background-color: #8ecaff;
+                background-color: #9ed8ff;
             }
         }
     }
@@ -223,7 +224,7 @@ const modalDisplay = computed(() => {
         }
 
         &:hover {
-            background-color: #00396b;
+            background-color: #0099ff;
         }
     }
 

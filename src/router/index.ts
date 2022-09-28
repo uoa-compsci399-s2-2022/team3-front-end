@@ -33,6 +33,11 @@ const routes = [
                 meta: { title:'Manage Course', permission: '5' },
                 component: () => import('@/views/management/ManageCourse.vue')
             },
+            {
+                path: '/applicationList',
+                meta: { title:'Application List', permission: '1' },
+                component: () => import('@/views/forms/ApplicationList.vue')
+            },
         ]
     },
     {
@@ -41,10 +46,11 @@ const routes = [
         component: () => import('@/views/login/Login.vue')
     },
     {
-        path: '/application',
+        path: '/application/:applicationID',
         meta: { title:'Apply for the position', permission: '2' },
         component: () => import('@/views/forms/Application.vue')
     },
+
     {
         path: "/403",
         component: () => import('@/views/403.vue')
