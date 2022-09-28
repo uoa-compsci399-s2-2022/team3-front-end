@@ -6,14 +6,21 @@
 <div class="card-container">
     <div class="card-cover">
         <div class="card-edit">
-            <el-icon><MoreFilled /></el-icon>
+            <el-icon><MoreFilled/></el-icon>
         </div>
     </div>
     <div class="card-info">
-        COMPSCI 399: Capstone computer science
+        COMPSCI 399: Capstone computer
+
     </div>
+
 </div>
+
 </template>
+
+
+<style scoped lang="scss">
+</style>
 
 <style scoped lang="scss">
 .card-container {
