@@ -11,10 +11,10 @@ get('api/currentUser').then(res => {
   console.log(err)
 })
 </script>
+
 <template>
   <div class="container">
     <Sidebar />
-    <!-- <div class="container-main" :class="sidebar.collapse ? `container-main-collapsed` : `container-main-expanded`"> -->
     <div class="container-main">
       <Header />
       <BreadCrumb />
@@ -46,15 +46,9 @@ get('api/currentUser').then(res => {
   &-main {
     display: flex;
     flex-direction: column;
-
-    &-main {
-      display: flex;
-      flex-direction: column;
-      width: calc(100% - var(--el-menu-icon-width) + var(--el-menu-base-level-padding) * 2);
-      min-width: calc(100% - 260px);
-
-    }
+    width: calc(100% - var(--el-menu-icon-width) + var(--el-menu-base-level-padding) * 2);
+    min-width: calc(100% - 260px);
   }
-
 }
+
 </style>
