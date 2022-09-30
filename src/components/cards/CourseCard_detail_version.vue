@@ -72,7 +72,7 @@ import Test from '@/components/cards/Test.vue'
         </div>
       </div>
 <!--      <el-divider style="position: absolute; bottom: 70px"/>-->
-      <div class="card-buttons">
+      <div class="card-buttons" style="display: none">
 
         <el-button style="color: rgb(255 255 255);background-color: #00467f;">Apply</el-button>
 
