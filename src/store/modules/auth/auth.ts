@@ -14,6 +14,12 @@ export const useUserStore = defineStore('user', () => {
         token.value = t;
         localStorage.setItem("mtms_token", t);
     }
+
+    const setUserId = (t: string) => {
+        userId.value = t;
+        localStorage.setItem("userID", t);
+    }
+
     const clearToken = () => {
         token.value = "";
         localStorage.removeItem("mtms_token");
@@ -26,5 +32,6 @@ export const useUserStore = defineStore('user', () => {
         // actions
         setToken,
         clearToken,
+        setUserId
     }
 })

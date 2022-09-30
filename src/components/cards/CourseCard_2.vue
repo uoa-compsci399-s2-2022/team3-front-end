@@ -5,10 +5,10 @@ import Test from '@/components/cards/Test.vue'
 <template>
   <div class="card-container">
     <div class="card-info">
-        <header class="card-title">
-          Compsci 101 : Capstone Project
-  <!--        {{ title }}-->
-        </header>
+      <header class="card-title">
+        Compsci 101 : Capstone Project
+        <!--        {{ title }}-->
+      </header>
       <el-divider/>
       <div class="card-content">
         <div class="course-semester">
@@ -61,7 +61,7 @@ import Test from '@/components/cards/Test.vue'
           </li>
         </div>
       </div>
-<!--      <el-divider style="position: absolute; bottom: 70px"/>-->
+      <!--      <el-divider style="position: absolute; bottom: 70px"/>-->
       <div class="card-buttons">
 
         <el-button style="color: rgb(255 255 255);background-color: #00467f;">Apply</el-button>
@@ -76,8 +76,8 @@ import Test from '@/components/cards/Test.vue'
 <style scoped lang="scss">
 .card-container{
   box-shadow: inset 1px 1px 0 0 hsl(0deg 0% 100%), 0 8px 31px 0 #9c989833;
-  width: 500px;
-  height: 900px;
+  //width: 500px;
+  //height: 900px;
   border-radius: 30px;
   position: relative;
   .task-description{
@@ -104,9 +104,6 @@ import Test from '@/components/cards/Test.vue'
       position: absolute;
       right: 40px;
     }
-
   }
 }
-
-
 </style>

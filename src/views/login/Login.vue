@@ -23,6 +23,7 @@ const login = () => {
         () => {
             get('/api/currentUser').then(
                 responce => {
+                    userStore.setUserId(responce.id);
                     permissionStore.setKeyFromGroups(responce.groups);
                     sessionStorage.setItem('mtms_keys', JSON.stringify(permissionStore.getKey))
                 }
