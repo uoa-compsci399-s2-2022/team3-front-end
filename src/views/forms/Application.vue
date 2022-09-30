@@ -1,13 +1,36 @@
 <script setup lang="ts">
 
-import {UploadFilled, Avatar, Key, Management} from '@element-plus/icons-vue'
-import {computed, onBeforeMount, reactive, ref, watch} from 'vue';
+import {UploadFilled, Avatar, Key, Management, Plus} from '@element-plus/icons-vue'
+import {computed, onBeforeMount, reactive, ref, watch, defineAsyncComponent} from 'vue';
 import {ElMessage, FormInstance, FormRules} from 'element-plus'
 import {useThrottleFn} from '@vueuse/core'
 import {} from 'element-plus'
 import {get, post} from '@/utils/request'
+import {useRoute, useRouter} from 'vue-router'
+import * as dayjs from "dayjs";
 
+const ApplicationCourse = defineAsyncComponent(() => import('@/components/ApplicationCourse.vue'))
+
+const route = useRoute();
+const router = useRouter();
+
+const metaLoading = ref(false);
+const saveLoading = ref(false);
+const userProfileLoading = ref(false);
+
+// define application basic info variables
+type ApplicationMetaInfo = {
+  term: string
+  termID: number
+  createdDateTime: string
+  status: string
+}
+
+const userID = ref(localStorage.getItem("userID") || "Unknown");
 const applicationID = ref(0);
+const applicationMetaInfo = ref({} as ApplicationMetaInfo);
+const termName = ref("");
+
 const step = ref(0); // current step
 const atFirst = ref(true); // at first step?
 const atLast = ref(false) // at last step?
@@ -64,33 +87,40 @@ type applicationData = {
   studentDegree: string;
   haveOtherContracts: boolean;
   otherContracts: string;
-  maxWorkingHours: number;
+  maximumWorkingHours: number;
 }
 // initialize data
 const data = reactive({} as applicationData);
 const currentUserProfile = reactive({} as applicationData);
-// 加载前先从sessionStorage里找，如果sessionStorage里面没有再从localStorage里找
+
+const getUserProfile = (currentUserProfile: any, saved: any) => {
+  if (currentUserProfile === null) {
+    return saved;
+  } else {
+    return null;
+  }
+}
+
 onBeforeMount(() => {
-  // let localData: applicationData;
-  // localData = reactive(JSON.parse(sessionStorage.getItem('applicationData')!))
-  // if (localData) {
-  //     Object.entries(localData).forEach(
-  //         // @ts-ignore
-  //         ([key, value]) => { data[key] = value; }
-  //     );
-  //     return;
-  // }
-  // localData = reactive(JSON.parse(localStorage.getItem('applicationData')!))
-  // if (localData) {
-  //     Object.entries(localData).forEach(
-  //         // @ts-ignore
-  //         ([key, value]) => { data[key] = value; }
-  //     );
-  //     return;
-  // }
+  if (!isNaN(parseInt(route.params.applicationID[0]))) {
+    applicationID.value = parseInt(route.params.applicationID[0])
+  } else {
+    router.push('/404')
+  }
 
+  get('api/application/' + applicationID.value).then(res => {
+    termName.value = res.term;
+    applicationMetaInfo.value.term = res.term;
+    applicationMetaInfo.value.status = res.status;
+    applicationMetaInfo.value.createdDateTime = res.createdDateTime;
+    applicationMetaInfo.value.termID = res.termID;
+    metaLoading.value = true;
 
+  }).then(() => {
 
+  }).catch((err) => {
+    console.log(err)
+  })
 
 
   get('api/currentUserProfile').then(res => {
@@ -103,14 +133,44 @@ onBeforeMount(() => {
     data.email = res.email;
     data.upi = res.upi;
     data.auid = res.auid;
+    userProfileLoading.value = true;
   }).catch((err) => {
     console.log(err)
   })
 
 
+  get('api/saveApplication/' + applicationID.value).then(res => {
+
+    data.name = getUserProfile(currentUserProfile.name, res.name);
+    data.email = getUserProfile(currentUserProfile.email, res.email);
+    data.upi = getUserProfile(currentUserProfile.upi, res.upi);
+    data.auid = getUserProfile(currentUserProfile.auid, res.auid);
+
+    data.currentlyOverseas = res.currentlyOverseas;
+    data.willBackToNZ = res.willBackToNZ;
+    data.isCitizenOrPR = res.isCitizenOrPR;
+    data.haveValidVisa = res.haveValidVisa;
+    data.enrolDetails = res.enrolDetails;
+    data.studentDegree = res.studentDegree;
+    data.haveOtherContracts = res.haveOtherContracts;
+    data.otherContracts = res.otherContracts;
+    data.maximumWorkingHours = res.maximumWorkingHours;
+    saveLoading.value = true;
+
+  }).catch((err) => {
+    console.log(err)
+  })
 
 
 })
+
+
+const courseVisible = reactive({
+  visible: false
+})
+const showCourseChooser = () => {
+  courseVisible.visible = true
+}
 
 
 //-----表单验证相关------start-----------------------------------------------
@@ -144,7 +204,7 @@ const dataRules = reactive<FormRules>({
     {required: true, message: 'Please enter you upi', trigger: 'blur'},
     {pattern: /^[a-z]+\d+/, message: 'UPI Example: rzac999', trigger: 'blur'}
   ],
-  studentId: [
+  auid: [
     {required: true, message: 'Please enter your student ID', trigger: 'blur'},
     {type: "number", message: 'Student ID must be an number', trigger: 'blur'}
   ],
@@ -168,13 +228,13 @@ const dataRules = reactive<FormRules>({
   enrolDetails: [
     {required: true, message: 'Please select one option', trigger: 'change'},
   ],
-  degree: [
+  studentDegree: [
     {required: true, message: 'Please select one option', trigger: 'change'},
   ],
-  hasOtherContract: [
+  haveOtherContracts: [
     {required: true, message: 'Please select one option', trigger: 'change'},
   ],
-  maxWorkingHours: [
+  maximumWorkingHours: [
     {required: true, message: 'Please enter your preffered working hours', trigger: 'change'},
   ]
 })
@@ -208,8 +268,8 @@ const validateStep = async (step: number) => {
         })
   } else if (step === 1) {
     await formRef.value?.validateField(
-        ['isCurrentlyOverseas', 'willComeBackToNZ', 'isCitizen',
-          'hasWorkVisa', 'degree', 'hasOtherContract', 'maxWorkingHours'],
+        ['currentlyOverseas', 'willComeBackToNZ', 'isCitizenOrPR',
+          'haveValidVisa', 'studentDegree', 'hasOtherContract', 'maximumWorkingHours'],
         (valid) => {
           flag = valid;
         })
@@ -260,158 +320,191 @@ const saveSession = () => {
 </script>
 
 <template>
+
+
   <div class="application-header">
     <img src="@/assets/logo/uoa.svg" alt="">
-    <span>ApplicationID: {{applicationID}}</span>
+      <el-card class="application-meta-box-card">
+        <div v-if="metaLoading && userProfileLoading && saveLoading">
+        <p>ApplicationID: {{ applicationID }}</p>
+        <p>UserID: {{ userID }}</p>
+        <p>Created Date Time: {{ dayjs(applicationMetaInfo.createdDateTime).format('DD/MM/YYYY HH:mm') }}</p>
+        <p>Status:
+          <el-tag>{{ applicationMetaInfo.status }}</el-tag>
+        </p>
+        </div>
+      </el-card>
+
   </div>
-  <div class="application-container">
+  <div v-if="metaLoading && userProfileLoading && saveLoading">
+    <el-row justify="center">
+      <p style="font-size: 30px">Apply for {{ termName }} Tutor or Marker</p>
+    </el-row>
 
-    <div class="progress-bar">
-      <el-steps :active="step" simple process-status="process" finish-status="finish" space="200px">
-        <el-step title="Identity Information" description="" :status="statusArr[0]" :icon="Key"/>
-        <el-step title="Personal Detail" description="" :status="statusArr[1]" :icon="Avatar"/>
-        <el-step title="Courses" description="" :status="statusArr[2]" :icon="Management"/>
-        <el-step title="File Upload" description="" :status="statusArr[3]" :icon="UploadFilled"/>
-      </el-steps>
-    </div>
+    <div class="application-container">
 
-    <div class="application-form-container">
+      <div class="progress-bar">
+        <el-steps :active="step" simple process-status="process" finish-status="finish" space="200px">
+          <el-step title="Identity Information" description="" :status="statusArr[0]" :icon="Key"/>
+          <el-step title="Personal Detail" description="" :status="statusArr[1]" :icon="Avatar"/>
+          <el-step title="Courses" description="" :status="statusArr[2]" :icon="Management"/>
+          <el-step title="File Upload" description="" :status="statusArr[3]" :icon="UploadFilled"/>
+        </el-steps>
+      </div>
 
-      <el-form ref="formRef" :model="data" :rules="dataRules" label-width="120px" class="data"
-               :hide-required-asterisk=true status-icon label-position="top">
+      <div class="application-form-container">
+
+        <el-form ref="formRef" :model="data" :rules="dataRules" label-width="120px" class="data"
+                 :hide-required-asterisk=true status-icon label-position="top">
+          <Transition>
+            <div v-show="stepArr[0]">
+              <el-alert
+                  title="Why can't some fields be entered?"
+                  type="warning"
+                  description="These are identifying information. Because you have provided your identity information before, any modification is not supported on the application page."
+                  show-icon
+              />
+              <el-form-item label="Name" prop="name">
+                <el-input v-model="data.name" :disabled="currentUserProfile.name !== null"/>
+              </el-form-item>
+              <el-form-item label="UPI" prop="upi">
+                <el-input v-model="data.upi" :disabled="currentUserProfile.upi !== null"/>
+              </el-form-item>
+              <el-form-item label="Student ID (AUID)" prop="auid">
+                <el-input v-model.number="data.auid" :disabled="currentUserProfile.auid !== null"/>
+              </el-form-item>
+              <el-form-item label="Preferred email" prop="email">
+                <el-input v-model="data.email"/>
+              </el-form-item>
+            </div>
+          </Transition>
+
+          <Transition>
+            <div v-show="stepArr[1]" class="step2">
+              <div>
+                <p>Currently overseas?</p>
+                <el-form-item prop="currentlyOverseas">
+                  <el-radio-group v-model="data.currentlyOverseas">
+                    <el-radio :label="true">Yes</el-radio>
+                    <el-radio :label="false">No</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </div>
+              <div class="indent" v-show="data.currentlyOverseas">
+                <p>Will you come back to NZ?</p>
+                <el-form-item prop="willComeBackToNZ">
+                  <el-radio-group v-model="data.willComeBackToNZ">
+                    <el-radio :label="true">Yes</el-radio>
+                    <el-radio :label="false">No</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </div>
+              <div>
+                <p>Citizen or Permanent resident?</p>
+                <el-form-item prop="isCitizenOrPR">
+                  <el-radio-group v-model="data.isCitizenOrPR">
+                    <el-radio :label="true">Yes</el-radio>
+                    <el-radio :label="false">No</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </div>
+              <div class="indent" v-show="data.isCitizenOrPR === false">
+                <p>Do you have a valid work visa?</p>
+                <el-form-item prop="haveValidVisa">
+                  <el-radio-group v-model="data.haveValidVisa">
+                    <el-radio :label="true">Yes</el-radio>
+                    <el-radio :label="false">No</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </div>
+              <div>
+                <p>Undergraduate or postgraduate?</p>
+                <el-form-item prop="studentDegree">
+                  <el-alert title="Notice" type="info"
+                            description="Postgraduate means that student has already completed a degree"
+                            show-icon/>
+                  <el-radio-group v-model="data.studentDegree">
+                    <el-radio label="Undergraduate">Undergraduate</el-radio>
+                    <el-radio label="Postgraduate">Postgraduate</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </div>
+              <div>
+                <p>Do you have any other TA/GTA contracts for that semester?</p>
+                <el-form-item prop="hasOtherContract">
+                  <el-radio-group v-model="data.haveOtherContracts">
+                    <el-radio :label="true">Yes</el-radio>
+                    <el-radio :label="false">No</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </div>
+              <div class="indent" v-show="data.haveOtherContracts">
+                <el-form-item>
+                  <el-input v-model="data.otherContracts" maxlength="200"
+                            placeholder="Please Describe these TA/GTA contracts..." show-word-limit
+                            type="textarea"/>
+                </el-form-item>
+              </div>
+              <div>
+                <p>Maximum number of hours per week, you would like to work.</p>
+                <el-form-item prop="maximumWorkingHours">
+                  <el-input-number v-model="data.maximumWorkingHours" :min="5" :max="40"
+                                   controls-position="right"/>
+                  <span style="margin-left:10px">hours</span>
+                </el-form-item>
+              </div>
+            </div>
+          </Transition>
+        </el-form>
+
         <Transition>
-          <div v-show="stepArr[0]">
-            <el-alert
-                title="Why can't some fields be entered?"
-                type="warning"
-                description="These are identifying information. Because you have provided your identity information before, any modification is not supported on the application page."
-                show-icon
-            />
-            <el-form-item label="Name" prop="name">
-              <el-input v-model="data.name" :disabled="currentUserProfile.name !== null"/>
-            </el-form-item>
-            <el-form-item label="UPI" prop="upi">
-              <el-input v-model="data.upi" :disabled="currentUserProfile.upi !== null"/>
-            </el-form-item>
-            <el-form-item label="Student ID" prop="studentId">
-              <el-input v-model.number="data.auid" :disabled="currentUserProfile.auid !== null"/>
-            </el-form-item>
-            <el-form-item label="Preferred email" prop="email">
-              <el-input v-model="data.email"/>
-            </el-form-item>
+          <div v-show="stepArr[2]" class="step3">
+            <el-row justify="center">
+              <el-button type="primary" :icon="Plus" size="large" @click="showCourseChooser">Add Prefer Courses
+              </el-button>
+            </el-row>
+
+
           </div>
         </Transition>
 
+
         <Transition>
-          <div v-show="stepArr[1]" class="step2">
-            <div>
-              <p>Currently overseas?</p>
-              <el-form-item prop="isCurrentlyOverseas">
-                <el-radio-group v-model="data.isCurrentlyOverseas">
-                  <el-radio :label="true">Yes</el-radio>
-                  <el-radio :label="false">No</el-radio>
-                </el-radio-group>
-              </el-form-item>
+          <el-upload class="upload-demo" drag
+                     action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" v-show="stepArr[3]"
+                     accept="application/pdf">
+            <el-icon class="el-icon--upload">
+              <upload-filled/>
+            </el-icon>
+            <div class="el-upload__text">
+              Drop your CV here or <em>click to upload</em>
             </div>
-            <div class="indent" v-show="data.isCurrentlyOverseas">
-              <p>Will you come back to NZ?</p>
-              <el-form-item prop="willComeBackToNZ">
-                <el-radio-group v-model="data.willComeBackToNZ">
-                  <el-radio :label="true">Yes</el-radio>
-                  <el-radio :label="false">No</el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </div>
-            <div>
-              <p>Citizen or Permanent resident?</p>
-              <el-form-item prop="isCitizen">
-                <el-radio-group v-model="data.isCitizen">
-                  <el-radio :label="true">Yes</el-radio>
-                  <el-radio :label="false">No</el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </div>
-            <div class="indent" v-show="data.isCitizen === false">
-              <p>Do you have a valid work visa></p>
-              <el-form-item prop="hasWorkVisa">
-                <el-radio-group v-model="data.hasWorkVisa">
-                  <el-radio :label="true">Yes</el-radio>
-                  <el-radio :label="false">No</el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </div>
-            <div>
-              <p>Undergraduate or postgraduate?</p>
-              <el-form-item prop="degree">
-                <el-alert title="Notice" type="info"
-                          description="Postgraduate means that student has already completed a degree"
-                          show-icon/>
-                <el-radio-group v-model="data.degree">
-                  <el-radio label="undergraduate">Undergraduate</el-radio>
-                  <el-radio label="postgraduate">Postgraduate</el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </div>
-            <div>
-              <p>Do you have any other TA/GTA contracts for that semester?</p>
-              <el-form-item prop="hasOtherContract">
-                <el-radio-group v-model="data.hasOtherContract">
-                  <el-radio :label="true">Yes</el-radio>
-                  <el-radio :label="false">No</el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </div>
-            <div class="indent" v-show="data.hasOtherContract">
-              <el-form-item>
-                <el-input v-model="data.otherContractDesc" maxlength="200"
-                          placeholder="Please Describe these TA/GTA contracts..." show-word-limit
-                          type="textarea"/>
-              </el-form-item>
-            </div>
-            <div>
-              <p>Maximum number of hours per week, you would like to work.</p>
-              <el-form-item prop="maxWorkingHours">
-                <el-input-number v-model="data.maxWorkingHours" :min="5" :max="40"
-                                 controls-position="right"/>
-                <span style="margin-left:10px">hours</span>
-              </el-form-item>
-            </div>
-          </div>
+            <template #tip>
+              <div class="el-upload__tip">
+                application/pdf files with a size less than 500kb
+              </div>
+            </template>
+          </el-upload>
         </Transition>
 
+      </div>
 
-      </el-form>
 
-
-      <Transition>
-        <el-upload class="upload-demo" drag
-                   action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" v-show="stepArr[3]"
-                   accept="application/pdf">
-          <el-icon class="el-icon--upload">
-            <upload-filled/>
-          </el-icon>
-          <div class="el-upload__text">
-            Drop your CV here or <em>click to upload</em>
-          </div>
-          <template #tip>
-            <div class="el-upload__tip">
-              application/pdf files with a size less than 500kb
-            </div>
-          </template>
-        </el-upload>
-      </Transition>
-
+      <div class="application-control-btns">
+        <el-button @click="prev()" :disabled="atFirst">Previous Step</el-button>
+        <el-button @click="save" class="application-control-btns-main" type="success" plain v-if="step <= 2">Save
+        </el-button>
+        <el-button @click="" class="application-control-btns-main" type="primary" v-else>Submit</el-button>
+        <el-button @click="next()" :disabled="atLast">Next Step</el-button>
+      </div>
     </div>
 
-
-    <div class="application-control-btns">
-      <el-button @click="prev()" :disabled="atFirst">Previous Step</el-button>
-      <el-button @click="save" class="application-control-btns-main" type="success" plain v-if="step <= 2">Save
-      </el-button>
-      <el-button @click="" class="application-control-btns-main" type="primary" v-else>Submit</el-button>
-      <el-button @click="next()" :disabled="atLast">Next Step</el-button>
-    </div>
   </div>
+
+
+  <ApplicationCourse v-if="applicationMetaInfo.termID" :visible="courseVisible" :termID="applicationMetaInfo.termID"/>
+
+
 </template>
 
 <style scoped lang="scss">
@@ -428,15 +521,10 @@ const saveSession = () => {
 .application-header {
   background-color: rgb(241, 241, 241);
   height: 80px;
-  margin-bottom: 100px;
+  margin-bottom: 50px;
   justify-content: flex-end;
   align-items: flex-end;
   display: flex;
-
-
-  span {
-    margin-right: 10px;
-  }
 
   img {
     width: 110px;
@@ -446,6 +534,14 @@ const saveSession = () => {
     transform: translateX(-50%);
   }
 }
+
+.application-meta-box-card {
+  margin-right: 20px;
+  position: absolute;
+  top: 25px;
+
+}
+
 
 .application-container {
   width: 800px;

@@ -6,7 +6,7 @@
       </el-col>
     </el-row>
     <el-button @click="clearFilter">Reset all filters</el-button>
-    <el-table ref="tableRef" row-key="date" :data="tableData" style="width: 99%">
+    <el-table ref="tableRef" row-key="date" :data="tableData" style="width: 99%" @row-click="tableRowClick">
       <el-table-column
           prop="applicationID"
           label="ApplicationID"
@@ -39,6 +39,7 @@
           </el-tag>
         </template>
       </el-table-column>
+
     </el-table>
   </div>
   <StartApplicationDrawer :visible="applicationVisible"/>
@@ -50,6 +51,11 @@ import {ElTable} from 'element-plus'
 import type {TableColumnCtx} from 'element-plus/es/components/table/src/table-column/defaults'
 import {get, post} from '@/utils/request'
 import StartApplicationDrawer from '@/components/StartApplicationDrawer.vue'
+import {useRouter, useRoute} from 'vue-router';
+import dayjs from "dayjs";
+
+const router = useRouter();
+const route = useRoute();
 
 
 const applicationVisible = reactive({
@@ -94,9 +100,25 @@ const filterHandler = (
 }
 
 
+const tableRowClick = (row: ApplicationList) => {
+  if (row.status === 'Unsubmit') {
+    router.push('/application/' + row.applicationID)
+  }
+}
+
+
 onBeforeMount(() => {
   get('api/currentStudentApplicationList').then((res) => {
     console.log(res)
+    res.forEach((item: ApplicationList) => {
+      if (dayjs(item.createdDateTime).isValid()){
+        item.createdDateTime = dayjs(item.createdDateTime).format('DD-MM-YYYY HH:mm:ss')
+      }
+      if (dayjs(item.submittedDateTime).isValid()){
+        item.submittedDateTime = dayjs(item.submittedDateTime).format('DD-MM-YYYY HH:mm:ss')
+      }
+
+    })
     tableData.push(...res)
   })
 
