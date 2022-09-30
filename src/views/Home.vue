@@ -5,7 +5,6 @@ import Header from '@/components/header/Header.vue';
 import BreadCrumb from '@/components/BreadCrumb.vue';
 import { useSidebarStore } from '@/store/index'
 const sidebar = useSidebarStore()
-sidebar.collapse
 get('api/currentUser').then(res => {
     console.log(res);
 }).catch((err) => {
@@ -15,7 +14,8 @@ get('api/currentUser').then(res => {
 <template>
     <div class="container">
         <Sidebar />
-        <div class="container-main" :class="sidebar.collapse ? `container-main-collapsed` : `container-main-expanded`">
+        <!-- <div class="container-main" :class="sidebar.collapse ? `container-main-collapsed` : `container-main-expanded`"> -->
+        <div class="container-main">
             <Header />
             <BreadCrumb/>
             <router-view />
@@ -43,15 +43,16 @@ get('api/currentUser').then(res => {
     &-main {
         display: flex;
         flex-direction: column;
-        
-        &-expanded {
-            width: calc(100% - 260px);
-            // transition: width 0.2s ease;
-        }
-        &-collapsed {
-            width: max(100% - calc(var(--el-menu-icon-width) + var(--el-menu-base-level-padding) * 2));
-            // transition: width 0.4s ease;
-        }
+        width: calc(100% - var(--el-menu-icon-width) + var(--el-menu-base-level-padding) * 2);
+        min-width: calc(100% - 260px);
+        // &-expanded {
+        //     width: calc(100% - 260px);
+        //     // transition: width 0.2s ease;
+        // }
+        // &-collapsed {
+        //     width: max(100% - calc(var(--el-menu-icon-width) + var(--el-menu-base-level-padding) * 2));
+        //     // transition: width 0.4s ease;
+        // }
     }
     
 }

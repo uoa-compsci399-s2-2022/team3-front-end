@@ -1,7 +1,14 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import { Delete, get, post, put } from '@/utils/request';
-import { ElMessage } from 'element-plus';
-import { computed, reactive, ref, watch } from 'vue'
+import { ElButton, ElMessage, ElPopconfirm, TableV2FixedDir } from 'element-plus';
+import { camelCase } from 'lodash';
+import { computed, h, reactive, Ref, ref, useSlots, watch } from 'vue'
+import { useSidebarStore } from '@/store/index'
+import type { Column } from 'element-plus'
+import { SetUp } from '@element-plus/icons-vue';
+
+const sidebar = useSidebarStore()
+
 
 const singleTableRef = ref<any>(null)
 const loading = ref(true)
@@ -61,8 +68,13 @@ const handleTermDelete = (index: number, row: term) => {
     )
 }
 
+const setOnSelect = (termID: number) => {
+    onSelect.value = termID
+}
+
 const setCurrent = (row?: term) => {
-    singleTableRef.value!.setCurrentRow(row)
+    setOnSelect(row!.termID!);
+    singleTableRef.value!.setCurrentRow(row);
 }
 
 async function getTermList() {
@@ -115,26 +127,146 @@ const handleTermAdd = () => {
 }
 //--------course------------
 const courseModalOpened = ref(false);
+// course DTO type
+type courseDTO = {
+    canPreAssign: boolean;
+    courseName: string;
+    courseNum: string;
+    currentlyNumOfStudents: number;
+    deadLine: string;
+    estimatedNumOfStudents: number;
+    markerResponsibility: string;
+    needMarkers: boolean;
+    needTutors: boolean;
+    numOfAssignments: number;
+    numOfLabsPerWeek: number;
+    numOfTutorialsPerWeek: number;
+    termID: number;
+    totalAvailableHours: number;
+    tutorResponsibility: string;
+}
 // course type
 type course = {
-    canPreAssign:          boolean;
-    courseName:            string;
-    courseNum:             string;
-    currentlyNumOfStudent: number;
-    deadLine:              string;
-    estimatedNumOfStudent: number;
-    markerResponsibility:  string;
-    needMarkers:           boolean;
-    needTutors:            boolean;
-    numOfAssignments:      number;
-    numOfLabsPerWeek:      number;
-    numOfTutorialsPerWeek: number;
-    termID:                number;
-    totalAvailableHours:   number;
-    tutorResponsibility:   string;
+    courseName: string;
+    courseNumber: string;
+    'pre-assignable': boolean;
+    numberOfStudents: number;
+    estimatedNumberOfStudent: number;
+    deadLine: string;
+    numberOfAssignments: number;
+    numberOfLabsPerWeek: number;
+    markerResponsibility: string;
+    tutorResponsibility: string;
+    numberOfTutorialsPerWeek: number;
+    needMarkers: boolean;
+    needTutors: boolean;
+    termID: number;
+    totalAvailableHours: number;
 }
 
-const courses: course[] = reactive<course[]>([])
+let titles = [
+    'Course Name',
+    'Course number',
+    'Pre-assignable',
+    'Number of students',
+    'Estimated number of student',
+    'DeadLine',
+    'Number of Assignments',
+    'Number of Labs per week',
+    'Marker Responsibility',
+    'Tutor Responsibility',
+    'Number of tutorials per week',
+    'Need markers',
+    'Need tutors',
+    'TermID',
+    'Total available hours'
+]
+
+const toDomainModel = (dto: courseDTO): course => {
+    return {
+        courseName: dto.courseName,
+        courseNumber: dto.courseNum,
+        'pre-assignable': dto.canPreAssign,
+        numberOfStudents: dto.currentlyNumOfStudents,
+        estimatedNumberOfStudent: dto.estimatedNumOfStudents,
+        deadLine: dto.deadLine,
+        numberOfAssignments: dto.numOfAssignments,
+        numberOfLabsPerWeek: dto.numOfLabsPerWeek,
+        markerResponsibility: dto.markerResponsibility,
+        tutorResponsibility: dto.tutorResponsibility,
+        numberOfTutorialsPerWeek: dto.numOfTutorialsPerWeek,
+        needMarkers: dto.needMarkers,
+        needTutors: dto.needTutors,
+        termID: dto.termID,
+        totalAvailableHours: dto.totalAvailableHours,
+    }
+}
+
+const toCamel = (str: string) => {
+    return str.split(' ').map(
+        (word, index) => index == 0 ?
+            word[0].toLowerCase() + word.slice(1) :
+            word[0].toUpperCase() + word.slice(1)
+    ).join('')
+}
+
+const widthCalculator = () => {
+    let canvas = document.createElement("canvas");
+    return (text: string) => {
+        let context = canvas.getContext("2d");
+        return context?.measureText(text).width;
+    }
+}
+
+const myWidthCalculator = widthCalculator()
+let columns: Column<any>[] = Array.from(titles, (v, i) => {
+    let camelCaseV = camelCase(v);
+    return {
+        key: camelCaseV,
+        dataKey: camelCaseV,
+        title: v,
+        width: 2 * myWidthCalculator(v)!,
+    }
+})
+const b = (i:any) => {console.log(i)}
+const handleCourseEdit = (row: number) => {
+    console.log(row);
+}
+const handleCourseDelete = (row: number) => {
+    console.log(row);
+}
+
+let col: Column<any> = {
+    key: 'operations',
+    title: 'Operations',
+    cellRenderer: ({rowIndex}) => (
+        <>
+        <ElButton size="small" onClick={() => {handleCourseEdit(rowIndex)}}> Edit </ElButton>
+        <ElPopconfirm title="Are you sure to delete this?" onConfirm={() => handleCourseDelete(rowIndex)} v-slots={{
+            reference: () => <el-button size="small" type="danger">Delete</el-button>
+        }} />
+        </>
+    ),
+    width: 150,
+    align: 'center',
+    fixed: TableV2FixedDir.RIGHT,
+  }
+columns.push(col)
+
+const onSelect = ref<number>(NaN);
+let data: Ref<any[]> = ref([])
+watch(onSelect, async (v) => {
+    if (Number.isNaN(onSelect)) {
+        return
+    } else {
+        let res = await get(`api/getCourseByTerm/${onSelect.value}`)
+        // console.log(res[0])
+        // console.log(toDomainModel(res[0]))
+        data.value.length = 0 // clear the array
+        res.forEach((row: courseDTO) => data.value.push(toDomainModel(row)))
+    }
+})
+
 
 </script>
 
@@ -166,7 +298,8 @@ const courses: course[] = reactive<course[]>([])
                         <template #default="scope">
                             <el-button size="small" @click="() => {edit = handleTermEdit(scope.$index, scope.row)}">Edit
                             </el-button>
-                            <el-popconfirm title="Are you sure to delete this?" @confirm="handleTermDelete(scope.$index, scope.row)">
+                            <el-popconfirm title="Are you sure to delete this?"
+                                @confirm="handleTermDelete(scope.$index, scope.row)">
                                 <template #reference>
                                     <el-button size="small" type="danger">
                                         Delete
@@ -185,7 +318,7 @@ const courses: course[] = reactive<course[]>([])
                 <el-button type="primary" plain @click="() => {courseModalOpened = true}">Add Course</el-button>
             </div>
             <article>
-                <el-table :data="courses" style="width: 100%" :height="courses.length > 0 ? 600 : 150" empty-text="Please select one term from above.">
+                <!-- <el-table :data="courses" style="width: 100%" :height="courses.length > 0 ? 600 : 150" empty-text="Please select one term from above.">
                     <el-table-column prop="courseName" label="Course name" width="120" />
                     <el-table-column prop="courseNum" label="Course number" width="120" />
                     <el-table-column prop="canPreAssign" label="pre-assignable" width="120" />
@@ -200,7 +333,22 @@ const courses: course[] = reactive<course[]>([])
                     <el-table-column prop="totalAvailableHours" label="Available Hours" width="120" />
                     <el-table-column prop="markerResponsibility" label="Marker Responsibility" width="120" />
                     <el-table-column prop="tutorResponsibility" label="Tutor Responsibility" width="120" />
-                </el-table>
+                </el-table> -->
+                <div style="height: 400px">
+                    <el-auto-resizer>
+                        <template #default="{ height, width }">
+                            <el-table-v2 :columns="columns" :data="data" :width="width" :height="height" fixed>
+                                <template #empty>
+                                    <div class="flex items-center justify-center h-100%">
+                                        <el-empty description="Please select term from above" :image-size="120" />
+                                    </div>
+                                </template>
+                            </el-table-v2>
+
+                        </template>
+                    </el-auto-resizer>
+                </div>
+
             </article>
         </section>
     </div>
@@ -308,7 +456,7 @@ const courses: course[] = reactive<course[]>([])
             input {
                 height: 32px;
                 border: 1.5px solid rgb(227, 227, 227);
-                width: 97%;
+                width: 100%;
                 border-radius: 4px;
                 padding-left: 10px;
             }
@@ -334,9 +482,11 @@ const courses: course[] = reactive<course[]>([])
 
     section {
         flex-shrink: 1;
+
         .manage-course-subtitle {
             display: flex;
             width: 100%;
+
             h2 {
                 font-size: 25px;
             }
@@ -351,7 +501,7 @@ const courses: course[] = reactive<course[]>([])
         display: flex;
         flex-direction: column;
 
-    
+
 
         .term-select {
             color: rgb(132, 199, 232);
