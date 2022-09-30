@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import CourseCard_lecturer from '@/components/cards/CourseCard_lecturer.vue'
+import CourseCard_lecturer from '@/components/cards/CourseCard_sample_version.vue'
 </script>
 
 <template>
