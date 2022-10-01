@@ -7,7 +7,8 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    ApplicationCourse: typeof import('./src/components/ApplicationCourse.vue')['default']
+    ApplicationCourse: typeof import('./src/components/applicationUseful/ApplicationCourse.vue')['default']
+    ApplicationPreferCourseList: typeof import('./src/components/applicationUseful/ApplicationPreferCourseList.vue')['default']
     BreadCrumb: typeof import('./src/components/BreadCrumb.vue')['default']
     CourseCard: typeof import('./src/components/cards/CourseCard.vue')['default']
     CourseCard_2: typeof import('./src/components/cards/CourseCard_2.vue')['default']
@@ -18,6 +19,8 @@ declare module '@vue/runtime-core' {
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
+    ElDescriptions: typeof import('element-plus/es')['ElDescriptions']
+    ElDescriptionsItem: typeof import('element-plus/es')['ElDescriptionsItem']
     ElDivider: typeof import('element-plus/es')['ElDivider']
     ElDropdown: typeof import('element-plus/es')['ElDropdown']
     ElDropdownItem: typeof import('element-plus/es')['ElDropdownItem']
@@ -31,6 +34,7 @@ declare module '@vue/runtime-core' {
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElPopconfirm: typeof import('element-plus/es')['ElPopconfirm']
+    ElPopover: typeof import('element-plus/es')['ElPopover']
     ElRadio: typeof import('element-plus/es')['ElRadio']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElRow: typeof import('element-plus/es')['ElRow']
@@ -46,10 +50,11 @@ declare module '@vue/runtime-core' {
     LoadingBar: typeof import('./src/components/LoadingBar.vue')['default']
     LoginBackground: typeof import('./src/components/backgrounds/LoginBackground.vue')['default']
     People: typeof import('./src/components/icons/People.vue')['default']
+    RawDisplayer: typeof import('./src/components/raw-displayer.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
-    StartApplicationDrawer: typeof import('./src/components/StartApplicationDrawer.vue')['default']
+    StartApplicationDrawer: typeof import('./src/components/applicationUseful/StartApplicationDrawer.vue')['default']
     Test: typeof import('./src/components/cards/Test.vue')['default']
   }
   export interface ComponentCustomProperties {

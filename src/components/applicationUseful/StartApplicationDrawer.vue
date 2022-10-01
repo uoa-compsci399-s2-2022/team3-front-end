@@ -82,7 +82,4 @@ const startApplication = () => {
 
 }
 
-
-
-
 </style>

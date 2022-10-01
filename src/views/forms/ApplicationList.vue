@@ -50,7 +50,7 @@ import {onBeforeMount, reactive, ref} from 'vue'
 import {ElTable} from 'element-plus'
 import type {TableColumnCtx} from 'element-plus/es/components/table/src/table-column/defaults'
 import {get, post} from '@/utils/request'
-import StartApplicationDrawer from '@/components/StartApplicationDrawer.vue'
+import StartApplicationDrawer from '@/components/applicationUseful/StartApplicationDrawer.vue'
 import {useRouter, useRoute} from 'vue-router';
 import dayjs from "dayjs";
 

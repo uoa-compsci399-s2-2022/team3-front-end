@@ -8,8 +8,9 @@ import {} from 'element-plus'
 import {get, post} from '@/utils/request'
 import {useRoute, useRouter} from 'vue-router'
 import * as dayjs from "dayjs";
+import ApplicationPreferCourseList from '@/components/applicationUseful/ApplicationPreferCourseList.vue'
 
-const ApplicationCourse = defineAsyncComponent(() => import('@/components/ApplicationCourse.vue'))
+const ApplicationCourse = defineAsyncComponent(() => import('@/components/applicationUseful/ApplicationCourse.vue'))
 
 const route = useRoute();
 const router = useRouter();
@@ -18,7 +19,7 @@ const metaLoading = ref(false);
 const saveLoading = ref(false);
 const userProfileLoading = ref(false);
 
-// define application basic info variables
+// init application data
 type ApplicationMetaInfo = {
   term: string
   termID: number
@@ -26,10 +27,48 @@ type ApplicationMetaInfo = {
   status: string
 }
 
+type applicationData = {
+  name: string;
+  upi: string;
+  auid: number;
+  email: string;
+  currentlyOverseas: boolean;
+  willBackToNZ: boolean;
+  isCitizenOrPR: boolean;
+  haveValidVisa: boolean;
+  enrolDetails: string;
+  studentDegree: string;
+  haveOtherContracts: boolean;
+  otherContracts: string;
+  maximumWorkingHours: number;
+}
+
+type preferCourse = {
+  courseID: number;
+  courseNum: string;
+  courseName: string;
+  hasLearned: boolean;
+  grade: string;
+  preExperience: string;
+  preference: number;
+}
+
 const userID = ref(localStorage.getItem("userID") || "Unknown");
 const applicationID = ref(0);
 const applicationMetaInfo = ref({} as ApplicationMetaInfo);
 const termName = ref("");
+const preferCourseList = ref([] as preferCourse[]);
+
+const data = reactive({} as applicationData);
+const currentUserProfile = reactive({} as applicationData);
+const getUserProfile = (currentUserProfile: any, saved: any) => {
+  if (currentUserProfile === null) {
+    return saved;
+  } else {
+    return null;
+  }
+}
+
 
 const step = ref(0); // current step
 const atFirst = ref(true); // at first step?
@@ -74,73 +113,42 @@ watch(step, (newStep, oldStep) => {
 
 const formRef = ref<FormInstance>(); // Form DOM instance
 // 申请表单数据
-type applicationData = {
-  name: string;
-  upi: string;
-  auid: number;
-  email: string;
-  currentlyOverseas: boolean;
-  willBackToNZ: boolean;
-  isCitizenOrPR: boolean;
-  haveValidVisa: boolean;
-  enrolDetails: string;
-  studentDegree: string;
-  haveOtherContracts: boolean;
-  otherContracts: string;
-  maximumWorkingHours: number;
-}
+
 // initialize data
-const data = reactive({} as applicationData);
-const currentUserProfile = reactive({} as applicationData);
 
-const getUserProfile = (currentUserProfile: any, saved: any) => {
-  if (currentUserProfile === null) {
-    return saved;
-  } else {
-    return null;
-  }
+if (!isNaN(parseInt(route.params.applicationID[0]))) {
+  applicationID.value = parseInt(route.params.applicationID[0])
+} else {
+  router.push('/404')
 }
 
-onBeforeMount(() => {
-  if (!isNaN(parseInt(route.params.applicationID[0]))) {
-    applicationID.value = parseInt(route.params.applicationID[0])
-  } else {
-    router.push('/404')
-  }
+get('api/application/' + applicationID.value).then(res => {
+  termName.value = res.term;
+  applicationMetaInfo.value.term = res.term;
+  applicationMetaInfo.value.status = res.status;
+  applicationMetaInfo.value.createdDateTime = res.createdDateTime;
+  applicationMetaInfo.value.termID = res.termID;
+  metaLoading.value = true;
 
-  get('api/application/' + applicationID.value).then(res => {
-    termName.value = res.term;
-    applicationMetaInfo.value.term = res.term;
-    applicationMetaInfo.value.status = res.status;
-    applicationMetaInfo.value.createdDateTime = res.createdDateTime;
-    applicationMetaInfo.value.termID = res.termID;
-    metaLoading.value = true;
-
-  }).then(() => {
-
-  }).catch((err) => {
-    console.log(err)
-  })
+}).catch((err) => {
+  console.log(err)
+})
 
 
-  get('api/currentUserProfile').then(res => {
-    currentUserProfile.name = res.name;
-    currentUserProfile.email = res.email;
-    currentUserProfile.upi = res.upi;
-    currentUserProfile.auid = res.auid;
+get('api/currentUserProfile').then(res => {
+  currentUserProfile.name = res.name;
+  currentUserProfile.email = res.email;
+  currentUserProfile.upi = res.upi;
+  currentUserProfile.auid = res.auid;
 
-    data.name = res.name;
-    data.email = res.email;
-    data.upi = res.upi;
-    data.auid = res.auid;
-    userProfileLoading.value = true;
-  }).catch((err) => {
-    console.log(err)
-  })
+  data.name = res.name;
+  data.email = res.email;
+  data.upi = res.upi;
+  data.auid = res.auid;
+  userProfileLoading.value = true;
 
-
+}).then(() => {
   get('api/saveApplication/' + applicationID.value).then(res => {
-
     data.name = getUserProfile(currentUserProfile.name, res.name);
     data.email = getUserProfile(currentUserProfile.email, res.email);
     data.upi = getUserProfile(currentUserProfile.upi, res.upi);
@@ -156,13 +164,13 @@ onBeforeMount(() => {
     data.otherContracts = res.otherContracts;
     data.maximumWorkingHours = res.maximumWorkingHours;
     saveLoading.value = true;
-
   }).catch((err) => {
-    console.log(err)
+    saveLoading.value = true;
   })
-
-
+}).catch((err) => {
+  console.log(err)
 })
+
 
 
 const courseVisible = reactive({
@@ -170,6 +178,27 @@ const courseVisible = reactive({
 })
 const showCourseChooser = () => {
   courseVisible.visible = true
+}
+
+const add_course = (course: any) => {
+  if (preferCourseList.value.map((item) => item.courseID).includes(course.courseID)) {
+    ElMessage({
+      message: 'You cannot add the same course',
+      type: 'warning',
+    });
+    return;
+  }
+
+  preferCourseList.value.push({
+    courseID: course.courseID,
+    courseNum: course.courseNum,
+    courseName: course.courseName,
+    hasLearned: false,
+    grade: "",
+    preExperience: "",
+    preference: preferCourseList.value.length + 1
+  })
+
 }
 
 
@@ -316,27 +345,26 @@ const saveSession = () => {
   sessionStorage.setItem('applicationData', JSON.stringify(data));
 }
 
+
 //---------保存数据相关------end
 </script>
 
 <template>
-
-
   <div class="application-header">
     <img src="@/assets/logo/uoa.svg" alt="">
-      <el-card class="application-meta-box-card">
-        <div v-if="metaLoading && userProfileLoading && saveLoading">
+    <el-card class="application-meta-box-card">
+      <div v-loading="!(metaLoading && userProfileLoading && saveLoading)">
         <p>ApplicationID: {{ applicationID }}</p>
         <p>UserID: {{ userID }}</p>
         <p>Created Date Time: {{ dayjs(applicationMetaInfo.createdDateTime).format('DD/MM/YYYY HH:mm') }}</p>
         <p>Status:
           <el-tag>{{ applicationMetaInfo.status }}</el-tag>
         </p>
-        </div>
-      </el-card>
+      </div>
+    </el-card>
 
   </div>
-  <div v-if="metaLoading && userProfileLoading && saveLoading">
+  <div v-loading="!(metaLoading && userProfileLoading && saveLoading)">
     <el-row justify="center">
       <p style="font-size: 30px">Apply for {{ termName }} Tutor or Marker</p>
     </el-row>
@@ -459,11 +487,12 @@ const saveSession = () => {
 
         <Transition>
           <div v-show="stepArr[2]" class="step3">
+
+            <ApplicationPreferCourseList v-model:preferCourseList="preferCourseList" />
             <el-row justify="center">
               <el-button type="primary" :icon="Plus" size="large" @click="showCourseChooser">Add Prefer Courses
               </el-button>
             </el-row>
-
 
           </div>
         </Transition>
@@ -501,8 +530,7 @@ const saveSession = () => {
 
   </div>
 
-
-  <ApplicationCourse v-if="applicationMetaInfo.termID" :visible="courseVisible" :termID="applicationMetaInfo.termID"/>
+  <ApplicationCourse v-if="applicationMetaInfo.termID" :visible="courseVisible" :termID="applicationMetaInfo.termID" @added_course="add_course"/>
 
 
 </template>
