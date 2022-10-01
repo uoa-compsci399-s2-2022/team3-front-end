@@ -22,6 +22,7 @@
   "devDependencies": {
     "@types/node": "^18.7.6",
     "@vitejs/plugin-vue": "^3.0.3",
+    "@vitejs/plugin-vue-jsx": "^2.0.1",
     "dayjs": "^1.11",
     "sass": "^1.54.4",
     "sass-loader": "^13.0.2",

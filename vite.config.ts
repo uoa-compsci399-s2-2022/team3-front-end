@@ -4,6 +4,7 @@ import { resolve } from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 
 const pathResolve = (dir: string): any => {
   return resolve(__dirname, '.', dir)
@@ -15,6 +16,7 @@ const alias: Record<string, string> = {
 
 // https://vitejs.dev/config/
 export default defineConfig({
+
   plugins: [
     vue(),
     AutoImport({
@@ -23,6 +25,9 @@ export default defineConfig({
     Components({
       resolvers: [ElementPlusResolver()],
     }),
+    vueJsx({
+      // options are passed on to @vue/babel-plugin-jsx
+    })
   ],
   resolve: {
     alias,
