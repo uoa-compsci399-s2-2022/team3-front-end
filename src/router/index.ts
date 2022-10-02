@@ -43,6 +43,12 @@ const routes = [
                 meta: { title:'Manage User', permission: '5' },
                 component: () => import('@/views/management/ManageUser.vue')
             },
+            {
+                path: "manageEnrolment",
+                name: "manageEnrolment",
+                meta: { title:'Manage Enrolment', permission: '5' },
+                component: () => import('@/views/management/ManageEnrolment.vue')
+            },
 
         ]
     },
