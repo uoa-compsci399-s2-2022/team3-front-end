@@ -24,12 +24,19 @@ const items: sidebarMenu = [
         title: 'Dashboard',
         permission: '1',
     },
+
     {
       icon: 'Document',
       index: '/applicationList',
       title: 'Application List',
       permission: '1',
     },
+   {
+     icon: "Collection",
+     index: "/courseList",
+     title: "Course List",
+     permission: "1",
+   },
     {
         icon: 'Management',
         index: '4',
@@ -118,6 +125,7 @@ const modalDisplay = computed(() => {
                                 {{ subItem.title }}
                             </el-menu-item>
                         </template>
+
                     </el-sub-menu>
                 </template>
                 <template v-else>
@@ -129,6 +137,9 @@ const modalDisplay = computed(() => {
                     </el-menu-item>
                 </template>
             </template>
+          <div>
+
+          </div>
 
         </el-menu>
     </div>
