@@ -25,8 +25,12 @@ const routes = [
                 meta: { title:'Profile', permission: '3' },
                 component: () => import('@/views/profile/Profile.vue')
             },
-
-            //managecourse
+            {
+                path: '/applicationList',
+                meta: { title:'Application List', permission: '1' },
+                component: () => import('@/views/forms/ApplicationList.vue')
+            },
+            //management
             {
                 path: "managecourse",
                 name: "managecourse",
@@ -34,10 +38,12 @@ const routes = [
                 component: () => import('@/views/management/ManageCourse.vue')
             },
             {
-                path: '/applicationList',
-                meta: { title:'Application List', permission: '1' },
-                component: () => import('@/views/forms/ApplicationList.vue')
+                path: "manageuser",
+                name: "manageuser",
+                meta: { title:'Manage User', permission: '5' },
+                component: () => import('@/views/management/ManageUser.vue')
             },
+
         ]
     },
     {

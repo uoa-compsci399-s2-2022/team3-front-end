@@ -7,6 +7,7 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    AddUser: typeof import('./src/components/userUseful/AddUser.vue')['default']
     ApplicationCourse: typeof import('./src/components/applicationUseful/ApplicationCourse.vue')['default']
     ApplicationPreferCourseList: typeof import('./src/components/applicationUseful/ApplicationPreferCourseList.vue')['default']
     BreadCrumb: typeof import('./src/components/BreadCrumb.vue')['default']
@@ -35,7 +36,6 @@ declare module '@vue/runtime-core' {
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElOption: typeof import('element-plus/es')['ElOption']
-    ElPopconfirm: typeof import('element-plus/es')['ElPopconfirm']
     ElPopover: typeof import('element-plus/es')['ElPopover']
     ElRadio: typeof import('element-plus/es')['ElRadio']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']

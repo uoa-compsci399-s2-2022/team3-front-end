@@ -41,6 +41,11 @@ const items: sidebarMenu = [
                 title: 'Manage Course',
                 permission: '5',
             },
+          {
+            index: '/manageuser',
+            title: 'Manage User',
+            permission: '5',
+          },
 
         ]
     },
