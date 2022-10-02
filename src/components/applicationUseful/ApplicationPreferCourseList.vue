@@ -4,7 +4,7 @@
     <SlickItem v-for="(c, i) in value" :key="c.courseID" :index="i" class="list-item">
       <el-icon><DCaret /></el-icon>
       {{ c.courseNum }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Preference: {{ c.preference}}
-        <el-button @click="deleteCourse" class="delete-button" type="danger">
+        <el-button @click="deleteCourse(i)" class="delete-button" type="danger">
           Delete
         </el-button>
     </SlickItem>
