@@ -1,12 +1,13 @@
 <script setup lang="ts">
-
-import CourseCard_lecturer from '@/components/cards/CourseCard_sample_version.vue'
+import CourseCard_detail from '@/components/cards/CourseCard_detail_version.vue'
+import CourseCard_sample from '@/components/cards/CourseCard_sample_version.vue'
 </script>
 
 <template>
     <div class="course-container">
 
-      <courseCard_lecturer/>
+      <course-card_sample/>
+      <course-card_detail/>
 
 
 
