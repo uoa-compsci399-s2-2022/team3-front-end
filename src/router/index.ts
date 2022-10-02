@@ -44,19 +44,19 @@ const routes = [
                 component: () => import('@/views/management/ManageUser.vue')
             },
             {
-<<<<<<< HEAD
+
                 path: "courseList",
                 name: "courseList",
                 meta: { title:'Course List', permission: '1' },
                 component: () => import('@/views/management/CourseList.vue')
-            }
-=======
+            },
+            {
                 path: "manageEnrolment",
                 name: "manageEnrolment",
                 meta: { title:'Manage Enrolment', permission: '5' },
                 component: () => import('@/views/management/ManageEnrolment.vue')
             },
->>>>>>> a9ac7cb61e2eb4f1882d880ccedfb9c39b2d3a35
+
 
         ]
     },
