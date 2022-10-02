@@ -117,12 +117,11 @@ onBeforeMount(() => {
       if (dayjs(item.submittedDateTime).isValid()){
         item.submittedDateTime = dayjs(item.submittedDateTime).format('DD-MM-YYYY HH:mm:ss')
       }
-
     })
     tableData.push(...res)
   })
 
-  get('api/term').then((res) => {
+  get('api/availableTerm').then((res) => {
     console.log(res)
     res.forEach((e: { termName: string; }) => {
       termList.push({text: e.termName, value: e.termName})
