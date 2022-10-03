@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import CourseCard from '@/components/cards/CourseCard.vue'
-import CourseCard_2 from '@/components/cards/CourseCard_2.vue'
+import CourseCard_2 from '@/components/cards/CourseCard_detail_version.vue'
 import {ref} from 'vue'
 import CourseList from '@/components/cards/CourseList.vue'
-const value = ref('')
+import {create} from "domain";
+const value = ref('1')
+
 const options =[
   {
     value : '1',
@@ -15,11 +17,12 @@ const options =[
   },
 ]
 
+
 </script>
 
 <template>
    <div class="show-style">
-     <el-select  placeholder="Select" v-model="value">
+     <el-select  v-model="value">
        <el-option
            v-for="item in options"
            :key="item.value"
@@ -27,6 +30,7 @@ const options =[
            :value="item.value"
       />
      </el-select>
+
    </div>
 
     <div class="course-container"  v-if="value === '1'">
