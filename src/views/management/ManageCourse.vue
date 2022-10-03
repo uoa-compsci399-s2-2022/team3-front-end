@@ -2,15 +2,17 @@
 import { Delete, get, post, put } from '@/utils/request';
 import { ElButton, ElMessage, ElPopconfirm, FormInstance, FormRules, TableV2FixedDir } from 'element-plus';
 import { computed, reactive, Ref, ref, watch } from 'vue'
-import { useSidebarStore } from '@/store/index'
 import type { Column } from 'element-plus'
 
 
 
+//-----------------------------Term start----------------------------------
+
+// dom element of add term table
 const singleTableRef = ref<any>(null)
 const loading = ref(true)
 
-
+// term type
 type term = {
     termID?: number;
     termName: string;
@@ -20,9 +22,19 @@ type term = {
     defaultDeadLine: string;
 }
 
+/**
+ * @description a list of term
+ */
 const terms: term[] = reactive<term[]>([])
 
+/**
+ * @description variable which binded with add course search
+ */
 const searchTerm = ref('')
+
+/**
+ * @description filtered terms based on the search result(searchTerm)
+ */
 const filterterms = computed(() =>
     terms.filter(
         (data) =>
@@ -31,51 +43,114 @@ const filterterms = computed(() =>
     )
 )
 
+/**
+ * @description a boolean variable which records whether the 'Add term modal' is opened
+ */
 const termModalOpened = ref(false);
+
+/**
+ * @description a boolean variable which records whether the 'edit term modal' is opened
+ */
 const termEditModalOpened = ref(false);
 
-
-
+// 通过闭包拿到edit方程
+/**
+ * @description a function, which initially was null,
+ * once the user select a term. It will become a function
+ * that can edit the selected term.
+ */
+let editTerm = ref<any>(null)
+/**
+ * @description closure function, once the user click on 'edit'
+ * this function will return a function sepecificlly for that term
+ * 通过闭包限制“row”的作用域，防止数据污染
+ */
 const handleTermEdit = (index: number, row: term) => {
     termEditModalOpened.value = true
+    termDTO.termName = row.termName;
+    termDTO.startDate = row.startDate;
+    termDTO.isAvailable = row.isAvailable;
+    termDTO.endDate = row.endDate;
+    termDTO.defaultDeadLine = row.defaultDeadLine;
+    dateRange.value = [new Date(row.startDate), new Date(row.endDate)];
+    defaultDeadLine.value = new Date(row.defaultDeadLine);
     return function () {
         put(`/api/modifyTerm/${row.termID}`, { data: termDTO })
             .then(
                 () => {
-                    setTimeout(() => { location.reload() }, 3000);
+                    // setTimeout(() => { location.reload() }, 3000);
+                    let id = terms[index].termID
+                    terms[index] = termDTO;
+                    terms[index].termID = id;
+                    termEditModalOpened.value = false;
                     ElMessage({
-                        message: `Edited success.\n The page will be refreshed in 3s.`,
+                        message: `Edited success.`,
                         type: 'success',
                     })
                 }
             )
     }
 }
-// 通过闭包拿到edit方程
-let editTerm = ref<any>(null)
 
+const clearTermForm = () => {
+    termDTO.termName = '';
+    termDTO.startDate = '';
+    termDTO.endDate = '';
+    termDTO.isAvailable = false;
+    termDTO.defaultDeadLine = '';
+    // reset dates
+    dateRange.value = undefined;
+    defaultDeadLine.value = undefined;
+}
 
+const closeEditTerm = () => {
+    clearTermForm();
+    termEditModalOpened.value = false;
+}
+
+/**
+ * @description function for deleting terms.
+ */
 const handleTermDelete = (index: number, row: term) => {
     Delete(`/api/term/${row.termID}`).then(
         () => {
-            setTimeout(() => { location.reload() }, 3000);
+            terms.splice(index, 1);
+            // setTimeout(() => { location.reload() }, 3000);
             ElMessage({
-                message: `Deleted success.\n The page will be refreshed in 3s.`,
+                message: `Deleted success.`,
                 type: 'success',
+            })
+        }
+    ).catch(
+        (err) => {
+            ElMessage({
+                message: `${err}`,
+                type: 'error',
             })
         }
     )
 }
-
+/**
+ * @description variable records which term is selected
+ */
 const setOnSelect = (termID: number) => {
     onSelect.value = termID
 }
 
+/**
+ * @description fcuntion to focus the row selected term.
+ * triggers when user click 'select' on a term.
+ */
 const setCurrent = (row?: term) => {
-    setOnSelect(row!.termID!);
-    singleTableRef.value!.setCurrentRow(row);
+    setOnSelect(row!.termID!); // set the selected term
+    singleTableRef.value!.setCurrentRow(row); // focus the row of selected term.
 }
 
+/**
+ * @description request the term list.
+ * the term list will be sorted by the startDate.
+ * The latest term will be at top
+ */
 async function getTermList() {
     let termList = await get('api/term');
     (termList as term[]).forEach((term) => terms.push(term));
@@ -84,10 +159,30 @@ async function getTermList() {
         return new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
     }); // sort according its start Date.
 }
-getTermList()
+getTermList() // get term list
+/**
+ * @description a varable which records the date range (Term start date and Term end date).
+ */
+const dateRange = ref<[Date, Date]>();
+const defaultDeadLine = ref<any>();
+// 监听dateRange，当用户选择日期后，自动转换为yyyy-mm-dd格式 
+watch(dateRange, (date) => {
+    if (date) {
+        termDTO.startDate = new Date(date![0]).toISOString().slice(0, 10)
+        termDTO.endDate = new Date(date![1]).toISOString().slice(0, 10)
+    }
+})
+// defaultDeadLine改变时自动转换日期为正确的ISO格式
+watch(defaultDeadLine, (date) => {
+    if (date) {
+        termDTO.defaultDeadLine = new Date(date).toISOString()
+    }
+})
 
-const dateRange = ref<any>()
-const termDTO: term = reactive({
+/**
+ * @description term data transfer object
+ */
+const termDTO = reactive<term>({
     startDate: "",
     endDate: "",
     termName: "",
@@ -95,21 +190,24 @@ const termDTO: term = reactive({
     defaultDeadLine: "",
 })
 
-watch(dateRange, (date) => {
-    termDTO.startDate = new Date(date[0]).toISOString().slice(0, 10)
-    termDTO.endDate = new Date(date[1]).toISOString().slice(0, 10)
-})
 
+/**
+ * @description function handles adding term
+ */
 const handleTermAdd = () => {
     if (termDTO.termName && termDTO.startDate && termDTO.endDate && termDTO.defaultDeadLine) {
         post('api/term', termDTO)
             .then(() => {
-
-                setTimeout(() => { location.reload() }, 3000);
+                terms.push(termDTO);
+                terms.sort((a: term, b: term) => {
+                    return new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+                }); // sort according its start Date.
                 ElMessage({
-                    message: `Added a new term ${termDTO.termName}.\n The page will be refreshed in 3s.`,
+                    message: `Added a new term ${termDTO.termName}.`,
                     type: 'success',
                 })
+                termModalOpened.value = false;
+
             })
             .catch(() => {
                 ElMessage({
@@ -125,9 +223,17 @@ const handleTermAdd = () => {
     }
 
 }
-//--------course------------
+//-----------------------------Term end----------------------------------
+
+//---------------------------Course start----------------------------------
+/**
+ * @description varable records the whether the course modal is opened or not
+ */
 const courseModalOpened = ref(false);
-// course DTO type
+
+/**
+ * @description course data transfer object
+ */
 type courseDTO = {
     courseID: number;
     canPreAssign: boolean;
@@ -146,7 +252,10 @@ type courseDTO = {
     totalAvailableHours: number;
     tutorResponsibility: string;
 }
-// course type
+
+/**
+ * @description course type
+ */
 type course = {
     courseID: number;
     courseName: string;
@@ -166,6 +275,9 @@ type course = {
     totalAvailableHours: number;
 }
 
+/**
+ * @description course table titles
+ */
 let titles = [
     'Course Name',
     'Course number',
@@ -184,6 +296,9 @@ let titles = [
     'Total available hours'
 ]
 
+/**
+ * @description convert courseDTO to course
+ */
 const toDomainModel = (dto: courseDTO): course => {
     return {
         courseID: dto.courseID,
@@ -205,8 +320,11 @@ const toDomainModel = (dto: courseDTO): course => {
     }
 }
 
-
-const toCamel = (str: string) => {
+/**
+ * @description change the input string to camel case
+ * @return {string} camel case version of input string
+ */
+const toCamel = (str: string): string => {
     return str.split(' ').map(
         (word, index) => index == 0 ?
             word[0].toLowerCase() + word.slice(1) :
@@ -214,7 +332,9 @@ const toCamel = (str: string) => {
     ).join('')
 }
 
-
+/**
+ * @description columns of the table
+ */
 let columns: Column<any>[] = Array.from(titles, (v, i) => {
     let camelCaseV = toCamel(v);
     console.log(camelCaseV)
@@ -226,7 +346,9 @@ let columns: Column<any>[] = Array.from(titles, (v, i) => {
     }
 })
 
-
+/**
+ * @description Operation column
+ */
 let col: Column<any> = {
     key: 'operations',
     title: 'Operations',
@@ -244,19 +366,44 @@ let col: Column<any> = {
 }
 columns.push(col) // add the last column
 
+/**
+ * @description term that is currently being selected
+ */
 const onSelect = ref<number>(NaN);
+
+/**
+ * @description course list, each course will be presented as rows of the table
+ */
 let courses: Ref<course[]> = ref([])
-watch(onSelect, async (v) => {
-    if (Number.isNaN(onSelect)) {
+
+/**
+ * @description send the request to get the cooresponding course list of selected term.
+ */
+const getCourseList = async () => {
+    let res = await get(`api/getCourseByTerm/${onSelect.value}`)
+    courses.value.length = 0 // clear the array
+    res.forEach((row: courseDTO) => courses.value.push(toDomainModel(row)))
+}
+
+/**
+ * @description once the onSelect has been changed, the course list will be obtained.
+ */
+watch(onSelect, (v) => {
+    if (Number.isNaN(v)) {
         return
     } else {
-        let res = await get(`api/getCourseByTerm/${onSelect.value}`)
-        courses.value.length = 0 // clear the array
-        res.forEach((row: courseDTO) => courses.value.push(toDomainModel(row)))
+        getCourseList()
     }
 })
 
+/**
+ * @description variable bind the value of serach course area
+ */
 const searchCourse = ref('')
+
+/**
+ * @description computed property, which show courses that match the search result.
+ */
 const filterCourses = computed(() =>
     courses.value.filter(
         (data) =>
@@ -265,6 +412,9 @@ const filterCourses = computed(() =>
     )
 )
 
+/**
+ * @description function used to open the Add course modal
+ */
 const handleCourseAdd = () => {
     if (onSelect.value) {
         courseModalOpened.value = true;
@@ -277,8 +427,10 @@ const handleCourseAdd = () => {
     }
 }
 
+/**
+ * @description course form type (Add/Edit)
+ */
 type courseFormType = {
-
     needTutors: boolean;
     estimatedNumOfStudents: string | number;
     numOfTutorialsPerWeek: string | number;
@@ -295,6 +447,23 @@ type courseFormType = {
     currentlyNumOfStudents: string | number;
     deadLine: string
 }
+
+/**
+ * @description deaLine is a intermediate variable used to get the correct date form.
+ */
+const deadLine = ref<any>();
+/**
+* @description gennerate correct Date form once the deadLine has been changed
+*/
+watch(deadLine, (date) => {
+    if (date) {
+        courseForm.deadLine = new Date(date).toISOString();
+    }
+})
+
+/**
+ * @description courseForm instance
+ */
 const courseForm = reactive<courseFormType>({
     needTutors: false,
     estimatedNumOfStudents: '',
@@ -313,7 +482,9 @@ const courseForm = reactive<courseFormType>({
     deadLine: ''
 })
 
-
+/**
+ * @description rules used for course form validation.
+ */
 const rules = reactive<FormRules>({
     courseNum: [{ required: true, message: 'Please input course number', trigger: 'blur' },],
     courseName: [
@@ -345,12 +516,16 @@ const rules = reactive<FormRules>({
     ]
 })
 
+/**
+ * @description function for adding new course
+ */
 const addCourse = async () => {
     try {
-        let res = await post('api/courseManagement', courseForm);
-        setTimeout(() => { location.reload() }, 3000);
+        await post('api/courseManagement', courseForm);
+        await getCourseList();
+        courseModalOpened.value = false;
         ElMessage({
-            message: 'Success, you will page will be refreshed in 3s.',
+            message: 'Successfully added a new course.',
             type: 'success',
         })
     } catch (err) {
@@ -362,17 +537,18 @@ const addCourse = async () => {
     }
 }
 
-
+/**
+ * @description function for deleting exsit course
+ */
 const handleCourseDelete = (courseID: number) => {
-    Delete(`api/deleteCourse/${courseID}`).then(
-        () => {
-            setTimeout(() => { location.reload() }, 3000);
-            ElMessage({
-                message: `Deleted success.\n The page will be refreshed in 3s.`,
-                type: 'success',
-            })
-        }
-    ).catch((err) => {
+    Delete(`api/deleteCourse/${courseID}`).then(() => {
+        getCourseList();
+    }).then(() => {
+        ElMessage({
+            message: `Deleted success.\n The page will be refreshed in 3s.`,
+            type: 'success',
+        })
+    }).catch((err) => {
         ElMessage({
             message: 'Oops. You seems offline.',
             type: 'error',
@@ -380,7 +556,9 @@ const handleCourseDelete = (courseID: number) => {
     })
 }
 
-
+/**
+ * @description clear the course form instance
+ */
 const clearCourseForm = () => {
     courseForm.needTutors = false;
     courseForm.estimatedNumOfStudents = '';
@@ -398,14 +576,30 @@ const clearCourseForm = () => {
     courseForm.currentlyNumOfStudents = '';
     courseForm.deadLine = ''
 }
+
+/**
+ * @description whether the couse Edit Modal is Opened
+ */
 const courseEditModalOpened = ref(false);
+
+/**
+ * @description Edit Course form DOM instance. Used for restting the fields and validation
+ */
 const courseEditRef = ref<FormInstance>();
+
+/**
+* @description once the Edit Course modal is closed, clear the data, and reset the validation.
+*/
 const closeEditCourse = () => {
     courseEditRef.value!.resetFields();
     clearCourseForm();
+    deadLine.value = undefined;
     courseEditModalOpened.value = false;
 }
 
+/**
+* @description display old course value for user the edit.
+*/
 const setCourseForm = (row: number) => {
     const courseToEdit = courses.value[row];
     courseForm.courseName = courseToEdit.courseName;
@@ -427,13 +621,23 @@ const setCourseForm = (row: number) => {
 // 通过闭包拿到edit方程
 let editCourse = ref<any>(null);
 
+/**
+ * @description function used to edit exsiting courses.
+ * 1. open the edit modal
+ * 2. get old data, and display them.
+ * 3. return the closure function for that course.
+ * 
+*/
 const handleCourseEdit = (row: number) => {
     courseEditModalOpened.value = true;
     setCourseForm(row);
+    deadLine.value = new Date(courses.value[row].deadLine)
     const courseID = courses.value[row].courseID;
     return function () {
         put(`/api/courseManagement/${courseID}`, { data: courseForm }).then(() => {
-            setTimeout(() => { location.reload() }, 3000);
+            getCourseList();
+        }).then(() => {
+            closeEditCourse();
             ElMessage({
                 message: `Edit success.\n The page will be refreshed in 3s.`,
                 type: 'success',
@@ -447,8 +651,6 @@ const handleCourseEdit = (row: number) => {
         })
     }
 }
-
-
 
 </script>
 
@@ -524,12 +726,6 @@ const handleCourseEdit = (row: number) => {
         </section>
     </div>
 
-
-
-
-
-
-
     <teleport to="body">
         <div class="modal-container" v-if="termModalOpened">
             <div class="modal">
@@ -548,12 +744,12 @@ const handleCourseEdit = (row: number) => {
                     <div class="modal-content-switch">
                         <span>Is available to apply</span>
                         <el-switch v-model="termDTO.isAvailable" inline-prompt
-                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-text="Y"
-                        inactive-text="N" />
+                            style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-text="Y"
+                            inactive-text="N" />
                     </div>
-                    <el-date-picker v-model="termDTO.defaultDeadLine" type="datetime" placeholder="Pick a Date for deadline" style="width:100%;"
-                        format="YYYY/MM/DD hh:mm:ss" value-format="YYYY-MM-DDThh:mm:ssZ"/>
-                </div> 
+                    <el-date-picker v-model="defaultDeadLine" type="datetime" placeholder="Pick a Date for deadline"
+                        style="width:100%;" format="YYYY/MM/DD hh:mm:ss" value-format="YYYY-MM-DDThh:mm:ssZ" />
+                </div>
                 <div class="modal-btns">
                     <el-button type="primary" @click="handleTermAdd">Add</el-button>
                 </div>
@@ -567,7 +763,7 @@ const handleCourseEdit = (row: number) => {
             <div class="modal">
                 <div class="modal-header">
                     <h2>Edit Term</h2>
-                    <button @click="() => {termEditModalOpened = false}">
+                    <button @click="closeEditTerm">
                         <el-icon>
                             <Close />
                         </el-icon>
@@ -580,21 +776,19 @@ const handleCourseEdit = (row: number) => {
                     <div class="modal-content-switch">
                         <span>Is available to apply</span>
                         <el-switch v-model="termDTO.isAvailable" inline-prompt
-                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-text="Y"
-                        inactive-text="N" />
+                            style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-text="Y"
+                            inactive-text="N" />
                     </div>
-                    <el-date-picker v-model="termDTO.defaultDeadLine" type="datetime" placeholder="Pick a Date for deadline" style="width:100%;"
-                        format="YYYY/MM/DD hh:mm:ss" value-format="YYYY-MM-DDThh:mm:ssZ"/>
-                </div> 
+                    <el-date-picker v-model="termDTO.defaultDeadLine" type="datetime"
+                        placeholder="Pick a Date for deadline" style="width:100%;" format="YYYY/MM/DD hh:mm:ss"
+                        value-format="YYYY-MM-DDThh:mm:ssZ" />
+                </div>
                 <div class="modal-btns">
                     <el-button type="primary" @click="editTerm">Edit</el-button>
                 </div>
             </div>
         </div>
     </teleport>
-
-
-
 
     <teleport to="body">
         <div class="modal-container" v-if="courseModalOpened">
@@ -668,7 +862,7 @@ const handleCourseEdit = (row: number) => {
                         </el-form-item>
 
                         <el-form-item label="Deadline" prop="deadLine">
-                            <el-date-picker v-model="courseForm.deadLine" type="datetime" placeholder="Pick a Date"
+                            <el-date-picker v-model="deadLine" type="datetime" placeholder="Pick a Date"
                                 format="YYYY/MM/DD hh:mm:ss" value-format="YYYY-MM-DDThh:mm:ssZ" />
                         </el-form-item>
 
@@ -678,12 +872,10 @@ const handleCourseEdit = (row: number) => {
                             <el-button type="primary" @click="addCourse">Add course</el-button>
                         </el-form-item>
                     </div>
-                    {{courseForm}}
                 </el-form>
             </div>
         </div>
     </teleport>
-
 
     <teleport to="body">
         <div class="modal-container" v-if="courseEditModalOpened">
@@ -746,7 +938,6 @@ const handleCourseEdit = (row: number) => {
                                 <template #append>hours</template>
                             </el-input>
                         </el-form-item>
-
                         <el-form-item label="Marker responsibility" prop="markerResponsibility">
                             <el-input v-model="courseForm.markerResponsibility" autosize type="textarea"
                                 placeholder="Please input" />
@@ -760,14 +951,12 @@ const handleCourseEdit = (row: number) => {
                             <el-date-picker v-model="courseForm.deadLine" type="datetime" placeholder="Pick a Date"
                                 format="YYYY/MM/DD hh:mm:ss" value-format="YYYY-MM-DDThh:mm:ssZ" />
                         </el-form-item>
-
                     </div>
                     <div class="modal-btns">
                         <el-form-item>
                             <el-button type="primary" @click="editCourse">Edit course</el-button>
                         </el-form-item>
                     </div>
-                    {{courseForm}}
                 </el-form>
             </div>
         </div>
@@ -778,9 +967,10 @@ const handleCourseEdit = (row: number) => {
 .modal-content-switch {
     display: flex;
     align-items: center;
+
     span {
-        font-size:15px;
-        color:rgb(86, 86, 86);
+        font-size: 15px;
+        color: rgb(86, 86, 86);
         margin-right: 30px;
     }
 }
@@ -847,8 +1037,6 @@ const handleCourseEdit = (row: number) => {
         }
     }
 
-
-
     .course-modal {
         width: 800px;
         height: 80%;
@@ -907,10 +1095,8 @@ const handleCourseEdit = (row: number) => {
 
         .term-select:hover {
             color: rgb(0, 170, 255);
-            
+
         }
-
-
 
     }
 
