@@ -87,13 +87,13 @@ async function getTermList() {
 getTermList()
 
 const dateRange = ref<any>()
-const termDTO: term = {
+const termDTO: term = reactive({
     startDate: "",
     endDate: "",
     termName: "",
     isAvailable: false,
     defaultDeadLine: "",
-}
+})
 
 watch(dateRange, (date) => {
     termDTO.startDate = new Date(date[0]).toISOString().slice(0, 10)
@@ -101,7 +101,7 @@ watch(dateRange, (date) => {
 })
 
 const handleTermAdd = () => {
-    if (termDTO.termName && termDTO.startDate && termDTO.endDate) {
+    if (termDTO.termName && termDTO.startDate && termDTO.endDate && termDTO.defaultDeadLine) {
         post('api/term', termDTO)
             .then(() => {
 
@@ -473,6 +473,8 @@ const handleCourseEdit = (row: number) => {
                     <el-table-column label="Term name" prop="termName" />
                     <el-table-column label="Start Date" prop="startDate" />
                     <el-table-column label="End Date" prop="endDate" />
+                    <el-table-column label="Is available" prop="isAvailable" />
+                    <el-table-column label="deadLine" prop="defaultDeadLine" />
                     <el-table-column align="right">
                         <template #header>
                             <el-input v-model="searchTerm" size="small" placeholder="Type to search" />
@@ -540,16 +542,25 @@ const handleCourseEdit = (row: number) => {
                     </button>
                 </div>
                 <div class="modal-content">
-                    <input v-model="termDTO.termName" placeholder="Enter term name" clearable />
+                    <el-input v-model="termDTO.termName" placeholder="Enter term name" clearable />
                     <el-date-picker v-model="dateRange" type="daterange" range-separator="To"
                         start-placeholder="Start date" end-placeholder="End date" />
-                </div>
+                    <div class="modal-content-switch">
+                        <span>Is available to apply</span>
+                        <el-switch v-model="termDTO.isAvailable" inline-prompt
+                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-text="Y"
+                        inactive-text="N" />
+                    </div>
+                    <el-date-picker v-model="termDTO.defaultDeadLine" type="datetime" placeholder="Pick a Date for deadline" style="width:100%;"
+                        format="YYYY/MM/DD hh:mm:ss" value-format="YYYY-MM-DDThh:mm:ssZ"/>
+                </div> 
                 <div class="modal-btns">
                     <el-button type="primary" @click="handleTermAdd">Add</el-button>
                 </div>
             </div>
         </div>
     </teleport>
+
 
     <teleport to="body">
         <div class="modal-container" v-if="termEditModalOpened">
@@ -563,11 +574,18 @@ const handleCourseEdit = (row: number) => {
                     </button>
                 </div>
                 <div class="modal-content">
-                    <input v-model="termDTO.termName" placeholder="Enter term name" clearable />
+                    <el-input v-model="termDTO.termName" placeholder="Enter term name" clearable />
                     <el-date-picker v-model="dateRange" type="daterange" range-separator="To"
                         start-placeholder="Start date" end-placeholder="End date" />
-
-                </div>
+                    <div class="modal-content-switch">
+                        <span>Is available to apply</span>
+                        <el-switch v-model="termDTO.isAvailable" inline-prompt
+                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-text="Y"
+                        inactive-text="N" />
+                    </div>
+                    <el-date-picker v-model="termDTO.defaultDeadLine" type="datetime" placeholder="Pick a Date for deadline" style="width:100%;"
+                        format="YYYY/MM/DD hh:mm:ss" value-format="YYYY-MM-DDThh:mm:ssZ"/>
+                </div> 
                 <div class="modal-btns">
                     <el-button type="primary" @click="editTerm">Edit</el-button>
                 </div>
@@ -757,6 +775,16 @@ const handleCourseEdit = (row: number) => {
 </template>
 
 <style scoped lang="scss">
+.modal-content-switch {
+    display: flex;
+    align-items: center;
+    span {
+        font-size:15px;
+        color:rgb(86, 86, 86);
+        margin-right: 30px;
+    }
+}
+
 .modal-container {
     position: fixed;
     top: 0;
@@ -808,18 +836,6 @@ const handleCourseEdit = (row: number) => {
             flex-direction: column;
             row-gap: 20px;
             margin-bottom: 20px;
-
-            input {
-                height: 32px;
-                border: 1.5px solid rgb(227, 227, 227);
-                width: 100%;
-                border-radius: 4px;
-                padding-left: 10px;
-            }
-
-            input:hover {
-                box-shadow: 0 0 0 1px #dcdfe6 inset;
-            }
         }
 
         &-btns {
@@ -891,6 +907,7 @@ const handleCourseEdit = (row: number) => {
 
         .term-select:hover {
             color: rgb(0, 170, 255);
+            
         }
 
 
