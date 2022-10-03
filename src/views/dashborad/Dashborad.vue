@@ -1,17 +1,11 @@
 <script setup lang="ts">
 import CourseCard from '@/components/cards/CourseCard.vue'
-import CourseCard_2 from '@/components/cards/CourseCard_detail_version.vue'
+import CourseCard_2 from '@/components/cards/CourseCard_2.vue'
 import {ref} from 'vue'
 import CourseList from '@/components/cards/CourseList.vue'
-<<<<<<< HEAD
 import {get} from "@/utils/request";
 const value = ref('')
 const value_semester = ref('')
-=======
-import {create} from "domain";
-const value = ref('1')
-
->>>>>>> 6d7eaaeed619a8b07619cece5286b6695a99080f
 const options =[
   {
     value : '1',
@@ -23,7 +17,6 @@ const options =[
   },
 ]
 
-<<<<<<< HEAD
 const options_semester = ref([
 ])
 get('/api/availableTerm').then(res => {
@@ -72,14 +65,6 @@ const resetSemesterStatus= () => {
 
   <div class="show-style">
      <el-select  placeholder="Select" v-model="value">
-=======
-
-</script>
-
-<template>
-   <div class="show-style">
-     <el-select  v-model="value">
->>>>>>> 6d7eaaeed619a8b07619cece5286b6695a99080f
        <el-option
            v-for="item in options"
            :key="item.value"
@@ -88,7 +73,6 @@ const resetSemesterStatus= () => {
            @click="resetSemesterStatus"
       />
      </el-select>
-
    </div>
 
   <div class="course-semester" v-if="value != ''">

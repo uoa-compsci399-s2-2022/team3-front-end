@@ -66,11 +66,6 @@ const routes = [
         component: () => import('@/views/login/Login.vue')
     },
     {
-        path: "/register",
-        meta: { title: 'MTMS Register service'},
-        component: () => import('@/views/login/Register.vue')
-    },
-    {
         path: '/application/:applicationID',
         meta: { title:'Apply for the position', permission: '2' },
         component: () => import('@/views/forms/Application.vue')
@@ -107,11 +102,6 @@ router.beforeEach((to, from, next) => {
     document.title = `${to.meta.title}`;
     Vnode.component?.exposed?.startLoading(); // start the loading bar animation
     const store = usePermissionStore();
-
-    if (to.path === '/register') {
-        next();
-        return;
-    }
 
     // if the page permission id exists, but the user doesn't have the permission to this page
     // redirect to 403
