@@ -6,11 +6,14 @@ import pinia, { usePermissionStore } from '@/store/index'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import VXETable from 'vxe-table'
+import 'vxe-table/lib/style.css'
 
 const app = createApp(App);
 app.use(router)
 app.use(pinia)
 app.use(ElementPlus)
+app.use(VXETable)
 const permission = usePermissionStore()
 
 // register element-plus icons
@@ -25,4 +28,7 @@ app.directive('permission', {
         }
     }
 })
+
+
+
 app.mount('#app')
