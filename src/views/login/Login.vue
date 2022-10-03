@@ -53,7 +53,10 @@ const login = () => {
                 </div>
                 <button type="submit" @click.prevent="login">Login</button>
             </form>
-
+            <div class="register-prompt">
+                <span>Don't have an account? Click </span><router-link to="/register">here</router-link><span> to create one</span>
+            </div>
+            
         </div>
     </div>
 </template>
@@ -165,6 +168,18 @@ const login = () => {
 
         button:active {
             opacity: 0.5;
+        }
+    }
+
+    .register-prompt {
+        align-self: flex-start;
+        span {
+            font-size: 12px;
+        }
+
+        a {
+            text-decoration: none;
+            color:#003867;
         }
     }
 }
