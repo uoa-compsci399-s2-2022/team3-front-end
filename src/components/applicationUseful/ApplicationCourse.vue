@@ -85,7 +85,7 @@
 <script setup lang="ts">
 import {onBeforeMount, reactive, ref} from 'vue'
 import {ElButton, ElDrawer, ElMessage, ElTable} from 'element-plus'
-import {get} from "@/utils/request";
+import {get, post} from "@/utils/request";
 import {useRouter, useRoute} from 'vue-router';
 import {Search} from '@element-plus/icons-vue'
 import dayjs from "dayjs";
@@ -157,6 +157,7 @@ get('api/getCourseByTerm/' + props.termID).then((res) => {
   })
   courseLoaded.value = true;
 })
+
 
 </script>
 

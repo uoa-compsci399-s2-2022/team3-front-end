@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import Test from '@/components/cards/Test.vue'
+  import Test from '@/components/cards/Test.vue'
+  import {ref} from 'vue'
+  import {get, post} from '@/utils/request'
+
+
+
 </script>
+
 
 <template>
   <div class="card-container">
     <div class="card-info">
       <header class="card-title">
-        Compsci 101 : Capstone Project
-        <!--        {{ title }}-->
+        fasdfb
       </header>
       <el-divider/>
       <div class="card-content">
