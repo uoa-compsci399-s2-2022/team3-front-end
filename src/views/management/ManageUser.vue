@@ -1,7 +1,11 @@
 <template>
 
   <div class="page-container">
-    <el-button type="primary" :icon="Plus" @click="showAddUser">Add User</el-button>
+    <el-button-group>
+      <el-button type="primary" :icon="Plus" @click="showAddUser">Add User</el-button>
+      <el-button type="primary" :icon="Ticket" @click="router.push('/manageuser/batch-invite-user')">Batch Invite</el-button>
+    </el-button-group>
+
     <el-table :data="filterTableData" style="width: 100%" v-loading="tableLoading">
       <el-table-column label="ID" prop="id"/>
       <el-table-column label="Email" prop="email"/>
@@ -35,7 +39,7 @@
       title="Delete Confirm"
       width="30%"
   >
-    <span>Please confirm to delete the user: {{wantToDeleteUser.id}}</span>
+    <span>Please confirm to delete the user: {{ wantToDeleteUser.id }}</span>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="deleteConfirmVisible = false">Cancel</el-button>
@@ -52,9 +56,13 @@
 import {computed, onBeforeMount, reactive, ref} from 'vue'
 import {get, Delete} from "@/utils/request";
 import dayjs from "dayjs";
-import {Plus} from '@element-plus/icons-vue'
+import {Plus, Ticket} from '@element-plus/icons-vue'
 import AddUser from '@/components/userUseful/AddUser.vue'
 import {ElMessage} from 'element-plus'
+import {useRouter, useRoute} from "vue-router";
+
+const router = useRouter()
+const route = useRoute()
 
 const addUserVisible = reactive({
   visible: false
@@ -112,7 +120,7 @@ const deleteUser = () => {
 
 const tableData = ref([] as User[])
 
-const getUser = () =>{
+const getUser = () => {
   get('api/users').then((res) => {
     tableData.value = []
     res.forEach((e: User) => {
@@ -129,7 +137,6 @@ const getUser = () =>{
     console.log(e)
   })
 }
-
 
 
 const refresh = () => {

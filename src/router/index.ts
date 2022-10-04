@@ -26,7 +26,7 @@ const routes = [
                 component: () => import('@/views/profile/Profile.vue')
             },
             {
-                path: '/applicationList',
+                path: 'applicationList',
                 meta: { title:'Application List', permission: '1' },
                 component: () => import('@/views/forms/ApplicationList.vue')
             },
@@ -41,7 +41,14 @@ const routes = [
                 path: "manageuser",
                 name: "manageuser",
                 meta: { title:'Manage User', permission: '5' },
-                component: () => import('@/views/management/ManageUser.vue')
+                component: () => import('@/views/management/ManageUser.vue'),
+
+            },
+            {
+                path: "manageuser/batch-invite-user",
+                name: "batch-invite-user",
+                meta: { title:'Batch Invite User', permission: '5' },
+                component: () => import('@/views/management/BatchInviteUser.vue')
             },
             {
 
