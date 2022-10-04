@@ -9,11 +9,13 @@
               border
               keep-source
               height="100%"
+              :keyboard-config="{isArrow: true, isDel: true, isEnter: true, isTab: true, isEdit: true, isChecked: true}"
               :data="tableData"
               :column-config="{resizable: true}"
               :edit-config="{trigger: 'click', mode: 'row', showStatus: true}"
               :sort-config="{trigger: 'cell', defaultSort: {field: 'age', order: 'desc'}, orders: ['desc', 'asc', null]}"
               @edit-closed="editClosedEvent">
+            <vxe-column type="checkbox" width="50"></vxe-column>
             <vxe-column title="#" width="60" field="index"></vxe-column>
             <vxe-column field="userID" title="UserID (UPI)" :edit-render="{}">
               <template #edit="{ row }">
@@ -49,7 +51,7 @@
       <el-col :span="4">
 
         <el-row justify="center" class="button-wrapper">
-          <el-button class="button" :icon="DocumentChecked" type="warning" @click="saveEvent">Save</el-button>
+          <el-button class="button" type="warning" @click="saveEvent"><font-awesome-icon icon="fa-solid fa-cloud-arrow-up" />Save</el-button>
         </el-row>
 
         <el-row justify="center" class="button-wrapper">
@@ -90,9 +92,6 @@ import {ref, reactive, toRefs} from 'vue'
 import {get, post} from "@/utils/request";
 import {ElMessage} from "element-plus";
 
-
-const tableRef = ref<VxeTableInstance>()
-const tableLoading = ref(false)
 type InviteUser = {
   index: number,
   userID: string
@@ -100,9 +99,17 @@ type InviteUser = {
   name: string,
   groups: Array<string>
 }
+type Group = {
+  groupID: number
+  groupName: string
+}
 
 
+const tableRef = ref<VxeTableInstance>()
+const tableLoading = ref(false)
 const tableData = ref([] as InviteUser[])
+const groups = ref([] as Group[])
+
 
 
 const editClosedEvent: VxeTableEvents.EditClosed = ({row, column}) => {
@@ -135,17 +142,6 @@ const addRow = async (group: string | null) => {
   await $table?.setEditCell(newRow, 'userID')
   tableData.value.push(user)
 }
-
-
-type Group = {
-  groupID: number
-  groupName: string
-}
-const groups = ref([] as Group[])
-
-get('api/groups').then((res) => {
-  groups.value = res;
-})
 
 
 const send = async () => {
@@ -206,6 +202,15 @@ const saveEvent = async () => {
   tableLoading.value = false
 }
 
+const removeEvent = async (row: any) => {
+  const $table = tableRef.value
+  const type = await VXETable.modal.confirm('Confirm to delete?')
+  if (type === 'confirm') {
+    $table?.remove(row)
+  }
+}
+
+
 const loadList = async () => {
   tableLoading.value = true
   try {
@@ -216,6 +221,11 @@ const loadList = async () => {
   }
   tableLoading.value = false
 }
+
+
+get('api/groups').then((res) => {
+  groups.value = res;
+})
 
 loadList()
 

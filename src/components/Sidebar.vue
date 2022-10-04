@@ -27,8 +27,14 @@ const items: sidebarMenu = [
   },
   {
     icon: 'Document',
-    index: '/applicationList',
+    index: '/applicationlist',
     title: 'Application List',
+    permission: '1',
+  },
+  {
+    icon: 'DocumentChecked',
+    index: '/applicationapproval',
+    title: 'Application Approval',
     permission: '1',
   },
   {

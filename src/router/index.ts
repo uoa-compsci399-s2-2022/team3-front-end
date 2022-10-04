@@ -26,9 +26,14 @@ const routes = [
                 component: () => import('@/views/profile/Profile.vue')
             },
             {
-                path: 'applicationList',
+                path: 'applicationlist',
                 meta: { title:'Application List', permission: '1' },
-                component: () => import('@/views/forms/ApplicationList.vue')
+                component: () => import('@/views/Application/ApplicationList.vue')
+            },
+            {
+                path: 'applicationapproval',
+                meta: { title:'Application Approval', permission: '5' },
+                component: () => import('@/views/Application/ApplicationApproval.vue')
             },
             //management
             {
@@ -75,7 +80,7 @@ const routes = [
     {
         path: '/application/:applicationID',
         meta: { title:'Apply for the position', permission: '2' },
-        component: () => import('@/views/forms/Application.vue')
+        component: () => import('@/views/Application/Application.vue')
     },
 
     {
