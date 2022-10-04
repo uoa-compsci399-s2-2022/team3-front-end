@@ -153,6 +153,7 @@ const setCurrent = (row?: term) => {
  */
 async function getTermList() {
     let termList = await get('api/term');
+    terms.length = 0;
     (termList as term[]).forEach((term) => terms.push(term));
     loading.value = false;
     terms.sort((a: term, b: term) => {
@@ -191,6 +192,8 @@ const termDTO = reactive<term>({
 })
 
 
+
+
 /**
  * @description function handles adding term
  */
@@ -198,10 +201,7 @@ const handleTermAdd = () => {
     if (termDTO.termName && termDTO.startDate && termDTO.endDate && termDTO.defaultDeadLine) {
         post('api/term', termDTO)
             .then(() => {
-                terms.push(termDTO);
-                terms.sort((a: term, b: term) => {
-                    return new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
-                }); // sort according its start Date.
+                getTermList();
                 ElMessage({
                     message: `Added a new term ${termDTO.termName}.`,
                     type: 'success',
@@ -545,7 +545,7 @@ const handleCourseDelete = (courseID: number) => {
         getCourseList();
     }).then(() => {
         ElMessage({
-            message: `Deleted success.\n The page will be refreshed in 3s.`,
+            message: `Delete success.`,
             type: 'success',
         })
     }).catch((err) => {
@@ -639,7 +639,7 @@ const handleCourseEdit = (row: number) => {
         }).then(() => {
             closeEditCourse();
             ElMessage({
-                message: `Edit success.\n The page will be refreshed in 3s.`,
+                message: `Edit success.`,
                 type: 'success',
             })
         }).catch(err => {
