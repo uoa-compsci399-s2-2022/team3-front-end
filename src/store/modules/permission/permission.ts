@@ -23,6 +23,7 @@ export const usePermissionStore = defineStore('permission', () => {
     }
 
     const setKeyFromGroups = (groupArr: string[]) => {
+        key.value.clear();
         groupArr.forEach( (group) => {
             defaultList.value[(group as identityGroups)].forEach(item => { key.value.add(item) })
         })

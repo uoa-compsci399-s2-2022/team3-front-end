@@ -1,290 +1,297 @@
 <script setup lang="ts">
-import { useSidebarStore } from '@/store/modules/sidebar/sidebar';
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import {useSidebarStore} from '@/store/modules/sidebar/sidebar';
+import {computed} from 'vue';
+import {useRoute} from 'vue-router';
 
 type sidebarSubMenu = {
-    index: string;
-    title: string;
-    permission: string;
+  index: string;
+  title: string;
+  permission: string;
+  subs?: sidebarSubMenu[]
 }
 
 type sidebarMenu = {
-    icon?: any;
-    index: string;
-    title: string;
-    permission?: string;
-    subs?: sidebarSubMenu[]
+  icon?: any;
+  index: string;
+  title: string;
+  permission?: string;
+  subs?: sidebarSubMenu[]
 }[]
 
 const items: sidebarMenu = [
-    {
-        icon: 'Odometer',
-        index: '/dashboard',
-        title: 'Dashboard',
-        permission: '1',
-    },
-
-    {
-      icon: 'Document',
-      index: '/applicationList',
-      title: 'Application List',
-      permission: '1',
-    },
-   {
-     icon: "Collection",
-     index: "/courseList",
-     title: "Course List",
-     permission: "1",
-   },
-    {
-        icon: 'Management',
-        index: '4',
-        title: 'Management',
-        permission: '4',
+  {
+    icon: 'Odometer',
+    index: '/dashboard',
+    title: 'Dashboard',
+    permission: '1',
+  },
+  {
+    icon: 'Document',
+    index: '/applicationlist',
+    title: 'Application List',
+    permission: '1',
+  },
+  {
+    icon: 'DocumentChecked',
+    index: '/applicationapproval',
+    title: 'Application Approval',
+    permission: '1',
+  },
+  {
+    icon: "Collection",
+    index: "/courseList",
+    title: "Course List",
+    permission: "1",
+  },
+  {
+    icon: 'Management',
+    index: '4',
+    title: 'Management',
+    permission: '4',
+    subs: [
+      {
+        index: '/managecourse',
+        title: 'Manage Course',
+        permission: '5',
+      },
+      {
+        index: 'manageuserFolder',
+        title: 'Manage User',
+        permission: '5',
         subs: [
-            {
-                index: '/managecourse',
-                title: 'Manage Course',
-                permission: '5',
-            },
           {
             index: '/manageuser',
             title: 'Manage User',
             permission: '5',
           },
           {
-            index: '/manageEnrolment',
-            title: 'Manage Enrolment',
+            index: '/manageuser/batch-invite-user',
+            title: 'Batch Invite User',
             permission: '5',
-          },
-
+          }
         ]
-    },
-
-
-    // {
-    //     icon: 'Collection',
-    //     index: '',
-    //     title: 'Course',
-    //     permission: '999',
-    // },
-    // {
-    //     icon: 'MessageBox',
-    //     index: '',
-    //     title: 'Message',
-    //     permission: '999',
-    // },
-
-    // {
-    //     icon: People,
-    //     index: '',
-    //     title: 'People',
-    //     permission: '999',
-    // },
-]
+      },
+      {
+        index: '/manageEnrolment',
+        title: 'Manage Enrolment',
+        permission: '5',
+      },
+    ]
+  }];
 
 const sidebar = useSidebarStore();
 const onRoutes = computed(() => {
-    const route = useRoute();
-    return route.path == '/' ? '/dashboard' : route.path;
+  const route = useRoute();
+  return route.path == '/' ? '/dashboard' : route.path;
 })
 
 const modalDisplay = computed(() => {
-    console.log(sidebar.collapse);
-    return { "display": `${sidebar.collapse ? "none" : "block"}` };
+  console.log(sidebar.collapse);
+  return {"display": `${sidebar.collapse ? "none" : "block"}`};
 })
 
 </script>
 
 <template>
-    <div class="sidebar">
-        <el-menu :default-active="onRoutes" :collapse="sidebar.collapse" :router="true" class="menu">
+  <div class="sidebar">
+    <el-menu :default-active="onRoutes" :collapse="sidebar.collapse" :router="true" class="menu">
 
-            <div class="control-collase">
-                <el-icon v-show="sidebar.collapse" @click="sidebar.handleCollase">
-                    <Expand />
-                </el-icon>
-                <el-icon v-show="!sidebar.collapse" @click="sidebar.handleCollase">
-                    <Fold />
-                </el-icon>
-            </div>
+      <div class="control-collase">
+        <el-icon v-show="sidebar.collapse" @click="sidebar.handleCollase">
+          <Expand/>
+        </el-icon>
+        <el-icon v-show="!sidebar.collapse" @click="sidebar.handleCollase">
+          <Fold/>
+        </el-icon>
+      </div>
 
-<!--            <div class="sidebar-logo">-->
-<!--                <a href="https://www.auckland.ac.nz">-->
-<!--                    <img src="@/assets/logo/uoa.svg" alt="UoA logo" />-->
-<!--                </a>-->
-<!--            </div>-->
-            <template v-for="item in items">
-                <template v-if="item.subs">
-                    <el-sub-menu :index="item.index" :key="item.index" v-permission="item.permission">
-                        <template #title>
-                            <el-icon>
-                                <component :is="item.icon"></component>
-                            </el-icon>
-                            <span>{{ item.title }}</span>
-                        </template>
-
-                        <template v-for="subItem in item.subs">
-                            <el-menu-item :index="subItem.index" v-permission="item.permission">
-                                {{ subItem.title }}
-                            </el-menu-item>
-                        </template>
-
-                    </el-sub-menu>
-                </template>
-                <template v-else>
-                    <el-menu-item :index="item.index" :key="item.index" v-permission="item.permission">
-                        <el-icon>
-                            <component :is="item.icon"></component>
-                        </el-icon>
-                        <template #title>{{ item.title }}</template>
-                    </el-menu-item>
-                </template>
+      <!--            <div class="sidebar-logo">-->
+      <!--                <a href="https://www.auckland.ac.nz">-->
+      <!--                    <img src="@/assets/logo/uoa.svg" alt="UoA logo" />-->
+      <!--                </a>-->
+      <!--            </div>-->
+      <template v-for="item in items">
+        <template v-if="item.subs">
+          <el-sub-menu :index="item.index" :key="item.index" v-permission="item.permission">
+            <template #title>
+              <el-icon>
+                <component :is="item.icon"></component>
+              </el-icon>
+              <span>{{ item.title }}</span>
             </template>
-          <div>
 
-          </div>
+            <template v-for="subItem in item.subs">
 
-        </el-menu>
-    </div>
+              <template v-if="subItem.subs">
+                <el-sub-menu :index="subItem.index" :key="subItem.index" v-permission="subItem.permission">
+                  <template #title>
+                    <span>{{ subItem.title }}</span>
+                  </template>
+                  <template v-for="subSubItem in subItem.subs" :key="subSubItem.index">
+                    <el-menu-item :index="subSubItem.index"
+                                  v-permission="subSubItem.permission">
+                      <span>{{ subSubItem.title }}</span>
+                    </el-menu-item>
+                  </template>
+                </el-sub-menu>
+              </template>
+              <template v-else>
+                <el-menu-item :index="subItem.index" :key="subItem.index" v-permission="subItem.permission">
+                  <span>{{ subItem.title }}</span>
+                </el-menu-item>
+              </template>
+            </template>
+          </el-sub-menu>
+        </template>
+        <template v-else>
+          <el-menu-item :index="item.index" :key="item.index" v-permission="item.permission">
+            <el-icon>
+              <component :is="item.icon"></component>
+            </el-icon>
+            <template #title>{{ item.title }}</template>
+          </el-menu-item>
+        </template>
+      </template>
 
-    <div class="model" :style="modalDisplay" @click="sidebar.handleCollase"></div>
+    </el-menu>
+  </div>
+
+  <div class="model" :style="modalDisplay" @click="sidebar.handleCollase"></div>
 
 
 </template>
 
 <style lang="scss">
 @media (max-width: 730px) {
-    .sidebar {
-        position: fixed !important;
-        z-index: 999;
-    }
+  .sidebar {
+    position: fixed !important;
+    z-index: 999;
+  }
 }
 
 @media (min-width: 730px) {
-    .model {
-        display: none !important;
-    }
+  .model {
+    display: none !important;
+  }
 }
 
 .model {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100vw;
-    backdrop-filter: blur(4px);
-    z-index: 1;
-    background-color: rgba($color: #000000, $alpha: 0.1);
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100vw;
+  backdrop-filter: blur(4px);
+  z-index: 1;
+  background-color: rgba($color: #000000, $alpha: 0.1);
 }
 
 @media (max-width: 540px) {
-    .sidebar {
-        display: none;
-    }
+  .sidebar {
+    display: none;
+  }
 }
 
 .sidebar {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    background-color: aliceblue;
-    background: red;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background-color: aliceblue;
+  background: red;
 
-    .menu {
-        --el-menu-bg-color: #222F3D;
-        --el-menu-text-color: white;
-        --el-menu-hover-text-color: white;
-        --el-menu-active-color: #222F3D;
+  .menu {
+    --el-menu-bg-color: #222F3D;
+    --el-menu-text-color: white;
+    --el-menu-hover-text-color: white;
+    --el-menu-active-color: #222F3D;
 
-        .el-sub-menu__title:hover {
-            background-color: #0099ff;
-        }
-
+    .el-sub-menu__title:hover {
+      background-color: #0099ff;
     }
 
-    .menu.el-menu--collapse {
-        .el-sub-menu.is-active {
-            .el-sub-menu__title {
-                background-color: white;
-            }
-        }
+  }
 
+  .menu.el-menu--collapse {
+    .el-sub-menu.is-active {
+      .el-sub-menu__title {
+        background-color: white;
+      }
     }
 
-    .menu:not(.el-menu--collapse) {
-        width: 260px;
-    }
+  }
 
-    .menu:not(.el-menu--collapse) {
-        .el-menu-item {
-            &.is-active:before {
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 4px;
-                content: "";
-                background-color: #9ed8ff;
-            }
-        }
-    }
+  .menu:not(.el-menu--collapse) {
+    width: 260px;
+  }
 
-
+  .menu:not(.el-menu--collapse) {
     .el-menu-item {
+      &.is-active:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 4px;
+        content: "";
+        background-color: #9ed8ff;
+      }
+    }
+  }
 
 
-        &.is-active {
-            background-color: #ffffff;
-        }
+  .el-menu-item {
 
-        &.is-active:hover {
-            background-color: #ffffff;
-        }
 
-        &:hover {
-            background-color: #0099ff;
-        }
+    &.is-active {
+      background-color: #ffffff;
     }
 
-    ul {
-        height: 100%;
+    &.is-active:hover {
+      background-color: #ffffff;
     }
 
-    .control-collase {
-        width: 100%;
-        height: 50px;
-        display: flex;
-        justify-content: flex-end;
-        padding: 10px 20px;
+    &:hover {
+      background-color: #0099ff;
+    }
+  }
 
-        .el-icon {
-            color: white;
-            font-size: 20px;
-            transition: all 0.2s ease;
-        }
+  ul {
+    height: 100%;
+  }
 
-        .el-icon:hover {
-            svg {
-                filter: drop-shadow(-0px 0px 1px rgb(255, 255, 255))
-            }
+  .control-collase {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 20px;
 
-            text-shadow: white 1rem 1rem 1rem;
-        }
+    .el-icon {
+      color: white;
+      font-size: 20px;
+      transition: all 0.2s ease;
     }
 
-    &-logo {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
+    .el-icon:hover {
+      svg {
+        filter: drop-shadow(-0px 0px 1px rgb(255, 255, 255))
+      }
 
-        img {
-            width: 150px;
-            cursor: pointer;
-        }
+      text-shadow: white 1rem 1rem 1rem;
     }
+  }
+
+  &-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+
+    img {
+      width: 150px;
+      cursor: pointer;
+    }
+  }
 
 }
 </style>
