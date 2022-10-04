@@ -51,6 +51,8 @@ declare module '@vue/runtime-core' {
     People: typeof import('./src/components/icons/People.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SendEmail: typeof import('./src/components/sendEmail.vue')['default']
+    SendEmailStatus: typeof import('./src/components/SendEmailStatus.vue')['default']
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
     StartApplicationDrawer: typeof import('./src/components/applicationUseful/StartApplicationDrawer.vue')['default']
     Test: typeof import('./src/components/cards/Test.vue')['default']
