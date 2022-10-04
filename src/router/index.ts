@@ -177,6 +177,7 @@ router.beforeEach((to, from, next) => {
     function restoreUserKey(): Promise<any> {
         return get('/api/currentUser').then(
             responce => {
+                console.log(responce)
                 store.setKeyFromGroups(responce.groups);
                 sessionStorage.setItem('mtms_keys', JSON.stringify(store.getKey))
             }

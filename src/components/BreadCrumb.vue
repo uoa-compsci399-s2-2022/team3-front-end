@@ -8,7 +8,6 @@ type Paths = {
   path: string;
   title: any;
 };
-console.log(router.getRoutes().filter((e) => e.path === "/manageuser"));
 
 const matched = computed(() => {
   let paths = [] as Paths[];
