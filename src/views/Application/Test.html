@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/test.js"></script>
+    <title>文件上传</title>
+    <style>
+        .myBtn{
+            padding: 5px 10px;
+            background: rgb(92,184,92);
+            color: white;
+            outline: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<input type="file" id="file" style="display: none" onchange="upload(this)">
+<button class="myBtn" onclick="fileBtn()">
+    上传文件
+</button>
+
+<a href="" id="img" style="width: 200px">
+<script>
+    function fileBtn() {
+        document.getElementById('file').click()
+    }
+
+    function upload(file) {
+        let img = document.getElementById('img')
+        let formData = new FormData()
+        let temp = file.files[0]
+        if (temp){
+            formData.append('file',temp)
+            img.href = window.URL.createObjectURL(temp)
+            $.ajax({
+                url:"/test/file2",
+                type:"POST",
+                data: formData,
+                processData: false, // 告诉jQuery不要去处理发送的数据
+                contentType: false, // 告诉jQuery不要去设置Content-Type请求头
+                success: function(result){
+                    alert(result);
+                }
+            })
+        }
+    }
+</script>
+</body>
+</html>

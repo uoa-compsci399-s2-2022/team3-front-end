@@ -322,10 +322,157 @@ const validateStep = async (step: number) => {
 }
 //---------表单验证相关------end--------------------------------------
 
+
+
+
+// -----Work by laiyu -------
+
+// -----Testing upload file ------ start
+import type  {UploadProps, UploadUserFile,  UploadInstance, UploadRawFile} from "element-plus";
+import axios from "axios";
+import {getBaseURL} from "xe-utils";
+
+import { genFileId } from 'element-plus'
+
+// 上传文件后对文件的预览于删除
+
+
+// uploadFile 对于当个文件上传， uploadFiles 对于多个文件上传
+// 目前考虑的是上传单个文件， 后续又修改在添加功能
+const fileList_cv = ref<UploadUserFile[]>([]);
+const fileCVURL_cv = ref<string>('')
+const upload_cv = ref<UploadInstance>()
+
+// academic data : ad
+const fileList_ad = ref<UploadUserFile[]>([]);
+const fileCVURL_ad = ref<string>('')
+const upload_ad = ref<UploadInstance>()
+
+// 当上传的文件超过1 个时， 则替换之前的那一个
+const handleExceed_cv: UploadProps['onExceed'] = (files, fileList) => {
+
+  upload_cv.value!.clearFiles()
+  const file = files[0] as UploadRawFile
+  file.uid = genFileId()
+  upload_cv.value!.handleStart(file)
+}
+// 检测文件上传
+const handleChange_cv: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
+  if (fileList_cv.value.length ==  0) {
+    fileList_cv.value.push(uploadFile)
+
+    // console.log(fileList.value)
+    let url = window.URL.createObjectURL(uploadFile.raw as Blob)
+    fileCVURL_cv.value = url
+  }
+  else{
+    fileList_cv.value[0] = uploadFile
+    let url = window.URL.createObjectURL(uploadFile.raw as Blob)
+    fileCVURL_cv.value = url
+  }
+  console.log(fileList_cv.value)
+  console.log(fileCVURL_cv.value)
+  console.log(upload_cv.value)
+}
+
+const handleRemove_cv: UploadProps['onRemove'] = (file, uploadFiles) => {
+  fileCVURL_cv.value = ''
+}
+
+const handleRemove_ad: UploadProps['onRemove'] = (file, uploadFiles) => {
+  fileCVURL_ad.value = ''
+}
+// academic data : ad
+const handleExceed_ad: UploadProps['onExceed'] = (files, fileList) => {
+
+  upload_ad.value!.clearFiles()
+  const file = files[0] as UploadRawFile
+  file.uid = genFileId()
+  upload_ad.value!.handleStart(file)
+}
+// 检测文件上传
+const handleChange_ad: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
+  if (fileList_ad.value.length ==  0) {
+    fileList_ad.value.push(uploadFile)
+
+    // console.log(fileList.value)
+    let url = window.URL.createObjectURL(uploadFile.raw as Blob)
+    fileCVURL_ad.value = url
+  }
+  else{
+    fileList_ad.value[0] = uploadFile
+    let url = window.URL.createObjectURL(uploadFile.raw as Blob)
+    fileCVURL_ad.value = url
+  }
+  console.log(fileList_ad.value)
+  console.log(fileCVURL_ad.value)
+  console.log(upload_ad.value)
+}
+
+// 上传文件， 通过 up-loa
+// d
+
+function handleUploadFile(){
+
+  var message = '';
+  var submit = true;
+  if (fileList_cv.value.length == 0 && fileList_ad.value.length == 0){
+    submit = false;
+    alert('Please upload your CV and academic data')
+  }
+  else if (fileList_cv.value.length == 0 && fileList_ad.value.length == 1)
+  {
+
+    message = 'Save academic data. Please upload your CV later.'
+  }
+  else if (fileList_cv.value.length == 1 && fileList_ad.value.length == 0)
+  {
+    message = 'Saved CV. Please upload your academic data later.'
+  }
+  else{
+    message = 'Upload successfully'
+  }
+  if (submit == true) {
+    post('api/uploadFile', {
+      'fileCV' : fileList_cv.value,
+      'fileURL':fileCVURL_cv,
+      'fileAD': fileList_ad.value,
+      'fileURLAD': fileCVURL_ad
+    }).then(
+
+        res => {
+          console.log(res)
+          ElMessage({
+            showClose: true,
+            message: message,
+            type: 'success',
+          })
+        }
+    ).catch(err => {
+      console.log(err)
+      ElMessage({
+        showClose: true,
+        message: err.response.data['message'],
+        type: 'error',
+      })
+    })
+  }
+
+
+}
+// -----Testing upload file ------ end
+
+
 //---------保存数据相关------start------------------------------------
 const save = () => {
   // saveLocal()
-  post(`api/saveApplication/${applicationID.value}`, {"applicationPersonalDetail": data}).then(
+  post(`api/saveApplication/${applicationID.value}`, {
+    "applicationPersonalDetail": data,
+    'fileCV' : fileList_cv.value,
+    'fileURLCV':fileCVURL_cv,
+    'fileAD': fileList_ad.value,
+    'fileURLAD': fileCVURL_ad
+  }).then(
       res => {
         console.log(res)
         ElMessage({
@@ -506,31 +653,64 @@ const saveSession = () => {
 
 
         <Transition>
-          <el-upload class="upload-demo" drag
-                     action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" v-show="stepArr[3]"
-                     accept="application/pdf">
-            <el-icon class="el-icon--upload">
-              <upload-filled/>
-            </el-icon>
-            <div class="el-upload__text">
-              Drop your CV here or <em>click to upload</em>
-            </div>
-            <template #tip>
-              <div class="el-upload__tip">
-                application/pdf files with a size less than 500kb
+          <div v-show="stepArr[3]">
+            <el-divider>Upload your personal CV data</el-divider>
+
+            <el-upload class="upload-cv" drag
+                       ref="upload_cv"
+                     accept="application/pdf"
+                       v-model:file-list = "fileList_cv"
+                       :on-change = "handleChange_cv"
+                       :on-exceed = "handleExceed_cv"
+                       :on-remove = "handleRemove_cv"
+                       :limit = "1">
+              <el-icon class="el-icon--upload">
+                <upload-filled/>
+              </el-icon>
+              <div class="el-upload__text">
+                Drop your CV here or <em>click to upload</em>
               </div>
-            </template>
-          </el-upload>
+              <template #tip>
+                <div class="el-upload__tip">
+                  application/pdf files with a size less than 500kb
+                </div>
+              </template>
+            </el-upload>
+
+            <el-divider>Upload your personal academic data</el-divider>
+            <el-upload class="upload-academicData" drag
+                       ref="upload_ad"
+                       accept="application/pdf"
+                       v-model:file-list = "fileList_ad"
+                       :on-change = "handleChange_ad"
+                       :on-exceed = "handleExceed_ad"
+                       :on-remove = "handleRemove_ad"
+                       :limit = "1">
+              <el-icon class="el-icon--upload">
+                <upload-filled/>
+              </el-icon>
+              <div class="el-upload__text">
+                Drop your academic data here or <em>click to upload</em>
+              </div>
+              <template #tip>
+                <div class="el-upload__tip">
+                  application/pdf files with a size less than 500kb
+                </div>
+              </template>
+            </el-upload>
+          </div>
+
         </Transition>
 
       </div>
-
+      <el-button @click="handleUploadFile" >Test</el-button>
 
       <div class="application-control-btns">
         <el-button @click="prev()" :disabled="atFirst">Previous Step</el-button>
-        <el-button @click="save" class="application-control-btns-main" type="success" plain v-if="step <= 2">Save
+        <el-button @click="save" class="application-control-btns-main" type="success" plain >Save
         </el-button>
-        <el-button @click="" class="application-control-btns-main" type="primary" v-else>Submit</el-button>
+<!--        <el-button @click="" class="application-control-btns-main" type="primary" v-else>Submit</el-button>-->
+        <el-button @click="" class="application-control-btns-main" type="primary" v-if="step === 3">Save Files and Submit</el-button>
         <el-button @click="next()" :disabled="atLast">Next Step</el-button>
       </div>
     </div>
