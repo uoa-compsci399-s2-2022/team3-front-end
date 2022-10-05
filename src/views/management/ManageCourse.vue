@@ -490,30 +490,30 @@ const rules = reactive<FormRules>({
     courseName: [
         { required: true, message: 'Please input course name', trigger: 'blur' },
     ],
-    estimatedNumOfStudents: [
-        { required: true, message: 'Field can\'t be empty', trigger: 'blur' },
-        { type: 'number', message: 'Must be a number' },
-    ],
-    currentlyNumOfStudents: [
-        { required: true, message: 'Field can\'t be empty', trigger: 'blur' },
-        { type: 'number', message: 'Must be a number' },
-    ],
-    numOfTutorialsPerWeek: [
-        { required: true, message: 'Field can\'t be empty', trigger: 'blur' },
-        { type: 'number', message: 'Must be a number' },
-    ],
-    numOfLabsPerWeek: [
-        { required: true, message: 'Field can\'t be empty', trigger: 'blur' },
-        { type: 'number', message: 'Must be a number' },
-    ],
-    numOfAssignments: [
-        { required: true, message: 'Field can\'t be empty', trigger: 'blur' },
-        { type: 'number', message: 'Must be a number' },
-    ],
-    totalAvailableHours: [
-        { required: true, message: 'Field can\'t be empty', trigger: 'blur' },
-        { type: 'number', message: 'Must be a number' },
-    ]
+    // estimatedNumOfStudents: [
+    //     { required: true, message: 'Field can\'t be empty', trigger: 'blur' },
+    //     { type: 'number', message: 'Must be a number' },
+    // ],
+    // currentlyNumOfStudents: [
+    //     { required: true, message: 'Field can\'t be empty', trigger: 'blur' },
+    //     { type: 'number', message: 'Must be a number' },
+    // ],
+    // numOfTutorialsPerWeek: [
+    //     { required: true, message: 'Field can\'t be empty', trigger: 'blur' },
+    //     { type: 'number', message: 'Must be a number' },
+    // ],
+    // numOfLabsPerWeek: [
+    //     { required: true, message: 'Field can\'t be empty', trigger: 'blur' },
+    //     { type: 'number', message: 'Must be a number' },
+    // ],
+    // numOfAssignments: [
+    //     { required: true, message: 'Field can\'t be empty', trigger: 'blur' },
+    //     { type: 'number', message: 'Must be a number' },
+    // ],
+    // totalAvailableHours: [
+    //     { required: true, message: 'Field can\'t be empty', trigger: 'blur' },
+    //     { type: 'number', message: 'Must be a number' },
+    // ]
 })
 
 /**
