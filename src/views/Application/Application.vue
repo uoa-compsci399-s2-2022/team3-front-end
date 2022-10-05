@@ -332,6 +332,7 @@ import type  {UploadProps, UploadUserFile,  UploadInstance, UploadRawFile} from 
 import axios from "axios";
 import {getBaseURL} from "xe-utils";
 
+
 import { genFileId } from 'element-plus'
 
 // 上传文件后对文件的预览于删除
@@ -358,21 +359,45 @@ const handleExceed_cv: UploadProps['onExceed'] = (files, fileList) => {
 }
 // 检测文件上传
 const handleChange_cv: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
+
+
+
+
+
   if (fileList_cv.value.length ==  0) {
     fileList_cv.value.push(uploadFile)
-
     // console.log(fileList.value)
-    let url = window.URL.createObjectURL(uploadFile.raw as Blob)
-    fileCVURL_cv.value = url
+    // let url = window.URL.createObjectURL(uploadFile.raw as Blob)
+    // fileCVURL_cv.value = url
+
+    const reader = new FileReader()
+    reader.readAsDataURL(uploadFile.raw as Blob)
+    reader.onload = () => {
+      const base64data = reader.result
+      const img = base64data as string;
+      // console.log(img)
+      fileCVURL_cv.value = img.split('data:application/pdf;base64,')[1]
+    }
+
   }
   else{
     fileList_cv.value[0] = uploadFile
-    let url = window.URL.createObjectURL(uploadFile.raw as Blob)
-    fileCVURL_cv.value = url
+    // let url = window.URL.createObjectURL(uploadFile.raw as Blob)
+    // fileCVURL_cv.value = url
+
+    const reader = new FileReader()
+    reader.readAsDataURL(uploadFile.raw as Blob)
+    reader.onload = () => {
+      const base64data = reader.result
+      const img = base64data as string;
+      // console.log(img)
+      fileCVURL_cv.value = img.split('data:application/pdf;base64,')[1]
+    }
+
   }
-  console.log(fileList_cv.value)
-  console.log(fileCVURL_cv.value)
-  console.log(upload_cv.value)
+  // console.log(fileList_cv.value)
+  // console.log(fileCVURL_cv.value)
+  // console.log(upload_cv.value)
 }
 
 const handleRemove_cv: UploadProps['onRemove'] = (file, uploadFiles) => {
@@ -396,21 +421,39 @@ const handleChange_ad: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
     fileList_ad.value.push(uploadFile)
 
     // console.log(fileList.value)
-    let url = window.URL.createObjectURL(uploadFile.raw as Blob)
-    fileCVURL_ad.value = url
+    // let url = window.URL.createObjectURL(uploadFile.raw as Blob)
+    // fileCVURL_ad.value = url
+
+    // base64 encode
+    const reader = new FileReader()
+    reader.readAsDataURL(uploadFile.raw as Blob)
+    reader.onload = () => {
+      const base64data = reader.result
+      const img = base64data as string;
+      // console.log(img)
+      fileCVURL_ad.value = img.split('data:application/pdf;base64,')[1]
+    }
   }
   else{
     fileList_ad.value[0] = uploadFile
-    let url = window.URL.createObjectURL(uploadFile.raw as Blob)
-    fileCVURL_ad.value = url
+    // let url = window.URL.createObjectURL(uploadFile.raw as Blob)
+    // fileCVURL_ad.value = url
+
+
+    const reader = new FileReader()
+    reader.readAsDataURL(uploadFile.raw as Blob)
+    reader.onload = () => {
+      const base64data = reader.result
+      const img = base64data as string;
+      // console.log(img)
+      fileCVURL_ad.value = img.split('data:application/pdf;base64,')[1]
+    }
   }
-  console.log(fileList_ad.value)
-  console.log(fileCVURL_ad.value)
-  console.log(upload_ad.value)
+  // console.log(fileList_ad.value)
+  // console.log(fileCVURL_ad.value)
+  // console.log(upload_ad.value)
 }
 
-// 上传文件， 通过 up-loa
-// d
 
 function handleUploadFile(){
 
@@ -659,6 +702,7 @@ const saveSession = () => {
             <el-upload class="upload-cv" drag
                        ref="upload_cv"
                      accept="application/pdf"
+
                        v-model:file-list = "fileList_cv"
                        :on-change = "handleChange_cv"
                        :on-exceed = "handleExceed_cv"
