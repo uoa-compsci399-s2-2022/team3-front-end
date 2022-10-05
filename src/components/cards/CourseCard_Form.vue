@@ -1,19 +1,5 @@
 <script setup lang="ts">
-import Test from '@/components/cards/Test.vue'
-  let title = "Compsci 101 : Capstone Project"
-  let semester = "semester one"
-  let course_descriptions = " This course is an introduction to programming computers. It is the main introductory course in the Computer Science department and is taken by students from a variety of disciplines wishing to have an understanding of computer programming as well as students wanting to continue on to further studies in Computer Science."
-  let num_assignment = 4
-  let num_mark_assignment = 3
-  let num_tut = 10
-  let requirement = "A grade in this course; GPA at least 6.0."
-  let Workload = 31
-  let num_student = 300
-  let num_tutor = 2
-  let num_marker = 10
-  let deadline = "2/17/2022"
-  let coordinator_name = "John"
-  let coordinator_email = "www.google.com"
+
 </script>
 
 <template>

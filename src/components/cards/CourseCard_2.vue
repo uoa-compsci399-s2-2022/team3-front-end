@@ -96,6 +96,10 @@
 
               </ui>
 
+
+                <el-button style="color: rgb(255 255 255);background-color: #00467f;">Apply</el-button>
+
+
 <!--              <li>-->
 <!--                Name: John-->
 <!--              </li>-->
@@ -105,11 +109,7 @@
             </div>
           </div>
           <!--      <el-divider style="position: absolute; bottom: 70px"/>-->
-          <div class="card-buttons">
 
-            <el-button style="color: rgb(255 255 255);background-color: #00467f;">Apply</el-button>
-
-          </div>
         </div>
       </div>
     </div>
@@ -130,6 +130,7 @@
   box-shadow: inset 1px 1px 0 0 hsl(0deg 0% 100%), 0 8px 31px 0 #9c989833;
   //width: 500px;
   //height: 900px;
+  height: auto;
   border-radius: 30px;
   position: relative;
   .task-description{
@@ -141,7 +142,7 @@
   }
   .card-info{
     margin: 35px;
-    height: -webkit-fill-available;   /* adapted height */
+    height: auto;   /* adapted height */
     .card-title {
       font-size: 20px;
       text-align: center;
@@ -151,11 +152,7 @@
     .course-semester{
       color: #959595;
     }
-    .card-buttons{
-      bottom: 30px;
-      position: absolute;
-      right: 40px;
-    }
+
   }
 }
 .card-info{

@@ -202,6 +202,9 @@ const add_course = (course: any) => {
 
 
 //-----表单验证相关------start-----------------------------------------------
+// --- 注意 ------------------------
+// 数据库中的 willBackToNZ column 与 这里提交订单的 willComeBackToNZ column 不一致
+// 这里我把 willComeBackToNZ 改成了 willBackToNZ， 函数名没变
 const validateWillComeBackToNZ = (rule: any, value: any, callback: any) => {
   if (data.currentlyOverseas === false) {
     callback();
@@ -247,6 +250,7 @@ const dataRules = reactive<FormRules>({
   willBackToNZ: [ // isCurrentlyOverseas 的子问题
     {validator: validateWillComeBackToNZ, trigger: 'change'},
   ],
+
   isCitizenOrPR: [
     {required: true, message: 'Please select one option', trigger: 'change'},
   ],
@@ -296,7 +300,9 @@ const validateStep = async (step: number) => {
         })
   } else if (step === 1) {
     await formRef.value?.validateField(
-        ['currentlyOverseas', 'willComeBackToNZ', 'isCitizenOrPR',
+        // ['currentlyOverseas', 'willComeBackToNZ', 'isCitizenOrPR',
+        //   'haveValidVisa', 'studentDegree', 'hasOtherContract', 'maximumWorkingHours'],
+        ['currentlyOverseas', 'willBackToNZ', 'isCitizenOrPR',
           'haveValidVisa', 'studentDegree', 'hasOtherContract', 'maximumWorkingHours'],
         (valid) => {
           flag = valid;
@@ -420,7 +426,9 @@ const saveSession = () => {
               <div class="indent" v-show="data.currentlyOverseas">
                 <p>Will you come back to NZ?</p>
                 <el-form-item prop="willComeBackToNZ">
-                  <el-radio-group v-model="data.willComeBackToNZ">
+<!--                  <el-form-item prop="willBackToNZ">-->
+<!--                  <el-radio-group v-model="data.willComeBackToNZ">-->
+                    <el-radio-group v-model="data.willBackToNZ">
                     <el-radio :label="true">Yes</el-radio>
                     <el-radio :label="false">No</el-radio>
                   </el-radio-group>

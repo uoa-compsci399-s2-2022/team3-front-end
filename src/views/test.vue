@@ -1,17 +1,12 @@
 <script setup lang="ts">
-import CourseCard_detail from '@/components/cards/CourseCard_detail_version.vue'
-import CourseCard_sample from '@/components/cards/CourseCard_sample_version.vue'
+import CourseCard_form from '@/components/cards/CourseCard_Form.vue'
+import {get} from "@/utils/request";
+
+
 </script>
 
 <template>
-    <div class="course-container">
-
-      <course-card_sample/>
-      <course-card_detail/>
-
-
-
-    </div>
+<CourseCard_form/>
 </template>
 
 <style lang="scss" scoped>
