@@ -60,7 +60,7 @@ const routes = [
                 path: "courseList",
                 name: "courseList",
                 meta: { title:'Course List', permission: '1' },
-                component: () => import('@/views/management/CourseList.vue')
+                component: () => import('@/views/CourseList.vue')
             },
             {
                 path: "manageEnrolment",

@@ -1,5 +1,4 @@
 <template>
-
   <div class="page-container">
     <el-row class="header-container">
         <el-select v-model="currentTerm" @change="handleTermChange" class="m-2" placeholder="Select Term" size="large" v-loading="isLoadingTerm">
@@ -11,14 +10,10 @@
           />
         </el-select>
         <el-alert class="alert" title="Tips: Please Select Term First" type="warning"  show-icon />
-
     </el-row>
 
-
     <el-row :gutter="22" class="table-wrapper">
-
       <el-col :span="12" class="leftBox">
-
         <el-row justify="center">
           <span class="tableTitle">Course List</span>
         </el-row>

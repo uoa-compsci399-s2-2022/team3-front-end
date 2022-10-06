@@ -170,15 +170,12 @@ const addRow = async (group: string | null) => {
 
 
 const send = async () => {
-  await loadList()
   await saveEvent()
   const $table = tableRef.value
   if ($table.data!.length === 0) {
     ElMessage.warning('Please add users who need to be invited!')
     return
   }
-
-
   if (sendEmail.processing) {
     ElMessage({
       message: 'Please wait for the previous email to be sent!',
@@ -189,7 +186,7 @@ const send = async () => {
   sendEmail.processing = true
   sendEmail.status = 'processing'
 
-  get('api/inviteUser').then((res) => {
+  get('api/inviteUser', null, 0).then((res) => {
     console.log(res)
     ElMessage({
       message: '',
@@ -253,11 +250,11 @@ const saveEvent = async () => {
       message: 'Save: No changes',
       type: 'warning'
     })
-    return
+    return false
   }
   const errMap = await $table?.validate()
   if (errMap) {
-    return
+    return false
   }
   tableLoading.value = true
   try {

@@ -40,11 +40,12 @@ instance.interceptors.response.use((responce: AxiosResponse) => {
 })
 
 
-export function get(url: string, params: any=null): Promise<any> {
+export function get(url: string, params: any=null, timeout:number=20000): Promise<any> {
     const config: AxiosRequestConfig = {
         method: 'get',
         url: url,
-        params: params
+        params: params,
+        timeout: timeout
     }
     return instance(config);
 }
