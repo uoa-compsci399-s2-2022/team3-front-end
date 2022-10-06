@@ -52,6 +52,7 @@ const login = () => {
                 <div class="keep-login"><input type="checkbox" class="login-options"><span>Keep me logged in</span>
                 </div>
                 <button type="submit" @click.prevent="login">Login</button>
+                <span class="register-prompt">Don't have an account? Click <router-link to="/register">here</router-link> to sign up.</span>
             </form>
 
         </div>
@@ -59,6 +60,19 @@ const login = () => {
 </template>
 
 <style scoped lang="scss">
+
+.register-prompt {
+    font-size: 14px;
+    a {
+        text-decoration: none;
+        color: #003867;
+        font-size: 18px;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+}
 .container {
     display: flex;
     width: 100%;
