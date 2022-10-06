@@ -97,7 +97,7 @@
               </ui>
 
 
-                <el-button style="color: rgb(255 255 255);background-color: #00467f;">Apply</el-button>
+<!--                <el-button style="color: rgb(255 255 255);background-color: #00467f;">Apply</el-button>-->
 
 
 <!--              <li>-->
