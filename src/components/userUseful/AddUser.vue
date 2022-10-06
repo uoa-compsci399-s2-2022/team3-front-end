@@ -28,9 +28,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="visible.visible = false">Cancel</el-button>
-        <el-button type="primary" @click="AddUserEvent"
-        >Add</el-button
-        >
+        <el-button type="primary" @click="AddUserEvent">Add</el-button>
       </span>
     </template>
   </el-dialog>

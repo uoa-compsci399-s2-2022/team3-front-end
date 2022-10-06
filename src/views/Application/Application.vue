@@ -65,7 +65,7 @@ const getUserProfile = (currentUserProfile: any, saved: any) => {
   if (currentUserProfile === null) {
     return saved;
   } else {
-    return null;
+    return currentUserProfile;
   }
 }
 
@@ -147,6 +147,7 @@ get('api/currentUserProfile').then(res => {
   data.auid = res.auid;
   userProfileLoading.value = true;
 
+
 }).then(() => {
   get('api/saveApplication/' + applicationID.value).then(res => {
     let personalDetail = res.applicationPersonalDetail;
@@ -173,7 +174,6 @@ get('api/currentUserProfile').then(res => {
       return a.preference - b.preference;
     })
 
-
     saveLoading.value = true;
   }).catch((err) => {
     saveLoading.value = true;
@@ -181,7 +181,6 @@ get('api/currentUserProfile').then(res => {
 }).catch((err) => {
   console.log(err)
 })
-
 
 
 const courseVisible = reactive({
@@ -338,19 +337,19 @@ const validateStep = async (step: number) => {
 
 // -----Work by laiyu -------
 // -----Testing upload file ------ start
-import type  {UploadProps, UploadUserFile,  UploadInstance, UploadRawFile} from "element-plus";
+import type {UploadProps, UploadUserFile, UploadInstance, UploadRawFile} from "element-plus";
 import axios from "axios";
 import {getBaseURL} from "xe-utils";
-import { genFileId } from 'element-plus'
+import {genFileId} from 'element-plus'
 // 上传文件后对文件的预览于删除
 // uploadFile 对于当个文件上传， uploadFiles 对于多个文件上传
 // 目前考虑的是上传单个文件， 后续又修改在添加功能
 const fileList_cv = ref<UploadUserFile[]>([]);
-const fileCVURL_cv = ref<string>('')
+const fileBase_cv = ref<string>('')
 const upload_cv = ref<UploadInstance>()
 // academic data : ad
 const fileList_ad = ref<UploadUserFile[]>([]);
-const fileCVURL_ad = ref<string>('')
+const fileBase_ad = ref<string>('')
 const upload_ad = ref<UploadInstance>()
 // 当上传的文件超过1 个时， 则替换之前的那一个
 const handleExceed_cv: UploadProps['onExceed'] = (files, fileList) => {
@@ -361,42 +360,31 @@ const handleExceed_cv: UploadProps['onExceed'] = (files, fileList) => {
 }
 // 检测文件上传
 const handleChange_cv: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
-  if (fileList_cv.value.length ==  0) {
+  if (fileList_cv.value.length == 0) {
     fileList_cv.value.push(uploadFile)
-    // console.log(fileList.value)
-    // let url = window.URL.createObjectURL(uploadFile.raw as Blob)
-    // fileCVURL_cv.value = url
     const reader = new FileReader()
     reader.readAsDataURL(uploadFile.raw as Blob)
     reader.onload = () => {
       const base64data = reader.result
       const img = base64data as string;
-      // console.log(img)
-      fileCVURL_cv.value = img.split('data:application/pdf;base64,')[1]
+      fileBase_cv.value = img.split('data:application/pdf;base64,')[1]
     }
-  }
-  else{
+  } else {
     fileList_cv.value[0] = uploadFile
-    // let url = window.URL.createObjectURL(uploadFile.raw as Blob)
-    // fileCVURL_cv.value = url
     const reader = new FileReader()
     reader.readAsDataURL(uploadFile.raw as Blob)
     reader.onload = () => {
       const base64data = reader.result
       const img = base64data as string;
-      // console.log(img)
-      fileCVURL_cv.value = img.split('data:application/pdf;base64,')[1]
+      fileBase_cv.value = img.split('data:application/pdf;base64,')[1]
     }
   }
-  // console.log(fileList_cv.value)
-  // console.log(fileCVURL_cv.value)
-  // console.log(upload_cv.value)
 }
 const handleRemove_cv: UploadProps['onRemove'] = (file, uploadFiles) => {
-  fileCVURL_cv.value = ''
+  fileBase_cv.value = ''
 }
 const handleRemove_ad: UploadProps['onRemove'] = (file, uploadFiles) => {
-  fileCVURL_ad.value = ''
+  fileBase_ad.value = ''
 }
 // academic data : ad
 const handleExceed_ad: UploadProps['onExceed'] = (files, fileList) => {
@@ -407,86 +395,40 @@ const handleExceed_ad: UploadProps['onExceed'] = (files, fileList) => {
 }
 // 检测文件上传
 const handleChange_ad: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
-  if (fileList_ad.value.length ==  0) {
+  if (fileList_ad.value.length == 0) {
     fileList_ad.value.push(uploadFile)
-    // console.log(fileList.value)
-    // let url = window.URL.createObjectURL(uploadFile.raw as Blob)
-    // fileCVURL_ad.value = url
-    // base64 encode
     const reader = new FileReader()
     reader.readAsDataURL(uploadFile.raw as Blob)
     reader.onload = () => {
       const base64data = reader.result
       const img = base64data as string;
-      // console.log(img)
-      fileCVURL_ad.value = img.split('data:application/pdf;base64,')[1]
+      fileBase_ad.value = img.split('data:application/pdf;base64,')[1]
     }
-  }
-  else{
+  } else {
     fileList_ad.value[0] = uploadFile
-    // let url = window.URL.createObjectURL(uploadFile.raw as Blob)
-    // fileCVURL_ad.value = url
     const reader = new FileReader()
     reader.readAsDataURL(uploadFile.raw as Blob)
     reader.onload = () => {
       const base64data = reader.result
       const img = base64data as string;
-      // console.log(img)
-      fileCVURL_ad.value = img.split('data:application/pdf;base64,')[1]
+      fileBase_ad.value = img.split('data:application/pdf;base64,')[1]
     }
-  }
-  // console.log(fileList_ad.value)
-  // console.log(fileCVURL_ad.value)
-  // console.log(upload_ad.value)
-}
-function handleUploadFile(){
-  let message = '';
-  let submit = true;
-  if (fileList_cv.value.length == 0 && fileList_ad.value.length == 0){
-    submit = false;
-    alert('Please upload your CV and academic data')
-  }
-  else if (fileList_cv.value.length == 0 && fileList_ad.value.length == 1)
-  {
-    message = 'Save academic data. Please upload your CV later.'
-  }
-  else if (fileList_cv.value.length == 1 && fileList_ad.value.length == 0)
-  {
-    message = 'Saved CV. Please upload your academic data later.'
-  }
-  else{
-    message = 'Upload successfully'
-  }
-  if (submit) {
-    post('api/uploadFile', {
-      'fileCV' : fileList_cv.value,
-      'fileURL':fileCVURL_cv,
-      'fileAD': fileList_ad.value,
-      'fileURLAD': fileCVURL_ad
-    }).then(
-        res => {
-          console.log(res)
-          ElMessage({
-            showClose: true,
-            message: message,
-            type: 'success',
-          })
-        }
-    ).catch(err => {
-      console.log(err)
-      ElMessage({
-        showClose: true,
-        message: err.response.data['message'],
-        type: 'error',
-      })
-    })
   }
 }
 // -----Testing upload file ------ end
 
 //---------保存数据相关------start------------------------------------
+
+
+const saveToServerLoading = ref(false)
 const save = () => {
-  post(`api/saveApplication/${applicationID.value}`, {"applicationPersonalDetail": data, "course": preferCourseList.value}).then(
+  saveToServerLoading.value = true
+  post(`api/saveApplication/${applicationID.value}`, {
+    "applicationPersonalDetail": data,
+    "course": preferCourseList.value,
+    "fileURLCV": fileBase_cv,
+    "fileURLAD": fileBase_ad
+  }).then(
       res => {
         console.log(res)
         ElMessage({
@@ -494,6 +436,7 @@ const save = () => {
           message: 'Save successfully',
           type: 'success',
         })
+        saveToServerLoading.value = false
       }
   ).catch(err => {
     console.log(err)
@@ -502,6 +445,7 @@ const save = () => {
       message: err.response.data['message'],
       type: 'error',
     })
+    saveToServerLoading.value = false
   })
 }
 const saveLocal = () => {
@@ -510,9 +454,25 @@ const saveLocal = () => {
 const saveSession = () => {
   sessionStorage.setItem('applicationData', JSON.stringify(data));
 }
-
-
 //---------保存数据相关------end
+
+const submitLoading = ref(false)
+
+const submitEvent = () => {
+  submitLoading.value = true
+  get('api/submitApplication/' + applicationID.value).then(res => {
+    ElMessage({
+      showClose: true,
+      message: 'Save successfully',
+      type: 'success',
+    })
+    submitLoading.value = false
+    router.push("/applicationlist")
+  }).catch(res => {
+    console.log(res)
+  })
+}
+
 </script>
 
 <template>
@@ -612,6 +572,12 @@ const saveSession = () => {
                 </el-form-item>
               </div>
               <div>
+                <p>Enrolment details for the semester (degree / year - e.g. 2nd year BSc, 1st year PhD, etc.)</p>
+                <el-form-item prop="enrolDetails">
+                  <el-input v-model="data.enrolDetails"/>
+                </el-form-item>
+              </div>
+              <div>
                 <p>Undergraduate or postgraduate?</p>
                 <el-form-item prop="studentDegree">
                   <el-alert title="Notice" type="info"
@@ -654,14 +620,14 @@ const saveSession = () => {
         <Transition>
           <div v-show="stepArr[2]" class="step3">
 
-            <ApplicationPreferCourseList v-model:preferCourseList="preferCourseList" />
+            <ApplicationPreferCourseList v-model:preferCourseList="preferCourseList"/>
             <el-row justify="center">
               <el-button type="primary" :icon="Plus" size="large" @click="showCourseChooser">Add Prefer Courses
               </el-button>
             </el-row>
 
 
-        </div>
+          </div>
         </Transition>
 
 
@@ -672,12 +638,11 @@ const saveSession = () => {
             <el-upload class="upload-cv" drag
                        ref="upload_cv"
                        accept="application/pdf"
-
-                       v-model:file-list = "fileList_cv"
-                       :on-change = "handleChange_cv"
-                       :on-exceed = "handleExceed_cv"
-                       :on-remove = "handleRemove_cv"
-                       :limit = "1">
+                       v-model:file-list="fileList_cv"
+                       :on-change="handleChange_cv"
+                       :on-exceed="handleExceed_cv"
+                       :on-remove="handleRemove_cv"
+                       :limit="1">
               <el-icon class="el-icon--upload">
                 <upload-filled/>
               </el-icon>
@@ -686,7 +651,7 @@ const saveSession = () => {
               </div>
               <template #tip>
                 <div class="el-upload__tip">
-                  Require: PDF files with a size less than 500kb
+                  Require: PDF files with a size less than 2MB
                 </div>
               </template>
             </el-upload>
@@ -695,46 +660,42 @@ const saveSession = () => {
             <el-upload class="upload-academicData" drag
                        ref="upload_ad"
                        accept="application/pdf"
-                       v-model:file-list = "fileList_ad"
-                       :on-change = "handleChange_ad"
-                       :on-exceed = "handleExceed_ad"
-                       :on-remove = "handleRemove_ad"
-                       :limit = "1">
+                       v-model:file-list="fileList_ad"
+                       :on-change="handleChange_ad"
+                       :on-exceed="handleExceed_ad"
+                       :on-remove="handleRemove_ad"
+                       :limit="1">
               <el-icon class="el-icon--upload">
                 <upload-filled/>
               </el-icon>
               <div class="el-upload__text">
-                Drop your academic data here or <em>click to upload</em>
+                Drop your Transcript here or <em>click to upload</em>
               </div>
               <template #tip>
                 <div class="el-upload__tip">
-                  Require: PDF files with a size less than 500kb
+                  Require: PDF files with a size less than 2MB
                 </div>
               </template>
             </el-upload>
           </div>
         </Transition>
-
       </div>
-
-      <el-button @click="handleUploadFile" >Test</el-button>
-
 
       <div class="application-control-btns">
         <el-button @click="prev()" :disabled="atFirst">Previous Step</el-button>
-        <el-button @click="save" class="application-control-btns-main" type="success" plain v-if="step <= 2">Save
+        <el-button v-loading.fullscreen.lock="saveToServerLoading" @click="save" class="application-control-btns-main"
+                   type="success" plain>Save
         </el-button>
-        <el-button @click="" class="application-control-btns-main" type="primary" v-else>Submit</el-button>
-        <el-button @click="next()" :disabled="atLast">Next Step</el-button>
+        <el-button @click="submitEvent" class="application-control-btns-main" type="primary" v-if="step === 3">Submit
+        </el-button>
+        <el-button @click="next()" v-if="step < 3">Next Step</el-button>
       </div>
     </div>
 
   </div>
 
-  <ApplicationCourse v-if="applicationMetaInfo.termID" :visible="courseVisible" :termID="applicationMetaInfo.termID" @added_course="add_course"/>
-
-
-
+  <ApplicationCourse v-if="applicationMetaInfo.termID" :visible="courseVisible" :termID="applicationMetaInfo.termID"
+                     @added_course="add_course"/>
 
 
 </template>
@@ -840,7 +801,7 @@ const saveSession = () => {
   background-color: rgb(242, 242, 242);
 }
 
-.step3{
+.step3 {
   width: 100%;
 }
 
