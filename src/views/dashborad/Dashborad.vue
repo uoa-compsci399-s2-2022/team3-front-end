@@ -4,7 +4,7 @@ import CourseCard_2 from '@/components/cards/CourseCard_2.vue'
 import {ref} from 'vue'
 import CourseList from '@/components/cards/CourseList.vue'
 import {get} from "@/utils/request";
-const value = ref('')
+const value = ref('1')
 const value_semester = ref('')
 const options =[
   {
@@ -37,6 +37,7 @@ get('/api/availableTerm').then(res => {
 
     })
   }
+
 })
 
 
