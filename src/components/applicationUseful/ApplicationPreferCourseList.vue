@@ -1,20 +1,45 @@
 <template>
   <h3>Prefer Courses List</h3>
-  <SlickList axis="y" v-model:list="value" class="list-container" @update:list="changePreference" distance="10">
+  <SlickList axis="y" v-model:list="value" class="list-container" @update:list="changePreference" :distance="10">
     <SlickItem v-for="(c, i) in value" :key="c.courseID" :index="i" class="list-item">
       <el-icon><DCaret /></el-icon>
       {{ c.courseNum }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Preference: {{ c.preference}}
-        <el-button @click="deleteCourse(i)" class="delete-button" type="danger">
-          Delete
-        </el-button>
+        <el-button @click="deleteCourse(i)" class="delete-button" type="danger" :icon="Delete" circle/>
+      <el-collapse>
+        <el-collapse-item title="Fill in the application information for this course" name="1" class="course-collapse">
+          <el-form :rules="rules" :model="c" label-width="250px" label-position="top" class="course-form">
+            <el-form-item label="Have you completed this course?" prop="hasLearned">
+              <el-switch v-model="c.hasLearned" />
+            </el-form-item>
+            <el-form-item label="Grade" v-show="c.hasLearned" prop="grade">
+              <el-select v-model="c.grade" clearable placeholder="Select">
+                <el-option
+                    v-for="g in GRADE"
+                    :key="g"
+                    :label="g"
+                    :value="g"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="If you have not taken this course, please explain why you think you are eligible to apply" v-show="c.hasLearned===false" prop="explanation">
+              <el-input v-model="c.explanation" type="textarea" />
+            </el-form-item>
+            <el-form-item label="Relevant previous experience" prop="preExperience">
+              <el-input v-model="c.preExperience" type="textarea" />
+            </el-form-item>
+
+          </el-form>
+        </el-collapse-item>
+      </el-collapse>
     </SlickItem>
   </SlickList>
 </template>
 
 <script setup lang="ts">
 import { SlickList, SlickItem } from 'vue-slicksort';
-import {computed, ref, toRef, watch} from "vue";
+import {computed, ref, toRef, watch, reactive} from "vue";
 import {DCaret, Delete} from "@element-plus/icons-vue";
+import {FormRules} from "element-plus";
 
 type preferCourse = {
   courseID: number;
@@ -22,6 +47,7 @@ type preferCourse = {
   courseName: string;
   hasLearned: boolean;
   grade: string;
+  explanation: string;
   preExperience: string;
   preference: number;
 }
@@ -29,7 +55,7 @@ type preferCourse = {
 
 const props = defineProps(['preferCourseList'])
 const emit = defineEmits(['update:preferCourseList'])
-
+const GRADE = ref(['A+','A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'CPL', 'Pass', 'D+', 'D', 'D-', 'DNC', 'DNS', 'Fail'])
 
 const value = computed({
   get() {
@@ -43,7 +69,6 @@ const value = computed({
 
 const changePreference = (array: preferCourse[]) => {
   for (let i = 0; i < array.length; i++) {
-    console.log(array[i].preference)
     array[i].preference = i + 1;
   }
 }
@@ -54,6 +79,34 @@ const deleteCourse = (index: number) => {
     value.value[i].preference = i + 1;
   }
 }
+
+
+const rules = reactive<FormRules>({
+  hasLearned: [
+    { required: true, message: 'Please select whether you have done this course', trigger: 'change' }
+  ],
+  grade: [
+    {
+      required: true,
+      message: 'Please select your grade in this course',
+      trigger: 'change',
+    },
+  ],
+  explanation: [
+    {
+      required: true,
+      message: 'Please explain why you think you are eligible to apply',
+      trigger: 'change',
+    },
+  ],
+  preExperience: [
+    {
+      required: true,
+      message: 'Please fill in your relevant previous experience',
+      trigger: 'change',
+    },
+  ],
+})
 
 </script>
 
@@ -85,9 +138,16 @@ h3{
 .delete-button{
   position: absolute;
   right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
+.course-collapse{
+  margin-top: 15px;
+  border-radius: 10px;
+}
+
+
+.course-form{
+  margin: 5px;
+}
 
 </style>

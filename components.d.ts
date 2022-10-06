@@ -13,7 +13,6 @@ declare module '@vue/runtime-core' {
     BreadCrumb: typeof import('./src/components/BreadCrumb.vue')['default']
     CourseCard: typeof import('./src/components/cards/CourseCard.vue')['default']
     CourseCard_2: typeof import('./src/components/cards/CourseCard_2.vue')['default']
-    CourseCard_Form: typeof import('./src/components/cards/CourseCard_Form.vue')['default']
     CourseList: typeof import('./src/components/cards/CourseList.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
     ElAutoResizer: typeof import('element-plus/es')['ElAutoResizer']

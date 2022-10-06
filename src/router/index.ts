@@ -60,7 +60,7 @@ const routes = [
                 path: "courseList",
                 name: "courseList",
                 meta: { title:'Course List', permission: '1' },
-                component: () => import('@/views/management/CourseList.vue')
+                component: () => import('@/views/CourseList.vue')
             },
             {
                 path: "manageEnrolment",
@@ -76,6 +76,11 @@ const routes = [
         path: "/login",
         meta: { title: 'MTMS Login service'},
         component: () => import('@/views/login/Login.vue')
+    },
+    {
+        path: "/register",
+        meta: { title: 'MTMS Register service'},
+        component: () => import('@/views/login/Register.vue')
     },
     {
         path: '/application/:applicationID',
@@ -95,10 +100,6 @@ const routes = [
         path: '/:pathMatch(.*)',
         redirect: '/404'
     },
-    {
-        path: "/test",
-        component: () => import('@/views/test.vue')
-    },
 ];
 
 
@@ -114,6 +115,11 @@ router.beforeEach((to, from, next) => {
     document.title = `${to.meta.title}`;
     Vnode.component?.exposed?.startLoading(); // start the loading bar animation
     const store = usePermissionStore();
+
+    if (to.path === '/register') {
+        next();
+        return;
+    }
 
     // if the page permission id exists, but the user doesn't have the permission to this page
     // redirect to 403
