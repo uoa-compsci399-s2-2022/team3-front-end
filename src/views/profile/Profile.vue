@@ -23,7 +23,7 @@ getUserProfile()
 
         <div class="profile-info">
             <div class="profile-info-general">
-                <div>Zixun Wang</div>
+                <div>{{ name }}</div>
                 <div>{{email}}</div>
             </div>
 
