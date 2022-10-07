@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { ArrowRight } from "@element-plus/icons-vue";
+import {computed, onBeforeMount, ref, watch} from "vue";
+import {useRoute, useRouter} from "vue-router";
+import {ArrowRight} from "@element-plus/icons-vue";
+import {get} from "@/utils/request";
+
 const route = useRoute();
 const router = useRouter();
 type Paths = {
@@ -9,9 +11,29 @@ type Paths = {
   title: any;
 };
 
-const matched = computed(() => {
+const matched = ref([] as Paths[]);
+
+
+const getPath = () => {
   let paths = [] as Paths[];
   let m = route.matched.filter(item => item.meta && item.meta.title)
+  if (route.name === "course-coordinator") {
+    let courseID = route.params.courseId;
+    get('api/getCourse/' + courseID).then((res) => {
+      matched.value = [
+        {
+          path: "/",
+          title: "DashBoard",
+        },
+        {
+          path: "/course-coordinator/" + courseID,
+          title: res.courseNum,
+        }]
+    }).catch((err) => {
+        router.push('/404')
+    })
+    return
+  }
   m.forEach(item => {
     let p = item.path.split('/').filter(item => item)
     if (p.length > 1) {
@@ -29,11 +51,25 @@ const matched = computed(() => {
       })
     }
   })
-  return paths;
-});
+  matched.value = paths
+}
+
+watch(route, () => {
+  matched.value = []
+  if (route.name !== "application"){
+    getPath()
+  }
+})
+
+
+if (route.name !== "application"){
+  getPath()
+}
+
+
 </script>
 <template>
-    <el-breadcrumb :separator-icon="ArrowRight">
+    <el-breadcrumb :separator-icon="ArrowRight" v-if="matched">
         <transition-group name="breadcrumb" mode="out-in">
             <el-breadcrumb-item :to="{ path: '/' }" key="/">Home</el-breadcrumb-item>
             <el-breadcrumb-item v-for="item in matched" :key="item.path" :to="{ path: item.path }">

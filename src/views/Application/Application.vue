@@ -115,9 +115,8 @@ const formRef = ref<FormInstance>(); // Form DOM instance
 // 申请表单数据
 
 // initialize data
-
-if (!isNaN(parseInt(route.params.applicationID[0]))) {
-  applicationID.value = parseInt(route.params.applicationID[0])
+if (!isNaN(parseInt(route.params.applicationID as string))) {
+  applicationID.value = parseInt(route.params.applicationID as string);
 } else {
   router.push('/404')
 }

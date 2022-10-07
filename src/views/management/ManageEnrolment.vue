@@ -6,7 +6,7 @@
               v-for="item in stateTerm"
               :key="item.termName"
               :label="item.termName"
-              :value="item"
+              :value="item.termID"
           />
         </el-select>
         <el-alert class="alert" title="Tips: Please Select Term First" type="warning"  show-icon />
@@ -60,14 +60,13 @@
         <el-row justify="center" v-if="isReadyUser" style="margin-top: 10px">
           <el-button type="primary" :icon="Plus">Add User</el-button>
         </el-row>
-
-
-
       </el-col>
-
     </el-row>
-
   </div>
+
+
+
+
 
 
 
@@ -120,7 +119,7 @@ const { isLoading:isLoadingUser, state:stateUser, isReady:isReadyUser, execute:e
 
 const handleTermChange = () => {
   if (currentTerm.value){
-    executeCourse(0,{termID: currentTerm.value.termID})
+    executeCourse(0,{termID: currentTerm.value})
   }
 
 }

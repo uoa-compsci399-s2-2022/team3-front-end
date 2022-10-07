@@ -1,79 +1,127 @@
 <template>
   <div class="page-container">
     <el-row>
-    <el-select v-model="selectedTerm" class="m-2" placeholder="Term">
-      <el-option
-          v-for="item in stateTerm"
-          :key="item.termName"
-          :label="item.termName"
-          :value="item"
-      />
-    </el-select>
-    <el-select v-model="tutorOrMarker" class="m-2" placeholder="Marker or Tutor">
-      <el-option key="Marker" label="Marker" value="Marker" />
-      <el-option key="Tutor" label="Tutor" value="Tutor" />
-    </el-select>
+      <el-select v-model="selectedTerm" class="m-2" placeholder="Term">
+        <el-option
+            v-for="item in stateTerm"
+            :key="item.termName"
+            :label="item.termName"
+            :value="item"
+        />
+      </el-select>
+      <el-select v-model="tutorOrMarker" class="m-2" placeholder="Marker or Tutor">
+        <el-option key="Marker" label="Marker" value="Marker"/>
+        <el-option key="Tutor" label="Tutor" value="Tutor"/>
+      </el-select>
     </el-row>
-
     <br/>
 
-  <el-button @click="resetDateFilter">reset date filter</el-button>
-  <el-button @click="clearFilter">reset all filters</el-button>
-  <el-table ref="tableRef" row-key="date" :data="tableData" style="width: 100%">
-    <el-table-column
-        prop="date"
-        label="Date"
-        sortable
-        width="180"
-        column-key="date"
-        :filters="[
-        { text: '2016-05-01', value: '2016-05-01' },
-        { text: '2016-05-02', value: '2016-05-02' },
-        { text: '2016-05-03', value: '2016-05-03' },
-        { text: '2016-05-04', value: '2016-05-04' },
-      ]"
-        :filter-method="filterHandler"
-    />
-    <el-table-column prop="name" label="Name" width="180" />
-    <el-table-column prop="address" label="Address" :formatter="formatter" />
+    <el-tabs tab-position="right" class="tabs" v-model="selectedTab">
+      <el-tab-pane label="Pending">
+        <template #label>
+          <div :class="{selected_item: selectedTab==='0'}">
+          <font-awesome-icon icon="fa-solid fa-file-circle-question" />
+          Pending
+          </div>
+        </template>
+        <el-button @click="resetDateFilter">reset date filter</el-button>
+        <el-button @click="clearFilter">reset all filters</el-button>
+        <vxe-table
+            border
+            show-overflow
+            ref="xTable"
+            :column-config="{resizable: true}"
+            :loading="isLoadingPendingApplication"
+            :data="stateApplication"
+            :edit-config="{trigger: 'manual', mode: 'row'}">
+          <vxe-column field="applicationID" title="Application ID" :edit-render="{}">
+            <template #edit="{ row }">
+              <vxe-input v-model="row.name" type="text"></vxe-input>
+            </template>
+          </vxe-column>
+          <vxe-column field="role" title="Role" :edit-render="{}">
+            <template #edit="{ row }">
+              <vxe-input v-model="row.role" type="text" placeholder="请输入昵称"></vxe-input>
+            </template>
+          </vxe-column>
+          <vxe-column field="sex" title="Sex" :edit-render="{}">
+            <template #default="{ row }">
+              <span>{{ formatSex(row.sex) }}</span>
+            </template>
+            <template #edit="{ row }">
+              <vxe-select v-model="row.sex" transfer>
+                <vxe-option v-for="item in demo1.sexList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+              </vxe-select>
+            </template>
+          </vxe-column>
+          <vxe-column field="sex2" title="多选下拉" :edit-render="{}">
+            <template #default="{ row }">
+              <span>{{ formatMultiSex(row.sex2) }}</span>
+            </template>
+            <template #edit="{ row }">
+              <vxe-select v-model="row.sex2" multiple transfer>
+                <vxe-option v-for="item in demo1.sexList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+              </vxe-select>
+            </template>
+          </vxe-column>
+          <vxe-column field="num6" title="Number" :edit-render="{}">
+            <template #edit="{ row }">
+              <vxe-input v-model="row.num6" type="number" placeholder="请输入数值"></vxe-input>
+            </template>
+          </vxe-column>
+          <vxe-column field="date12" title="Date" :edit-render="{}">
+            <template #edit="{ row }">
+              <vxe-input v-model="row.date12" type="date" placeholder="请选择日期" transfer></vxe-input>
+            </template>
+          </vxe-column>
+          <vxe-column field="date13" title="Week" :edit-render="{}">
+            <template #edit="{ row }">
+              <vxe-input v-model="row.date13" type="week" placeholder="请选择日期" transfer></vxe-input>
+            </template>
+          </vxe-column>
+          <vxe-column field="address" title="Address" :edit-render="{}">
+            <template #edit="{ row }">
+              <vxe-input v-model="row.address" type="text"></vxe-input>
+            </template>
+          </vxe-column>
+          <vxe-column title="操作" width="160">
+            <template #default="{ row }">
+              <template v-if="$refs.xTable.isEditByRow(row)">
+                <vxe-button @click="saveRowEvent(row)">保存</vxe-button>
+                <vxe-button @click="cancelRowEvent(row)">取消</vxe-button>
+              </template>
+              <template v-else>
+                <vxe-button @click="editRowEvent(row)">编辑</vxe-button>
+              </template>
+            </template>
+          </vxe-column>
+        </vxe-table>
 
-    <el-table-column
-        prop="tag"
-        label="Tag"
-        width="100"
-        :filters="[
-        { text: 'Home', value: 'Home' },
-        { text: 'Office', value: 'Office' },
-      ]"
-        :filter-method="filterTag"
-        filter-placement="bottom-end"
-    >
-      <template #default="scope">
-        <el-tag
-            :type="scope.row.tag === 'Home' ? '' : 'success'"
-            disable-transitions
-        >{{ scope.row.tag }}</el-tag
-        >
-      </template>
-    </el-table-column>
-  </el-table>
+
+      </el-tab-pane>
+      <el-tab-pane label="Config">Config</el-tab-pane>
+      <el-tab-pane label="Role">Role</el-tab-pane>
+      <el-tab-pane label="Task">Task</el-tab-pane>
+    </el-tabs>
 
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { ElTable } from 'element-plus'
-import type { TableColumnCtx } from 'element-plus/es/components/table/src/table-column/defaults'
+import {computed, ref, watch, reactive} from 'vue'
+import {ElTable} from 'element-plus'
+import type {TableColumnCtx} from 'element-plus/es/components/table/src/table-column/defaults'
 import {useAsyncState} from "@vueuse/core";
 import {get} from "@/utils/request";
+import { VXETable, VxeTableInstance } from 'vxe-table'
 
 const selectedTerm = ref({} as Term)
+const selectedStatus = ref('Pending')
 const tutorOrMarker = ref("")
+const selectedTab = ref('0')
 
 
-
-const { isLoading:isLoadingTerm, state:stateTerm, isReady:isReadyTerm, execute:executeTerm } = useAsyncState(
+const {isLoading: isLoadingTerm, state: stateTerm, isReady: isReadyTerm, execute: executeTerm} = useAsyncState(
     (args) => {
       return get('api/term')
     },
@@ -83,59 +131,97 @@ const { isLoading:isLoadingTerm, state:stateTerm, isReady:isReadyTerm, execute:e
     },
 )
 
+const {isLoading: isLoadingPendingApplication, state: statePendingApplication, isReady: isReadyPendingApplication, execute: executePendingApplication} = useAsyncState(
+    (args) => {
+      return get(`api/applicationListByTerm/${selectedTerm.value.termID}/${selectedStatus.value}`)
+    },
+    {},
+    {
+      resetOnExecute: false,
+    },
+)
 
-const tableRef = ref<InstanceType<typeof ElTable>>()
 
-const resetDateFilter = () => {
-  tableRef.value!.clearFilter(['date'])
-}
-// TODO: improvement typing when refactor table
-const clearFilter = () => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-  tableRef.value!.clearFilter()
-}
-const formatter = (row: User, column: TableColumnCtx<User>) => {
-  return row.address
-}
-const filterTag = (value: string, row: User) => {
-  return row.tag === value
-}
-const filterHandler = (
-    value: string,
-    row: User,
-    column: TableColumnCtx<User>
-) => {
-  const property = column['property']
-  return row[property] === value
+
+watch(selectedTerm, (newVal, oldVal) => {
+  executePendingApplication()
+})
+
+
+
+
+const xTable = ref<VxeTableInstance>({} as VxeTableInstance)
+
+
+
+interface ItemVO {
+  id: number;
+  name: string;
+  nickname: string;
+  [key: string]: any;
 }
 
-const tableData: User[] = [
-  {
-    date: '2016-05-03',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-    tag: 'Home',
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-    tag: 'Office',
-  },
-  {
-    date: '2016-05-04',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-    tag: 'Home',
-  },
-  {
-    date: '2016-05-01',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-    tag: 'Office',
-  },
-]
+const demo1 = reactive({
+  loading: false,
+  tableData: [
+    { id: 10001, name: 'Test1', nickname: 'T1', role: 'Develop', sex: '0', sex2: ['0'], num1: 40, age: 28, address: 'Shenzhen', date12: '', date13: '' },
+    { id: 10002, name: 'Test2', nickname: 'T2', role: 'Designer', sex: '1', sex2: ['0', '1'], num1: 20, age: 22, address: 'Guangzhou', date12: '', date13: '2020-08-20' },
+    { id: 10003, name: 'Test3', nickname: 'T3', role: 'Test', sex: '0', sex2: ['1'], num1: 200, age: 32, address: 'Shanghai', date12: '2020-09-10', date13: '' },
+    { id: 10004, name: 'Test4', nickname: 'T4', role: 'Designer', sex: '1', sex2: ['1'], num1: 30, age: 23, address: 'Shenzhen', date12: '', date13: '2020-12-04' }
+  ] as ItemVO[],
+  sexList: [
+    { label: '', value: '' },
+    { label: '男', value: '1' },
+    { label: '女', value: '0' }
+  ]
+})
+
+const formatSex = (value: any) => {
+  if (value === '1') {
+    return '男'
+  }
+  if (value === '0') {
+    return '女'
+  }
+  return ''
+}
+
+const formatMultiSex = (values: any[]) => {
+  if (values) {
+    return values.map(val => formatSex(val)).join(',')
+  }
+  return ''
+}
+
+const isActiveStatus = (row: ItemVO) => {
+  const $table = xTable.value
+  return $table.isEditByRow(row)
+}
+
+const editRowEvent = (row: ItemVO) => {
+  const $table = xTable.value
+  $table.setEditRow(row)
+}
+
+const saveRowEvent = () => {
+  const $table = xTable.value
+  $table.clearEdit().then(() => {
+    demo1.loading = true
+    setTimeout(() => {
+      demo1.loading = false
+      VXETable.modal.message({ content: '保存成功！', status: 'success' })
+    }, 300)
+  })
+}
+
+const cancelRowEvent = (row: ItemVO) => {
+  const $table = xTable.value
+  $table.clearEdit().then(() => {
+    $table.revertData(row)
+  })
+}
+
+
 </script>
 
 
@@ -145,6 +231,12 @@ const tableData: User[] = [
 }
 
 
+.selected_item{
+  font-size: larger
+}
 
+.tabs{
+  max-height: 100vh;
+}
 
 </style>
