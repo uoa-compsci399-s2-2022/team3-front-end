@@ -49,3 +49,30 @@ type courseFormType = {
     currentlyNumOfStudents: string | number;
     deadLine: string
 }
+
+
+type applicationApprovalList = {
+    applicationID: number;
+    submittedDate: string;
+    createdDateTime: string;
+    term: string;
+    termID: number;
+    status: string;
+    email: string;
+    name: string;
+    upi: string;
+    auid: string;
+    currentlyOverseas: boolean;
+    willBackToNZ: boolean;
+    isCitizenOrPR: boolean;
+    haveValidVisa: boolean;
+    enrolDetails: string;
+    studentDegree: string;
+    haveOtherContracts: boolean;
+    otherContracts: string;
+    maximumWorkingHours: string;
+    savedTime: string;
+    PreferCourse: Array<any>;
+    userID: string;
+    PreferCourseGPA: number;
+}

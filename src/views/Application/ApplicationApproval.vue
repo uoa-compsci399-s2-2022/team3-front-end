@@ -1,7 +1,7 @@
 <template>
   <div class="page-container">
     <el-row>
-      <el-select v-model="selectedTerm" class="m-2" placeholder="Term">
+      <el-select v-model="selectedTerm" class="m-2" placeholder="Term" style="margin-right: 10px">
         <el-option
             v-for="item in stateTerm"
             :key="item.termName"
@@ -24,11 +24,11 @@
           Pending
           </div>
         </template>
-        <ApprovalTable :applicationList="statePendingApplication" :isLoading="isLoadingTerm"/>
+        <ApprovalTable v-model:applicationApprovalList="statePendingApplication" v-model:isLoading="isLoadingPendingApplication"/>
       </el-tab-pane>
-      <el-tab-pane label="Config">Config</el-tab-pane>
-      <el-tab-pane label="Role">Role</el-tab-pane>
-      <el-tab-pane label="Task">Task</el-tab-pane>
+      <el-tab-pane label="Accepted">Accepted</el-tab-pane>
+      <el-tab-pane label="Rejected">Rejected</el-tab-pane>
+      <el-tab-pane label="Published">Published</el-tab-pane>
     </el-tabs>
 
   </div>
@@ -63,16 +63,20 @@ const {isLoading: isLoadingPendingApplication, state: statePendingApplication, i
     (args) => {
       return get(`api/applicationListByTerm/${selectedTerm.value}/${selectedStatus.value}`)
     },
-    {},
+    [],
     {
       resetOnExecute: false,
+      immediate: false
     },
 )
 
 
 
 watch(selectedTerm, (newVal, oldVal) => {
-  executePendingApplication()
+  if (selectedTerm.value) {
+    executePendingApplication()
+  }
+
 })
 
 

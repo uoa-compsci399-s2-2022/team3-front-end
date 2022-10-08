@@ -40,6 +40,7 @@ type applicationData = {
   haveOtherContracts: boolean;
   otherContracts: string;
   maximumWorkingHours: number;
+  gpa: number;
 }
 
 type preferCourse = {
@@ -166,6 +167,7 @@ get('api/currentUserProfile').then(res => {
     data.haveOtherContracts = personalDetail.haveOtherContracts;
     data.otherContracts = personalDetail.otherContracts;
     data.maximumWorkingHours = personalDetail.maximumWorkingHours;
+    data.gpa = personalDetail.gpa;
 
     preferCourseList.value = courseList;
 
@@ -314,7 +316,7 @@ const validateStep = async (step: number) => {
         })
   } else if (step === 1) {
     await formRef.value?.validateField(
-        ['currentlyOverseas', 'willComeBackToNZ', 'isCitizenOrPR',
+        ['currentlyOverseas', 'willBackToNZ', 'isCitizenOrPR',
           'haveValidVisa', 'studentDegree', 'hasOtherContract', 'maximumWorkingHours'],
         (valid) => {
           flag = valid;
@@ -545,8 +547,8 @@ const submitEvent = () => {
               </div>
               <div class="indent" v-show="data.currentlyOverseas">
                 <p>Will you come back to NZ?</p>
-                <el-form-item prop="willComeBackToNZ">
-                  <el-radio-group v-model="data.willComeBackToNZ">
+                <el-form-item prop="willBackToNZ">
+                  <el-radio-group v-model="data.willBackToNZ">
                     <el-radio :label="true">Yes</el-radio>
                     <el-radio :label="false">No</el-radio>
                   </el-radio-group>
@@ -607,9 +609,14 @@ const submitEvent = () => {
               <div>
                 <p>Maximum number of hours per week, you would like to work.</p>
                 <el-form-item prop="maximumWorkingHours">
-                  <el-input-number v-model="data.maximumWorkingHours" :min="5" :max="40"
-                                   controls-position="right"/>
-                  <span style="margin-left:10px">hours</span>
+                  <el-input-number v-model="data.maximumWorkingHours" :min="5" :max="40"/>
+                  <span style="margin-left:10px; color: #555a64">hours</span>
+                </el-form-item>
+              </div>
+              <div>
+                <p>Your GPA (If available)</p>
+                <el-form-item prop="gpa">
+                  <el-input-number v-model="data.gpa" :min="0" :max="9" :precision="2" :step="0.1"/>
                 </el-form-item>
               </div>
             </div>
@@ -618,14 +625,11 @@ const submitEvent = () => {
 
         <Transition>
           <div v-show="stepArr[2]" class="step3">
-
             <ApplicationPreferCourseList v-model:preferCourseList="preferCourseList"/>
             <el-row justify="center">
               <el-button type="primary" :icon="Plus" size="large" @click="showCourseChooser">Add Prefer Courses
               </el-button>
             </el-row>
-
-
           </div>
         </Transition>
 

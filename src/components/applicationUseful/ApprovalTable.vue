@@ -5,183 +5,141 @@
       show-overflow
       ref="xTable"
       :column-config="{resizable: true}"
-      :loading="isLoadingPendingApplication"
-      :data="stateApplication"
-      :edit-config="{trigger: 'manual', mode: 'row'}">
+      :row-config="{isHover: true}"
+      :loading="isLoadingSync"
+      :data="applicationApprovalListSync"
+      :edit-config="{trigger: 'manual', mode: 'row', showIcon:false}">
     <vxe-column field="applicationID" title="Application ID" :edit-render="{}">
       <template #edit="{ row }">
         <vxe-input v-model="row.name" type="text"></vxe-input>
       </template>
     </vxe-column>
-    <vxe-column field="role" title="Role" :edit-render="{}">
+    <vxe-column field="upi" title="UPI" :edit-render="{}">
       <template #edit="{ row }">
-        <vxe-input v-model="row.role" type="text" placeholder="请输入昵称"></vxe-input>
+        <vxe-input v-model="row.upi" type="text"></vxe-input>
       </template>
     </vxe-column>
-    <vxe-column field="sex" title="Sex" :edit-render="{}">
-      <template #default="{ row }">
-        <span>{{ formatSex(row.sex) }}</span>
-      </template>
+    <vxe-column field="name" title="Name" :edit-render="{}">
       <template #edit="{ row }">
-        <vxe-select v-model="row.sex" transfer>
-          <vxe-option v-for="item in demo1.sexList" :key="item.value" :value="item.value"
-                      :label="item.label"></vxe-option>
+        <vxe-input v-model="row.name" type="text"></vxe-input>
+      </template>
+    </vxe-column>
+    <vxe-column field="gpa" title="GPA" :edit-render="{}">
+      <template #edit="{ row }">
+        <vxe-input v-model="row.gpa" type="number"></vxe-input>
+      </template>
+    </vxe-column>
+    <vxe-column field="PreferCourseGPA" title="Prefer Course GPA" :edit-render="{}">
+      <template #edit="{ row }">
+        <vxe-input v-model="row.PreferCourseGPA" type="number"></vxe-input>
+      </template>
+    </vxe-column>
+    <vxe-column field="currentlyOverseas" title="Currently Overseas" :edit-render="{}">
+      <template #edit="{ row }">
+        <vxe-select v-model="row.currentlyOverseas" clearable transfer>
+          <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
         </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="sex2" title="多选下拉" :edit-render="{}">
-      <template #default="{ row }">
-        <span>{{ formatMultiSex(row.sex2) }}</span>
-      </template>
+    <vxe-column field="willBackToNZ" title="Will Back To NZ" :edit-render="{}">
       <template #edit="{ row }">
-        <vxe-select v-model="row.sex2" multiple transfer>
-          <vxe-option v-for="item in demo1.sexList" :key="item.value" :value="item.value"
-                      :label="item.label"></vxe-option>
+        <vxe-select v-model="row.willBackToNZ" clearable transfer>
+          <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
         </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="num6" title="Number" :edit-render="{}">
+    <vxe-column field="isCitizenOrPR" title="is Citizen or PR" :edit-render="{}">
       <template #edit="{ row }">
-        <vxe-input v-model="row.num6" type="number" placeholder="请输入数值"></vxe-input>
+        <vxe-select v-model="row.isCitizenOrPR" clearable transfer>
+          <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
+        </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="date12" title="Date" :edit-render="{}">
+    <vxe-column field="haveValidVisa" title="have Valid Visa" :edit-render="{}">
       <template #edit="{ row }">
-        <vxe-input v-model="row.date12" type="date" placeholder="请选择日期" transfer></vxe-input>
+        <vxe-select v-model="row.haveValidVisa" clearable transfer>
+          <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
+        </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="date13" title="Week" :edit-render="{}">
+    <vxe-column field="enrolDetails" title="Enrol Details" :edit-render="{}">
       <template #edit="{ row }">
-        <vxe-input v-model="row.date13" type="week" placeholder="请选择日期" transfer></vxe-input>
+        <vxe-input v-model="row.enrolDetails" type="text"></vxe-input>
       </template>
     </vxe-column>
-    <vxe-column field="address" title="Address" :edit-render="{}">
+    <vxe-column field="studentDegree" title="Student Degree" :edit-render="{}">
       <template #edit="{ row }">
-        <vxe-input v-model="row.address" type="text"></vxe-input>
+        <vxe-select v-model="row.studentDegree" clearable transfer>
+          <vxe-option v-for="item in studentDegree" :key="item" :value="item" :label="item"></vxe-option>
+        </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column title="操作" width="160">
+    <vxe-column field="haveOtherContracts" title="have Other Contracts" :edit-render="{}">
+      <template #edit="{ row }">
+        <vxe-select v-model="row.haveOtherContracts" clearable transfer>
+          <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
+        </vxe-select>
+      </template>
+    </vxe-column>
+
+    <vxe-column title="Operation" width="150">
       <template #default="{ row }">
+        <div style="text-align: center">
         <template v-if="$refs.xTable.isEditByRow(row)">
-          <vxe-button @click="saveRowEvent(row)">保存</vxe-button>
-          <vxe-button @click="cancelRowEvent(row)">取消</vxe-button>
+          <el-button @click="saveRowEvent(row)" type="success" :icon="Select" circle plain />
+          <el-button @click="cancelRowEvent(row)" type="primary" :icon="SemiSelect" circle plain />
         </template>
         <template v-else>
-          <vxe-button @click="editRowEvent(row)">编辑</vxe-button>
+          <el-button @click="editRowEvent(row)" type="primary" :icon="Edit" circle plain />
+          <el-button type="success" :icon="Check" circle />
+          <el-button type="danger" :icon="Close" circle />
         </template>
+        </div>
       </template>
     </vxe-column>
+    <template #empty>
+      <el-empty description="No data. Please select Terms and Approval Type (Marker or Tutor)."/>
+    </template>
   </vxe-table>
 
 </template>
 
 <script setup lang="ts">
 import { VXETable, VxeTableInstance } from 'vxe-table'
-import {ref, reactive, computed} from 'vue'
+import {ref, reactive, computed, watch} from 'vue'
+import {Edit, Check, Close, Select, SemiSelect} from '@element-plus/icons-vue'
+
 const xTable = ref<VxeTableInstance>({} as VxeTableInstance)
 
 
+const boolean = ref(['true', 'false'])
+const studentDegree = ref(['Undergraduate', "Postgraduate"])
 
-const props = defineProps(['applicationList'])
-const emit = defineEmits(['update:applicationList'])
-const value = computed({
+
+const props = defineProps(['applicationApprovalList', 'isLoading'])
+const emit = defineEmits(['update:applicationApprovalList', 'update:isLoading'])
+const applicationApprovalListSync = computed({
   get() {
-    return props.applicationList as applicationList[]
+    return props.applicationApprovalList as applicationApprovalList[]
   },
   set(value) {
-    emit('update:applicationList', value)
+    emit('update:applicationApprovalList', value)
   }
 })
 
-
-
-interface ItemVO {
-  id: number;
-  name: string;
-  nickname: string;
-
-  [key: string]: any;
-}
-
-const demo1 = reactive({
-  loading: false,
-  tableData: [
-    {
-      id: 10001,
-      name: 'Test1',
-      nickname: 'T1',
-      role: 'Develop',
-      sex: '0',
-      sex2: ['0'],
-      num1: 40,
-      age: 28,
-      address: 'Shenzhen',
-      date12: '',
-      date13: ''
-    },
-    {
-      id: 10002,
-      name: 'Test2',
-      nickname: 'T2',
-      role: 'Designer',
-      sex: '1',
-      sex2: ['0', '1'],
-      num1: 20,
-      age: 22,
-      address: 'Guangzhou',
-      date12: '',
-      date13: '2020-08-20'
-    },
-    {
-      id: 10003,
-      name: 'Test3',
-      nickname: 'T3',
-      role: 'Test',
-      sex: '0',
-      sex2: ['1'],
-      num1: 200,
-      age: 32,
-      address: 'Shanghai',
-      date12: '2020-09-10',
-      date13: ''
-    },
-    {
-      id: 10004,
-      name: 'Test4',
-      nickname: 'T4',
-      role: 'Designer',
-      sex: '1',
-      sex2: ['1'],
-      num1: 30,
-      age: 23,
-      address: 'Shenzhen',
-      date12: '',
-      date13: '2020-12-04'
-    }
-  ] as ItemVO[],
-  sexList: [
-    {label: '', value: ''},
-    {label: '男', value: '1'},
-    {label: '女', value: '0'}
-  ]
+const isLoadingSync = computed({
+  get() {
+    return props.isLoading as boolean
+  },
+  set(value) {
+    emit('update:isLoading', value)
+  }
 })
 
-const formatSex = (value: any) => {
-  if (value === '1') {
-    return '男'
-  }
-  if (value === '0') {
-    return '女'
-  }
-  return ''
-}
+watch(props.applicationApprovalList, (val) => {
+  console.log(val)
+})
 
-const formatMultiSex = (values: any[]) => {
-  if (values) {
-    return values.map(val => formatSex(val)).join(',')
-  }
-  return ''
-}
 
 const isActiveStatus = (row: ItemVO) => {
   const $table = xTable.value

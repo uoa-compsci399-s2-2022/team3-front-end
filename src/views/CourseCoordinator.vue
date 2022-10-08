@@ -194,6 +194,8 @@
   </el-dialog>
 
   <el-drawer v-model="enrollUserModalOpened" title="Enroll to the Course" size="50%" direction="rtl">
+
+    <p class="emphasis">Find Users</p>
     <el-input
         v-model="userIDSearch"
         class="w-50 m-2"
