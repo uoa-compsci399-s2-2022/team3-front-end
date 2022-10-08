@@ -10,6 +10,7 @@ declare module '@vue/runtime-core' {
     AddUser: typeof import('./src/components/userUseful/AddUser.vue')['default']
     ApplicationCourse: typeof import('./src/components/applicationUseful/ApplicationCourse.vue')['default']
     ApplicationPreferCourseList: typeof import('./src/components/applicationUseful/ApplicationPreferCourseList.vue')['default']
+    ApprovalTable: typeof import('./src/components/applicationUseful/ApprovalTable.vue')['default']
     BreadCrumb: typeof import('./src/components/BreadCrumb.vue')['default']
     CourseCard: typeof import('./src/components/cards/CourseCard.vue')['default']
     CourseCard_2: typeof import('./src/components/cards/CourseCard_2.vue')['default']

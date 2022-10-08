@@ -1,12 +1,13 @@
 <script setup lang="ts">
 
 import CourseCard from '@/components/cards/CourseCard.vue'
+import {Collection, Document} from '@element-plus/icons-vue'
 
 
 const value = ref('1')
 const value_semester = ref('')
 
-import {onBeforeMount, ref} from "vue";
+import {onBeforeMount, ref, watch} from "vue";
 import {get} from "@/utils/request";
 import {useAsyncState} from "@vueuse/core";
 
@@ -47,11 +48,10 @@ async function GetCourse(termID: String) {
       if (item.roleName === 'courseCoordinator') {
         item.path = `course-coordinator/${item.courseID}`
         courseList.value.push(item)
-      }else{
+      } else {
         item.path = `/`
         courseList.value.push(item)
       }
-
     })
   })
 }
@@ -64,10 +64,15 @@ onBeforeMount(() => {
   executeTerm()
 })
 
+const noCourse = ref(false)
+
+watch(courseList, (courseList)=> {
+  noCourse.value = courseList.length == 0;
+})
+
 
 </script>
 <template>
-
   <div class="page-container">
     <div>
       <el-select placeholder="Select Term" v-model="value_semester" v-loading="isLoadingTerm">
@@ -97,10 +102,32 @@ onBeforeMount(() => {
         <router-link :to="item.path">
           <CourseCard :course="item"/>
         </router-link>
-
       </div>
     </div>
+  </div>
 
+  <div v-show="noCourse">
+    <br/>
+    <el-row justify="center" style="color: #acb9c6">There are no courses in current term.</el-row>
+    <br/>
+    <div class="center-button-group">
+      <div class="button-wrapper">
+        <el-button @click="$router.push('courseList')" class="big-button" type="primary" plain>
+          <el-icon :size="90">
+            <Collection/>
+          </el-icon>
+          <p>Browse available courses</p>
+        </el-button>
+      </div>
+      <div class="button-wrapper">
+        <el-button @click="$router.push('applicationlist')" class="big-button" type="primary" plain>
+          <el-icon :size="90">
+            <Document/>
+          </el-icon>
+          Start Applications
+        </el-button>
+      </div>
+    </div>
   </div>
 
 
@@ -123,12 +150,29 @@ onBeforeMount(() => {
 
 }
 
-a{
+a {
   text-decoration: none;
 }
 
 .router-link-active {
   text-decoration: none;
 }
+
+.big-button {
+  height: 140px;
+  width: 275px;
+}
+
+.button-wrapper {
+  margin: 10px;
+  text-align: center;
+}
+
+.center-button-group{
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 
 </style>

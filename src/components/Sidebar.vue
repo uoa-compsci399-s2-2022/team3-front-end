@@ -90,6 +90,9 @@ const modalDisplay = computed(() => {
   return {"display": `${sidebar.collapse ? "none" : "block"}`};
 })
 
+
+
+
 </script>
 
 <template>
