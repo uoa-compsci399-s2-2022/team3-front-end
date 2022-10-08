@@ -8,6 +8,7 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     AddUser: typeof import('./src/components/userUseful/AddUser.vue')['default']
+    AddUserDrawer: typeof import('./src/components/ManageUseful/AddUserDrawer.vue')['default']
     ApplicationCourse: typeof import('./src/components/applicationUseful/ApplicationCourse.vue')['default']
     ApplicationPreferCourseList: typeof import('./src/components/applicationUseful/ApplicationPreferCourseList.vue')['default']
     BreadCrumb: typeof import('./src/components/BreadCrumb.vue')['default']
