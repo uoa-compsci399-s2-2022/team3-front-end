@@ -3,6 +3,8 @@ import {get} from '@/utils/request'
 import {ElMessage, ElMessageBox} from 'element-plus';
 import {ref, watch} from 'vue';
 import {useRouter, useRoute} from 'vue-router';
+import 'element-plus/theme-chalk/display.css';
+
 
 const router = useRouter();
 const route = useRoute();
@@ -66,14 +68,8 @@ watch(route, () => {
   getUserProfile()
   getCourseNum()
 })
-
-
 getUserProfile()
 getCourseNum()
-
-
-
-
 </script>
 
 <template>
@@ -99,7 +95,7 @@ getCourseNum()
         </el-dropdown>
 
       </div>
-      <div class="info-card-general">
+      <div class="info-card-general hidden-sm-and-down">
         <div>{{ name }}</div>
         <div>{{ email }}</div>
       </div>

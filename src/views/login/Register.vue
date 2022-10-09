@@ -108,8 +108,9 @@ const register = () => {
         })
         .catch(
             err => {
+
                 ElMessage({
-                message: `${err}`,
+                message: `${err.response.data.message}`,
                 type: 'error',
             })
             }
@@ -148,7 +149,7 @@ const sendCode = async () => {
         .catch(
             err => {
                 ElMessage({
-                    message: `${err}`,
+                    message: `${err.response.data.message}`,
                     type: 'error',
                 })
             }

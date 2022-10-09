@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="visible.visible" :show-close="false">
+  <el-drawer v-model="visible.visible" :show-close="false" :size="drawerSize" :direction="drawerDirection">
     <template #header="{ titleId, titleClass }">
       <h4 :id="titleId" :class="titleClass" style="font-size: x-large">Start an Application</h4>
     </template>
@@ -53,6 +53,7 @@ onBeforeMount(() => {
       termList.push({label: e.termName, value: e.termID})
     })
   })
+  responsiveLayout()
 
 })
 
@@ -71,6 +72,25 @@ const startApplication = () => {
   )
 
 }
+
+const drawerSize = ref()
+const drawerDirection = ref()
+
+setInterval(() => {
+  responsiveLayout()
+}, 2000)
+
+
+const getWidth = () => {
+  return window.innerWidth
+}
+
+const responsiveLayout = () => {
+  drawerSize.value = getWidth() > 768 ? '30%' : '80%'
+  drawerDirection.value = getWidth() > 768 ? 'rtl' : 'btt'
+}
+
+
 
 
 </script>
