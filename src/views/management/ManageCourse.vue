@@ -732,7 +732,7 @@ const handleCourseEdit = (row: number) => {
                             inactive-text="N" />
                     </div>
                     <el-date-picker v-model="defaultDeadLine" type="datetime" placeholder="Pick a Date for deadline"
-                        style="width:100%;" format="YYYY/MM/DD hh:mm:ss" value-format="YYYY-MM-DDThh:mm:ssZ" />
+                        style="width:100%;" format="YYYY/MM/DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ssZ" />
                 </div>
                 <div class="modal-btns">
                     <el-button type="primary" @click="handleTermAdd">Add</el-button>
@@ -764,8 +764,8 @@ const handleCourseEdit = (row: number) => {
                             inactive-text="N" />
                     </div>
                     <el-date-picker v-model="termDTO.defaultDeadLine" type="datetime"
-                        placeholder="Pick a Date for deadline" style="width:100%;" format="YYYY/MM/DD hh:mm:ss"
-                        value-format="YYYY-MM-DDThh:mm:ssZ" />
+                        placeholder="Pick a Date for deadline" style="width:100%;" format="YYYY/MM/DD HH:mm:ss"
+                        value-format="YYYY-MM-DDTHH:mm:ssZ" />
                 </div>
                 <div class="modal-btns">
                     <el-button type="primary" @click="editTerm">Edit</el-button>
@@ -847,7 +847,7 @@ const handleCourseEdit = (row: number) => {
 
                         <el-form-item label="Deadline" prop="deadLine">
                             <el-date-picker v-model="deadLine" type="datetime" placeholder="Pick a Date"
-                                format="YYYY/MM/DD hh:mm:ss" value-format="YYYY-MM-DDThh:mm:ssZ" />
+                                format="YYYY/MM/DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ssZ" />
                         </el-form-item>
 
                     </div>
@@ -933,7 +933,7 @@ const handleCourseEdit = (row: number) => {
 
                         <el-form-item label="Deadline" prop="deadLine">
                             <el-date-picker v-model="courseForm.deadLine" type="datetime" placeholder="Pick a Date"
-                                format="YYYY/MM/DD hh:mm:ss" value-format="YYYY-MM-DDThh:mm:ssZ" />
+                                format="YYYY/MM/DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ssZ" />
                         </el-form-item>
                     </div>
                     <div class="modal-btns">
