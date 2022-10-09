@@ -130,7 +130,6 @@ const deleteDialogVisible = ref(false)
 const editClosedEvent: VxeTableEvents.EditClosed = ({row, column}) => {
   const $table = tableRef.value
   if ($table.isUpdateByRow(row)) {
-    console.log(row)
     autoSaveUpdateEvent()
   }
 }

@@ -29,13 +29,13 @@ const items: sidebarMenu = [
     icon: 'Document',
     index: '/applicationlist',
     title: 'Application List',
-    permission: '1',
+    permission: '2',
   },
   {
     icon: 'DocumentChecked',
     index: '/applicationapproval',
     title: 'Application Approval',
-    permission: '1',
+    permission: '4',
   },
   {
     icon: "Collection",
@@ -45,36 +45,36 @@ const items: sidebarMenu = [
   },
   {
     icon: 'Management',
-    index: '4',
+    index: '3',
     title: 'Management',
-    permission: '4',
+    permission: '3',
     subs: [
       {
         index: '/managecourse',
         title: 'Manage Course',
-        permission: '5',
+        permission: '4',
       },
       {
         index: 'manageuserFolder',
         title: 'Manage User',
-        permission: '5',
+        permission: '3',
         subs: [
           {
             index: '/manageuser',
             title: 'Manage User',
-            permission: '5',
+            permission: '3',
           },
           {
             index: '/manageuser/batch-invite-user',
             title: 'Batch Invite User',
-            permission: '5',
+            permission: '3',
           }
         ]
       },
       {
         index: '/manageEnrolment',
         title: 'Manage Enrolment',
-        permission: '5',
+        permission: '4',
       },
     ]
   }];
@@ -86,7 +86,6 @@ const onRoutes = computed(() => {
 })
 
 const modalDisplay = computed(() => {
-  console.log(sidebar.collapse);
   return {"display": `${sidebar.collapse ? "none" : "block"}`};
 })
 
@@ -124,7 +123,6 @@ const modalDisplay = computed(() => {
             </template>
 
             <template v-for="subItem in item.subs">
-
               <template v-if="subItem.subs">
                 <el-sub-menu :index="subItem.index" :key="subItem.index" v-permission="subItem.permission">
                   <template #title>

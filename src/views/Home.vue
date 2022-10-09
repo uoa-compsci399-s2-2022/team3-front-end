@@ -3,13 +3,8 @@ import { get } from '@/utils/request';
 import Sidebar from '@/components/Sidebar.vue';
 import Header from '@/components/header/Header.vue';
 import BreadCrumb from '@/components/BreadCrumb.vue';
-import { useSidebarStore } from '@/store/index'
+import { useSidebarStore } from '@/store'
 const sidebar = useSidebarStore()
-get('api/currentUser').then(res => {
-  console.log(res);
-}).catch((err) => {
-  console.log(err)
-})
 </script>
 
 <template>

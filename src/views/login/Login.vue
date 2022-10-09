@@ -2,7 +2,7 @@
 import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
 import { reactive, ref } from 'vue';
 import { get, post } from '@/utils/request'
-import { useUserStore, usePermissionStore } from '@/store/index'
+import { useUserStore, usePermissionStore } from '@/store'
 import { useRouter } from 'vue-router';
 
 

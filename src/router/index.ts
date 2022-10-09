@@ -22,37 +22,37 @@ const routes = [
             {
                 path: "profile",
                 name: "profile",
-                meta: { title:'Profile', permission: '3' },
+                meta: { title:'Profile', permission: '1' },
                 component: () => import('@/views/profile/Profile.vue')
             },
             {
                 path: 'applicationlist',
-                meta: { title:'Application List', permission: '1' },
+                meta: { title:'Application List', permission: '2' },
                 component: () => import('@/views/Application/ApplicationList.vue')
             },
             {
                 path: 'applicationapproval',
-                meta: { title:'Application Approval', permission: '5' },
+                meta: { title:'Application Approval', permission: '4' },
                 component: () => import('@/views/Application/ApplicationApproval.vue')
             },
             //management
             {
                 path: "managecourse",
                 name: "managecourse",
-                meta: { title:'Manage Course', permission: '5' },
+                meta: { title:'Manage Course', permission: '4' },
                 component: () => import('@/views/management/ManageCourse.vue')
             },
             {
                 path: "manageuser",
                 name: "manageuser",
-                meta: { title:'Manage User', permission: '5' },
+                meta: { title:'Manage User', permission: '3' },
                 component: () => import('@/views/management/ManageUser.vue'),
 
             },
             {
                 path: "manageuser/batch-invite-user",
                 name: "batch-invite-user",
-                meta: { title:'Batch Invite User', permission: '5' },
+                meta: { title:'Batch Invite User', permission: '3' },
                 component: () => import('@/views/management/BatchInviteUser.vue')
             },
             {
@@ -65,13 +65,13 @@ const routes = [
             {
                 path: "manageEnrolment",
                 name: "manageEnrolment",
-                meta: { title:'Manage Enrolment', permission: '5' },
+                meta: { title:'Manage Enrolment', permission: '4' },
                 component: () => import('@/views/management/ManageEnrolment.vue')
             },
             {
                 path: "course-coordinator/:courseId",
                 name: "course-coordinator",
-                meta: { title:'Course Coordinator', permission: '6' },
+                meta: { title:'Course Coordinator', permission: '3' },
                 component: () => import('@/views/CourseCoordinator.vue')
             },
         ]

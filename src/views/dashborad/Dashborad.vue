@@ -2,14 +2,14 @@
 
 import CourseCard from '@/components/cards/CourseCard.vue'
 import {Collection, Document} from '@element-plus/icons-vue'
-
+import {onBeforeMount, ref, watch} from "vue";
+import {get} from "@/utils/request";
+import {useAsyncState} from "@vueuse/core";
 
 const value = ref('1')
 const value_semester = ref('')
 
-import {onBeforeMount, ref, watch} from "vue";
-import {get} from "@/utils/request";
-import {useAsyncState} from "@vueuse/core";
+
 
 
 const {isLoading: isLoadingTerm, state: stateTerm, isReady: isReadyTerm, execute: executeTerm} = useAsyncState(

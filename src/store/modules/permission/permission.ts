@@ -6,14 +6,14 @@ export const usePermissionStore = defineStore('permission', () => {
     const keys = sessionStorage.getItem('mtms_keys');
     const key = ref(keys ? new Set<string>(JSON.parse(keys)) : new Set<string>([]));
 
-    type identityGroups = 'student' | 'courseCoordinator' |  'tutorCoordinator' | 'markerCoodinator' | 'admin'
+    type identityGroups = 'student' | 'courseCoordinator' |  'tutorCoordinator' | 'markerCoordinator' | 'admin'
 
     const defaultList = ref<{[K in identityGroups] : Set<string>}>({
-        student: new Set(['1', '2', '3']),
-        courseCoordinator: new Set(['1', '2', '3', '6']),
-        tutorCoordinator: new Set(['1', '2', '3']),
-        markerCoodinator: new Set(['1', '2', '3']),
-        admin: new Set(['1', '2', '3', '4', '5', '6'])
+        student: new Set(['1', '2']),
+        courseCoordinator: new Set(['1', '3']),
+        tutorCoordinator: new Set(['1', '3', '4']),
+        markerCoordinator: new Set(['1', '3', '4']),
+        admin: new Set(['1', '2', '3', '4', '5'])
     })
 
     const getKey = computed(() => { return Array.from(key.value).sort()})

@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { resolve } from 'path'
+import { resolve, dirname } from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import vueJsx from '@vitejs/plugin-vue-jsx'
+import { fileURLToPath } from 'url'
+import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 
 const pathResolve = (dir: string): any => {
   return resolve(__dirname, '.', dir)
@@ -16,7 +18,6 @@ const alias: Record<string, string> = {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-
   plugins: [
     vue(),
     AutoImport({
@@ -27,7 +28,12 @@ export default defineConfig({
     }),
     vueJsx({
       // options are passed on to @vue/babel-plugin-jsx
-    })
+    }),
+    VueI18nPlugin({
+      /* options */
+      // locale messages resource pre-compile option
+      include: resolve(dirname(fileURLToPath(import.meta.url)), './path/to/src/locales/**'),
+    }),
   ],
   resolve: {
     alias,
@@ -45,7 +51,7 @@ export default defineConfig({
     host:true,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:5000',
+        target: 'http://192.168.1.10:5000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },

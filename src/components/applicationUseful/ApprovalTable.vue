@@ -10,7 +10,10 @@
       :loading="isLoadingSync"
       :loading-config="{icon: 'vxe-icon-indicator roll', text: 'Loading...'}"
       :data="applicationApprovalListSync"
-      :edit-config="{trigger: 'manual', mode: 'row', showIcon:false}">
+      :edit-config="{trigger: 'manual', mode: 'row', showIcon:false}"
+      :checkbox-config="{highlight: true}"
+      @toggle-row-expand="toggleExpandChangeEvent">
+    <vxe-column type="checkbox" width="40"></vxe-column>
     <vxe-column type="expand" width="40">
       <template #content="{ row, rowIndex }">
         <div class="expand-wrapper">
@@ -84,85 +87,79 @@
         </div>
       </template>
     </vxe-column>
-    <vxe-column field="applicationID" title="AppID" :edit-render="{}" width="65">
-      <template #edit="{ row }">
-        <vxe-input v-model="row.name" type="text"></vxe-input>
-      </template>
+    <vxe-column field="applicationID" title="AppID" width="65">
     </vxe-column>
     <vxe-column field="upi" title="UPI" :edit-render="{}" width="75">
       <template #edit="{ row }">
         <vxe-input v-model="row.upi" type="text"></vxe-input>
       </template>
     </vxe-column>
-    <vxe-column field="name" title="Name" :edit-render="{}" min-width="75">
+    <vxe-column field="name" title="Name" :edit-render="{}" min-width="100">
       <template #edit="{ row }">
         <vxe-input v-model="row.name" type="text"></vxe-input>
       </template>
     </vxe-column>
-    <vxe-column field="gpa" title="GPA" :edit-render="{}" width="70">
+    <vxe-column field="gpa" title="GPA" :edit-render="{}" width="70" sortable >
       <template #edit="{ row }">
         <vxe-input v-model="row.gpa" type="number"></vxe-input>
       </template>
     </vxe-column>
-    <vxe-column field="PreferCourseGPA" title="PreferCourse GPA" width="110" :edit-render="{}">
-      <template #edit="{ row }">
-        <vxe-input v-model="row.PreferCourseGPA" type="number"></vxe-input>
-      </template>
+    <vxe-column field="PreferCourseGPA" title="PreferCourse GPA" width="110" sortable >
     </vxe-column>
-    <vxe-column field="currentlyOverseas" title="Currently Overseas" width="95" :edit-render="{}">
+    <vxe-column field="currentlyOverseas" title="Currently Overseas" width="95" :edit-render="{}" :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.currentlyOverseas" clearable transfer>
           <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
         </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="willBackToNZ" title="Will back to NZ" width="88" :edit-render="{}">
+    <vxe-column field="willBackToNZ" title="Will back to NZ" width="88" :edit-render="{}" :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.willBackToNZ" clearable transfer>
           <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
         </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="isCitizenOrPR" title="is Citizen or PR" width="79" :edit-render="{}">
+    <vxe-column field="isCitizenOrPR" title="is Citizen or PR" width="79" :edit-render="{}" :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.isCitizenOrPR" clearable transfer>
           <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
         </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="haveValidVisa" title="have Valid Visa" width="100" :edit-render="{}">
+    <vxe-column field="haveValidVisa" title="have Valid Visa" width="100" :edit-render="{}" :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.haveValidVisa" clearable transfer>
           <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
         </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="enrolDetails" title="Enrol Details" width="110" :edit-render="{}">
+    <vxe-column field="enrolDetails" title="Enrol Details" width="110" :edit-render="{}" show-overflow>
       <template #edit="{ row }">
         <vxe-input v-model="row.enrolDetails" type="text"></vxe-input>
       </template>
     </vxe-column>
-    <vxe-column field="studentDegree" title="Student Degree" :edit-render="{}" width="123">
+    <vxe-column field="studentDegree" title="Student Degree" :edit-render="{}" width="123" :filters="[{label: 'Undergraduate', value: 'Undergraduate'}, {label: 'Postgraduate', value: 'Postgraduate'}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.studentDegree" clearable transfer>
           <vxe-option v-for="item in studentDegree" :key="item" :value="item" :label="item"></vxe-option>
         </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="haveOtherContracts" width="100" title="Have other contracts" :edit-render="{}">
+    <vxe-column field="haveOtherContracts" width="100" title="Have other contracts" :edit-render="{}" :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.haveOtherContracts" clearable transfer>
           <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
         </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="maximumWorkingHours" title="Max working hours" width="108" :edit-render="{}">
+    <vxe-column field="maximumWorkingHours" title="Max working hours" width="108" :edit-render="{}" sortable >
       <template #edit="{ row }">
         <vxe-input v-model="row.maximumWorkingHours" type="number"></vxe-input>
       </template>
     </vxe-column>
 
-    <vxe-column title="Operation" width="150" :fixed="operationFixed">
+    <vxe-column title="Operation" width="160" :fixed="operationFixed" v-if="tagIndexSync!=='3'">
       <template #default="{ row }">
         <div style="text-align: center">
           <template v-if="$refs.xTable.isEditByRow(row)">
@@ -171,7 +168,7 @@
           </template>
           <template v-else>
             <el-button @click="editRowEvent(row)" type="primary" :icon="Edit" circle plain/>
-            <el-button type="success" :icon="Check" circle/>
+            <el-button type="success" :icon="Check" @click="acceptEvent(row)" circle/>
             <el-button type="danger" :icon="Close" circle/>
           </template>
         </div>
@@ -222,25 +219,70 @@
   </el-drawer>
 
 
+  <el-dialog v-model="enrollDialogVisible" title="Accept & Enroll">
+
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="enrollDialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="enrollDialogVisible = false"
+        >Confirm</el-button
+        >
+      </span>
+    </template>
+  </el-dialog>
+
+
+
+
+
 </template>
 
 <script setup lang="ts">
-import {VXETable, VxeTableInstance} from 'vxe-table'
-import {ref, reactive, computed, watch, toRef, onBeforeMount} from 'vue'
+import {VXETable, VxeTableEvents, VxeTableInstance} from 'vxe-table'
+import {ref, reactive, computed, watch, toRef, onBeforeMount, onUpdated} from 'vue'
 import {Edit, Check, Close, Select, SemiSelect} from '@element-plus/icons-vue'
 import 'element-plus/theme-chalk/display.css';
+import {post} from "@/utils/request";
+import {ElMessage} from "element-plus";
 
-const xTable = ref<VxeTableInstance>({} as VxeTableInstance)
+// *********************
+// * Sync Parameter
+// *********************
+const props = defineProps(['applicationApprovalList', 'isLoading', 'tagIndex'])
+const emit = defineEmits(['update:applicationApprovalList', 'update:isLoading', 'update:tagIndex'])
+const applicationApprovalListSync = computed({
+  get() {
+    return props.applicationApprovalList as applicationApprovalList[]
+  },
+  set(value) {
+    emit('update:applicationApprovalList', value)
+  }
+})
 
-const coursedrawer = ref(false)
-const coursedrawerData = ref({})
+const isLoadingSync = computed({
+  get() {
+    return props.isLoading as boolean
+  },
+  set(value) {
+    emit('update:isLoading', value)
+  }
+})
+
+const tagIndexSync = computed({
+  get() {
+    return props.tagIndex as string
+  },
+  set(value) {
+    emit('update:tagIndex', value)
+  }
+})
+
+
+// *********************
+// * Layout
+// *********************
 const coursedrawerSize = ref()
 const operationFixed = ref('right')
-
-interface eventProps {
-  row: any
-}
-
 
 setInterval(() => {
   coursedrawerSize.value = getWidth() > 768 ? '40%' : '100%'
@@ -262,6 +304,13 @@ onBeforeMount(() => {
 })
 
 
+
+// *********************
+// * Prefer Course Drawer
+// *********************
+const coursedrawer = ref(false)
+const coursedrawerData = ref({})
+
 const showCourseDrawer = ({row}: eventProps) => {
   coursedrawerData.value = row
   console.log(coursedrawerData.value)
@@ -269,62 +318,125 @@ const showCourseDrawer = ({row}: eventProps) => {
 }
 
 
+interface eventProps {
+  row: any
+}
+
+// *********************
+// * Enroll Dialog
+// *********************
+const enrollDialogVisible = ref(false)
+
+const acceptEvent = (row:any) => {
+  enrollDialogVisible.value = true
+}
+
+
+
+// *********************
+// * Table
+// *********************
+const xTable = ref<VxeTableInstance>({} as VxeTableInstance)
 const boolean = ref(['true', 'false'])
 const studentDegree = ref(['Undergraduate', "Postgraduate"])
 
-
-const props = defineProps(['applicationApprovalList', 'isLoading'])
-const emit = defineEmits(['update:applicationApprovalList', 'update:isLoading'])
-const applicationApprovalListSync = computed({
-  get() {
-    return props.applicationApprovalList as applicationApprovalList[]
-  },
-  set(value) {
-    emit('update:applicationApprovalList', value)
-  }
-})
-
-const isLoadingSync = computed({
-  get() {
-    return props.isLoading as boolean
-  },
-  set(value) {
-    emit('update:isLoading', value)
-  }
-})
-
-watch(props.applicationApprovalList, (val) => {
-  console.log(val)
-})
-
-
-const isActiveStatus = (row: ItemVO) => {
+onUpdated(() => {
   const $table = xTable.value
-  return $table.isEditByRow(row)
+  $table.refreshColumn()
+})
+
+type saveApplicationApprovalList = {
+  upi: string
+  name: string
+  studentDegree: string
+  haveOtherContracts: boolean
+  maximumWorkingHours: number
+  gpa: number
+  currentlyOverseas: boolean
+  willBackToNZ: boolean
+  isCitizenOrPR: boolean
+  haveValidVisa: boolean
+  enrolDetails: string
+
 }
 
-const editRowEvent = (row: ItemVO) => {
+
+const autoSaveUpdateEvent = async (row: any, applicationID: number) => {
+  const $table = xTable.value
+  console.log($table.getRecordset())
+  const {updateRecords} = $table.getRecordset()
+  const errMap = await $table?.validate()
+  if (errMap) {
+    return
+  }
+  try {
+    await post(`api/saveApplication/${applicationID}`, {"applicationPersonalDetail": row}).then(
+        (res) => {
+          ElMessage({
+            message: 'Save success',
+            type: 'success'
+          })
+          isLoadingSync.value = false
+        }).catch((err) => {
+      ElMessage({
+        message: err.response.data['message'],
+        type: 'error'
+      })
+      isLoadingSync.value = false
+    })
+  } catch (e: any) {
+    if (e && e.message) {
+      ElMessage({
+        message: e.message,
+        type: 'error'
+      })
+    }
+    isLoadingSync.value = false
+  }
+}
+
+
+const editRowEvent = (row: any) => {
   const $table = xTable.value
   $table.setEditRow(row)
 }
 
-const saveRowEvent = () => {
+const saveRowEvent = (row:any) => {
   const $table = xTable.value
   $table.clearEdit().then(() => {
-    demo1.loading = true
-    setTimeout(() => {
-      demo1.loading = false
-      VXETable.modal.message({content: '保存成功！', status: 'success'})
-    }, 300)
+    isLoadingSync.value = true
+    const toServerRow:saveApplicationApprovalList = {
+      upi: row.upi,
+      name: row.name,
+      studentDegree: row.studentDegree,
+      haveOtherContracts: eval(row.haveOtherContracts),
+      maximumWorkingHours: row.maximumWorkingHours,
+      gpa: row.gpa,
+      currentlyOverseas: eval(row.currentlyOverseas),
+      willBackToNZ: eval(row.willBackToNZ),
+      isCitizenOrPR: eval(row.isCitizenOrPR),
+      haveValidVisa: eval(row.haveValidVisa),
+      enrolDetails: row.enrolDetails
+    }
+    autoSaveUpdateEvent(toServerRow, row.applicationID)
   })
 }
 
-const cancelRowEvent = (row: ItemVO) => {
+const cancelRowEvent = (row: any) => {
   const $table = xTable.value
   $table.clearEdit().then(() => {
     $table.revertData(row)
   })
 }
+
+const toggleExpandChangeEvent = ({row}: eventProps) => {
+  const $table = xTable.value
+  $table.refreshColumn()
+}
+
+
+
+
 
 </script>
 
