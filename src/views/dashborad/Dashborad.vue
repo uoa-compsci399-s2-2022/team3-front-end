@@ -1,129 +1,178 @@
 <script setup lang="ts">
+
 import CourseCard from '@/components/cards/CourseCard.vue'
-import CourseCard_2 from '@/components/cards/CourseCard_2.vue'
-import {ref} from 'vue'
-import CourseList from '@/components/cards/CourseList.vue'
-import {get} from "@/utils/request";
+import {Collection, Document} from '@element-plus/icons-vue'
+
+
 const value = ref('1')
 const value_semester = ref('')
-const options =[
-  {
-    value : '1',
-    label : 'Course Card'
-  },
-  {
-    value: '2',
-    label: 'Course List'
-  },
-]
 
-const options_semester = ref([
-])
-get('/api/availableTerm').then(res => {
-  // var data = new Array()
-  for (let i = 0; i < res.length; i++) {
-
-    let termName = res[i].termName.toString();
-    let termID = res[i].termID;
-    let startDate = res[i].startDate;
-    let endDate = res[i].endDate;
-    let Date = startDate + " to " + endDate;
+import {onBeforeMount, ref, watch} from "vue";
+import {get} from "@/utils/request";
+import {useAsyncState} from "@vueuse/core";
 
 
+const {isLoading: isLoadingTerm, state: stateTerm, isReady: isReadyTerm, execute: executeTerm} = useAsyncState(
+    (args) => {
+      return get('api/getCurrentUserTerm')
+    },
+    {},
+    {
+      resetOnExecute: false,
+    },
+)
 
-    options_semester.value.push({
-      value_semester : termID.toString(),
-      label_semester: termName.toString(),
 
+const {
+  isLoading: isLoadingCurrentTerm,
+  state: stateCurrentTerm,
+  isReady: isReadyCurrentTerm,
+  execute: executeCurrentTerm
+} = useAsyncState(
+    (args) => {
+      return get('api/getTermNow')
+    },
+    {},
+    {
+      resetOnExecute: false,
+    },
+)
+
+
+const courseList = ref([] as Object[])
+
+async function GetCourse(termID: String) {
+  get('/api/getCurrentUserEnrollByTerm/' + termID).then(res => {
+    courseList.value = []
+    res.forEach((item: any) => {
+      if (item.roleName === 'courseCoordinator') {
+        item.path = `course-coordinator/${item.courseID}`
+        courseList.value.push(item)
+      } else {
+        item.path = `/`
+        courseList.value.push(item)
+      }
     })
-  }
+  })
+}
 
+onBeforeMount(() => {
+  executeCurrentTerm().then(() => {
+    value_semester.value = stateCurrentTerm.value[0].termID
+    GetCourse(value_semester.value)
+  })
+  executeTerm()
+})
+
+const noCourse = ref(false)
+
+watch(courseList, (courseList)=> {
+  noCourse.value = courseList.length == 0;
 })
 
 
-
-const callCourseCardRef = ref()
-const callCourseListRef = ref()
-
-const callCourse = (termID : String, type: String) => {
-  // type === 1 CourseCard function
-  // type === 2 CourseList function
-  if (type === '1') {
-    callCourseCardRef.value.showCourses(termID)
-  } else {
-    callCourseListRef.value.showCourses(termID)
-  }
-
-}
-const resetSemesterStatus= () => {
-  value_semester.value = ''
-}
 </script>
-
 <template>
+  <div class="page-container">
+    <div>
+      <el-select placeholder="Select Term" v-model="value_semester" v-loading="isLoadingTerm">
+        <el-option-group label="Current Terms">
+          <el-option
+              v-for="item in stateCurrentTerm"
+              :key="item.termID"
+              :label="item.termName"
+              :value="item.termID"
+              @click="GetCourse(value_semester)"
+          />
+        </el-option-group>
+        <el-option-group label="Your Terms">
+          <el-option
+              v-for="item in stateTerm"
+              :key="item.termID"
+              :label="item.termName"
+              :value="item.termID"
+              @click="GetCourse(value_semester)"/>
+        </el-option-group>
 
-
-
-  <div class="show-style">
-     <el-select  placeholder="Select" v-model="value">
-       <el-option
-           v-for="item in options"
-           :key="item.value"
-           :label="item.label"
-           :value="item.value"
-           @click="resetSemesterStatus"
-      />
-     </el-select>
-   </div>
-
-  <div class="course-semester" v-if="value != ''">
-    <el-divider content-position="center">Select a semester</el-divider>
-    <div class="course-list-semester">
-      <el-select  placeholder="Select a semester" v-model="value_semester" >
-
-        <el-option
-            v-for="item in options_semester"
-            :key="item.value_semester"
-            :label="item.label_semester"
-            :value="item.value_semester"
-            @click="callCourse(value_semester, value)"/>
       </el-select>
     </div>
-  </div>
-    <div class="course-container"  v-if="value === '1'">
-      <course-card_2 ref="callCourseCardRef"/>
+
+    <div class="course-container">
+      <div v-for="item in courseList">
+        <router-link :to="item.path">
+          <CourseCard :course="item"/>
+        </router-link>
+      </div>
     </div>
+  </div>
 
-
-  <div class="course-list" v-else-if="value === '2'">
-    <course-list ref="callCourseListRef"/>
+  <div v-show="noCourse">
+    <br/>
+    <el-row justify="center" style="color: #acb9c6">There are no courses in current term.</el-row>
+    <br/>
+    <div class="center-button-group">
+      <div class="button-wrapper">
+        <el-button @click="$router.push('courseList')" class="big-button" type="primary" plain>
+          <el-icon :size="90">
+            <Collection/>
+          </el-icon>
+          <p>Browse available courses</p>
+        </el-button>
+      </div>
+      <div class="button-wrapper">
+        <el-button @click="$router.push('applicationlist')" class="big-button" type="primary" plain>
+          <el-icon :size="90">
+            <Document/>
+          </el-icon>
+          Start Applications
+        </el-button>
+      </div>
+    </div>
   </div>
 
 
 </template>
 
-<style lang="scss" scoped>
-    //.course-container {
-    //    margin: 20px 30px;
-    //    display: grid;
-    //    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    //    // grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    //    grid-auto-rows: inherit;
-    //    gap: 20px;
-    //}
-    .show-style{
-      padding-top: 25px;
-      /* padding-right: 20px; */
-      padding-left: 30px;
-      padding-bottom: 10px;
-    }
+<style scoped lang="scss">
 
-    .course-list{
-      padding-left: 30px;
-      padding-top: 15px;
-    }
-    .course-list-semester{
-      text-align: center;
-      padding: 10px;
-    }
+.page-container {
+  margin: 30px 30px 30px 30px;
+}
+
+
+.course-container {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  // grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-auto-rows: 210px;
+  gap: 10px;
+
+}
+
+a {
+  text-decoration: none;
+}
+
+.router-link-active {
+  text-decoration: none;
+}
+
+.big-button {
+  height: 140px;
+  width: 275px;
+}
+
+.button-wrapper {
+  margin: 10px;
+  text-align: center;
+}
+
+.center-button-group{
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+
 </style>

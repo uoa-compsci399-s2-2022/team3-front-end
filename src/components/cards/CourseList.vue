@@ -85,7 +85,7 @@ defineExpose({
 
       <el-table-column fiexd="right"  width="120px">
         <template #default="scope">
-          <el-button type="primary" size="mini" @click="handleApply(scope.$index, scope.row)">Apply</el-button>
+<!--          <el-button type="primary" size="mini" @click="handleApply(scope.$index, scope.row)">Apply</el-button>-->
         </template>
       </el-table-column>
 
@@ -167,7 +167,7 @@ defineExpose({
                 <!--      <el-divider style="position: absolute; bottom: 70px"/>-->
                 <div class="card-buttons">
 
-                  <el-button style="color: rgb(255 255 255);background-color: #00467f;">Apply</el-button>
+<!--                  <el-button style="color: rgb(255 255 255);background-color: #00467f;">Apply</el-button>-->
 
                 </div>
               </div>

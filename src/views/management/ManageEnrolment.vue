@@ -6,7 +6,7 @@
               v-for="item in stateTerm"
               :key="item.termName"
               :label="item.termName"
-              :value="item"
+              :value="item.termID"
           />
         </el-select>
         <el-alert class="alert" title="Tips: Please Select Term First" type="warning"  show-icon />
@@ -58,30 +58,28 @@
         </el-table>
 
         <el-row justify="center" v-if="isReadyUser" style="margin-top: 10px">
-          <el-button type="primary" :icon="Plus">Add User</el-button>
+          <el-button @click="showUser" type="primary" :icon="Plus" style="margin-left: 16px ;">Add User</el-button>
+
         </el-row>
-
-
-
       </el-col>
-
     </el-row>
-
   </div>
 
-
+  <AddUserDrawer :visible="UserVisible" direction="ltr" :currentCourse="currentCourse"/>
 
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue";
+import {reactive, ref} from "vue";
 import { useAsyncState } from '@vueuse/core'
-import {get} from "@/utils/request";
-import { ElTable } from 'element-plus'
+import {get, post,Delete} from "@/utils/request";
+import {ElMessage, ElTable} from 'element-plus'
 import {Plus} from '@element-plus/icons-vue'
+import AddUserDrawer from '@/components/ManageUseful/AddUserDrawer.vue'
 
 const currentTerm = ref<Term>();
 const currentCourse = ref<Course>();
+
 
 
 const { isLoading:isLoadingTerm, state:stateTerm, isReady:isReadyTerm, execute:executeTerm } = useAsyncState(
@@ -120,7 +118,7 @@ const { isLoading:isLoadingUser, state:stateUser, isReady:isReadyUser, execute:e
 
 const handleTermChange = () => {
   if (currentTerm.value){
-    executeCourse(0,{termID: currentTerm.value.termID})
+    executeCourse(0,{termID: currentTerm.value})
   }
 
 }
@@ -136,6 +134,12 @@ const handleCurrentChange = (val: Course | undefined) => {
   if (currentCourse.value){
     executeUser(0,{courseID: currentCourse.value.courseID})
   }
+}
+const UserVisible = reactive({
+  visible: false
+})
+const showUser = () => {
+  UserVisible.visible = true
 }
 
 

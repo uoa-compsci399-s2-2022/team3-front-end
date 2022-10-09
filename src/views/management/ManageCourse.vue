@@ -430,23 +430,7 @@ const handleCourseAdd = () => {
 /**
  * @description course form type (Add/Edit)
  */
-type courseFormType = {
-    needTutors: boolean;
-    estimatedNumOfStudents: string | number;
-    numOfTutorialsPerWeek: string | number;
-    canPreAssign: boolean;
-    termID: number;
-    numOfAssignments: string | number;
-    courseNum: string;
-    markerResponsibility: string;
-    courseName: string;
-    tutorResponsibility: string;
-    numOfLabsPerWeek: string | number;
-    totalAvailableHours: string | number;
-    needMarkers: boolean;
-    currentlyNumOfStudents: string | number;
-    deadLine: string
-}
+
 
 /**
  * @description deaLine is a intermediate variable used to get the correct date form.

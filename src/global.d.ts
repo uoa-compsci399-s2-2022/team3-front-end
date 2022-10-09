@@ -30,3 +30,49 @@ interface Course {
     prerequisite: string;
 
 }
+
+
+type courseFormType = {
+    needTutors: boolean;
+    estimatedNumOfStudents: string | number;
+    numOfTutorialsPerWeek: string | number;
+    canPreAssign: boolean;
+    termID: number;
+    numOfAssignments: string | number;
+    courseNum: string;
+    markerResponsibility: string;
+    courseName: string;
+    tutorResponsibility: string;
+    numOfLabsPerWeek: string | number;
+    totalAvailableHours: string | number;
+    needMarkers: boolean;
+    currentlyNumOfStudents: string | number;
+    deadLine: string
+}
+
+
+type applicationApprovalList = {
+    applicationID: number;
+    submittedDate: string;
+    createdDateTime: string;
+    term: string;
+    termID: number;
+    status: string;
+    email: string;
+    name: string;
+    upi: string;
+    auid: string;
+    currentlyOverseas: boolean;
+    willBackToNZ: boolean;
+    isCitizenOrPR: boolean;
+    haveValidVisa: boolean;
+    enrolDetails: string;
+    studentDegree: string;
+    haveOtherContracts: boolean;
+    otherContracts: string;
+    maximumWorkingHours: string;
+    savedTime: string;
+    PreferCourse: Array<any>;
+    userID: string;
+    PreferCourseGPA: number;
+}

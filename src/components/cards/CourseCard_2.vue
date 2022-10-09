@@ -7,6 +7,7 @@
   const semester = ref('')
 
   const showCourses = (termID : String) => {
+
     get('/api/getCourseByTerm/' + termID).then(async res => {
       tableData.value = []   // clear the table
       for (let i = 0; i < res.length; i++) {
@@ -21,16 +22,27 @@
 
   }
 
-  const showCoursesBy_courseID = (courseID : String) => {
-    get('/api/GetCourseCardMetaData/' + courseID).then(res => {
+   async function showCoursesBy_courseID(termID : string) {
+    // console.log(termID)
+    let name_id = ref('')
+    let user = await get('api/currentUserProfile')
+    name_id.value = user.id
+    // console.log(adv)
+    let course = await  get('/api/GetCourseByUserIDTermID/' + name_id.value + '/' + termID).then(res => {
       tableData.value = []   // clear the table
-      tableData.value.push(res)
+      for (let i = 0; i < res.length; i++) {
+        let courseID = res[i].courseID;
+        get('/api/GetCourseCardMetaData/' + courseID).then(res1 => {
+          tableData.value.push(res1)
+        })
+      }
     })
   }
 
   defineExpose({
     showCourses,
-    showCoursesBy_courseID
+    showCoursesBy_courseID,
+
   })
 
 </script>
@@ -97,7 +109,7 @@
               </ui>
 
 
-                <el-button style="color: rgb(255 255 255);background-color: #00467f;">Apply</el-button>
+<!--                <el-button style="color: rgb(255 255 255);background-color: #00467f;">Apply</el-button>-->
 
 
 <!--              <li>-->

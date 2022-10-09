@@ -68,8 +68,12 @@ const routes = [
                 meta: { title:'Manage Enrolment', permission: '5' },
                 component: () => import('@/views/management/ManageEnrolment.vue')
             },
-
-
+            {
+                path: "course-coordinator/:courseId",
+                name: "course-coordinator",
+                meta: { title:'Course Coordinator', permission: '6' },
+                component: () => import('@/views/CourseCoordinator.vue')
+            },
         ]
     },
     {
@@ -84,6 +88,7 @@ const routes = [
     },
     {
         path: '/application/:applicationID',
+        name: "application",
         meta: { title:'Apply for the position', permission: '2' },
         component: () => import('@/views/Application/Application.vue')
     },
@@ -99,10 +104,6 @@ const routes = [
     {
         path: '/:pathMatch(.*)',
         redirect: '/404'
-    },
-    {
-        path: "/test",
-        component: () => import('@/views/test.vue')
     },
 ];
 
