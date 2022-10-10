@@ -16,15 +16,17 @@
         <template #header>
           <el-input v-model="search" size="small" placeholder="Type to search"/>
         </template>
-          <el-button size="small" @click="handleAddUser1(scope.$index, scope.row)" type="danger">
+        <template #default="scope">
+          <el-button size="small" @click="handleAddUser1(scope.row)" type="danger">
             Add Tutor
           </el-button>
-          <el-button size="small" @click="handleAddUser2(scope.$index, scope.row)" type="danger">
+          <el-button size="small" @click="handleAddUser2(scope.row)" type="danger">
             Add Marker
           </el-button>
-          <el-button size="small" @click="handleAddUser3(scope.$index, scope.row)" type="danger">
+          <el-button size="small" @click="handleAddUser3(scope.row)" type="danger">
             Add CourseCoordinator
           </el-button>
+        </template>
 
       </el-table-column>
     </el-table>
@@ -113,7 +115,7 @@ type Enrollment = {
 const form = reactive ({} as Enrollment)
 
 
-const handleAddUser1 = (index: number, row: User) => {
+const handleAddUser1 = (row: User) => {
   addUserConfirmVisible.value = true;
   wantToAddUser.value = row;
   form.courseID=props.currentCourse.courseID
@@ -121,15 +123,15 @@ const handleAddUser1 = (index: number, row: User) => {
   form.role="tutor"
   addUser()
 }
-const handleAddUser2 = (index: number, row: User) => {
+const handleAddUser2 = (row: User) => {
   addUserConfirmVisible.value = true;
   wantToAddUser.value = row;
   form.courseID=props.currentCourse.courseID
   form.userID=wantToAddUser.value.id
-  form.role="maker"
+  form.role="marker"
   addUser()
 }
-const handleAddUser3 = (index: number, row: User) => {
+const handleAddUser3 = (row: User) => {
   addUserConfirmVisible.value = true;
   wantToAddUser.value = row;
   form.courseID=props.currentCourse.courseID
