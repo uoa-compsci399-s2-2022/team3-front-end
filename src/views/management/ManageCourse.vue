@@ -3,6 +3,7 @@ import { Delete, get, post, put } from '@/utils/request';
 import { ElButton, ElMessage, ElPopconfirm, FormInstance, FormRules, TableV2FixedDir } from 'element-plus';
 import { computed, reactive, Ref, ref, watch } from 'vue'
 import type { Column } from 'element-plus'
+import { watchDebounced } from '@vueuse/core';
 
 
 
@@ -19,7 +20,8 @@ type term = {
     startDate: string;
     endDate: string;
     isAvailable: boolean;
-    defaultDeadLine: string;
+    defaultMarkerDeadLine: string;
+    defaultTutorDeadLine: string;
 }
 
 /**
@@ -71,9 +73,11 @@ const handleTermEdit = (index: number, row: term) => {
     termDTO.startDate = row.startDate;
     termDTO.isAvailable = row.isAvailable;
     termDTO.endDate = row.endDate;
-    termDTO.defaultDeadLine = row.defaultDeadLine;
+    termDTO.defaultMarkerDeadLine = row.defaultMarkerDeadLine;
+    termDTO.defaultTutorDeadLine = row.defaultTutorDeadLine;
     dateRange.value = [new Date(row.startDate), new Date(row.endDate)];
-    defaultDeadLine.value = new Date(row.defaultDeadLine);
+    defaultMarkerDeadLine.value = new Date(row.defaultMarkerDeadLine);
+    defaultTutorDeadLine.value = new Date(row.defaultTutorDeadLine);
     return function () {
         put(`/api/modifyTerm/${row.termID}`, { data: termDTO })
             .then(
@@ -97,10 +101,12 @@ const clearTermForm = () => {
     termDTO.startDate = '';
     termDTO.endDate = '';
     termDTO.isAvailable = false;
-    termDTO.defaultDeadLine = '';
+    termDTO.defaultMarkerDeadLine = '';
+    termDTO.defaultTutorDeadLine = '';
     // reset dates
     dateRange.value = undefined;
-    defaultDeadLine.value = undefined;
+    defaultMarkerDeadLine.value = undefined;
+    defaultTutorDeadLine.value = undefined;
 }
 
 const closeEditTerm = () => {
@@ -165,7 +171,8 @@ getTermList() // get term list
  * @description a varable which records the date range (Term start date and Term end date).
  */
 const dateRange = ref<[Date, Date]>();
-const defaultDeadLine = ref<any>();
+const defaultMarkerDeadLine = ref<any>();
+const defaultTutorDeadLine = ref<any>();
 // 监听dateRange，当用户选择日期后，自动转换为yyyy-mm-dd格式 
 watch(dateRange, (date) => {
     if (date) {
@@ -173,12 +180,27 @@ watch(dateRange, (date) => {
         termDTO.endDate = new Date(date![1]).toISOString().slice(0, 10)
     }
 })
-// defaultDeadLine改变时自动转换日期为正确的ISO格式
-watch(defaultDeadLine, (date) => {
+// defaultMarkerDeadLine改变时自动转换日期为正确的ISO格式
+watchDebounced(defaultMarkerDeadLine, (date) => {
     if (date) {
-        termDTO.defaultDeadLine = new Date(date).toISOString()
+        let ISOtime = new Date(date).getTime();
+        let localTimeOffset = new Date(date).getTimezoneOffset() * 60 * 1000
+        let localTime = ISOtime - localTimeOffset
+        console.log(ISOtime)
+        console.log(localTimeOffset)
+        termDTO.defaultMarkerDeadLine = new Date(localTime).toISOString()
     }
-})
+}, { debounce: 300, maxWait: 1000 })
+
+// defaultMarkerDeadLine改变时自动转换日期为正确的ISO格式
+watchDebounced(defaultTutorDeadLine, (date) => {
+    if (date) {
+        let ISOtime = new Date(date).getTime();
+        let localTimeOffset = new Date(date).getTimezoneOffset() * 60 * 1000
+        let localTime = ISOtime - localTimeOffset
+        termDTO.defaultTutorDeadLine = new Date(localTime).toISOString()
+    }
+}, { debounce: 300, maxWait: 1000 })
 
 /**
  * @description term data transfer object
@@ -188,7 +210,8 @@ const termDTO = reactive<term>({
     endDate: "",
     termName: "",
     isAvailable: false,
-    defaultDeadLine: "",
+    defaultMarkerDeadLine: "",
+    defaultTutorDeadLine: "",
 })
 
 
@@ -198,7 +221,9 @@ const termDTO = reactive<term>({
  * @description function handles adding term
  */
 const handleTermAdd = () => {
-    if (termDTO.termName && termDTO.startDate && termDTO.endDate && termDTO.defaultDeadLine) {
+    if (termDTO.termName && termDTO.startDate &&
+     termDTO.endDate && termDTO.defaultMarkerDeadLine &&
+      termDTO.defaultTutorDeadLine) {
         post('api/term', termDTO)
             .then(() => {
                 getTermList();
@@ -660,7 +685,8 @@ const handleCourseEdit = (row: number) => {
                     <el-table-column label="Start Date" prop="startDate" />
                     <el-table-column label="End Date" prop="endDate" />
                     <el-table-column label="Is available" prop="isAvailable" />
-                    <el-table-column label="deadLine" prop="defaultDeadLine" />
+                    <el-table-column label="Marker deadline" prop="defaultMarkerDeadLine" />
+                    <el-table-column label="Tutor deadline" prop="defaultTutorDeadLine" />
                     <el-table-column align="right">
                         <template #header>
                             <el-input v-model="searchTerm" size="small" placeholder="Type to search" />
@@ -731,8 +757,12 @@ const handleCourseEdit = (row: number) => {
                             style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-text="Y"
                             inactive-text="N" />
                     </div>
-                    <el-date-picker v-model="defaultDeadLine" type="datetime" placeholder="Pick a Date for deadline"
-                        style="width:100%;" format="YYYY/MM/DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ssZ" />
+                    <el-date-picker v-model="defaultMarkerDeadLine" type="datetime"
+                        placeholder="Pick a Date for Marker deadline" style="width:100%;" format="YYYY/MM/DD HH:mm:ss"
+                        value-format="YYYY-MM-DDTHH:mm:ssZ" />
+                    <el-date-picker v-model="defaultTutorDeadLine" type="datetime"
+                        placeholder="Pick a Date for Tutor deadline" style="width:100%;" format="YYYY/MM/DD HH:mm:ss"
+                        value-format="YYYY-MM-DDTHH:mm:ssZ" />
                 </div>
                 <div class="modal-btns">
                     <el-button type="primary" @click="handleTermAdd">Add</el-button>
@@ -763,8 +793,11 @@ const handleCourseEdit = (row: number) => {
                             style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-text="Y"
                             inactive-text="N" />
                     </div>
-                    <el-date-picker v-model="termDTO.defaultDeadLine" type="datetime"
-                        placeholder="Pick a Date for deadline" style="width:100%;" format="YYYY/MM/DD HH:mm:ss"
+                    <el-date-picker v-model="termDTO.defaultMarkerDeadLine" type="datetime"
+                        placeholder="Pick a Date for Marker deadline" style="width:100%;" format="YYYY/MM/DD HH:mm:ss"
+                        value-format="YYYY-MM-DDTHH:mm:ssZ" />
+                    <el-date-picker v-model="termDTO.defaultTutorDeadLine" type="datetime"
+                        placeholder="Pick a Date for Tutor deadline" style="width:100%;" format="YYYY/MM/DD HH:mm:ss"
                         value-format="YYYY-MM-DDTHH:mm:ssZ" />
                 </div>
                 <div class="modal-btns">
