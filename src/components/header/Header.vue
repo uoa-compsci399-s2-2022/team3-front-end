@@ -4,7 +4,8 @@ import {ElMessage, ElMessageBox} from 'element-plus';
 import {ref, watch} from 'vue';
 import {useRouter, useRoute} from 'vue-router';
 import 'element-plus/theme-chalk/display.css';
-
+import {useSidebarStore} from "@/store";
+const sidebar = useSidebarStore();
 
 const router = useRouter();
 const route = useRoute();
@@ -74,10 +75,17 @@ getCourseNum()
 
 <template>
   <section>
-    <div class="title" v-if="$route.name==='course-coordinator'">
+
+    <div class="title" v-if="$route.name==='course-coordinator'" @click="sidebar.handleCollase()">
+      <el-icon class="expand-sidebar">
+        <Expand/>
+      </el-icon>
       Course Coordinator - {{ courseNum }}
     </div>
-    <div class="title" v-else>
+    <div class="title" v-else @click="sidebar.handleCollase()">
+      <el-icon class="expand-sidebar">
+        <Expand/>
+      </el-icon>
       {{ $route.meta.title }}
     </div>
 
@@ -104,6 +112,9 @@ getCourseNum()
 </template>
 
 <style lang="scss">
+
+
+
 section {
   display: flex;
   margin-top: 30px;
@@ -112,10 +123,25 @@ section {
   padding: 0px 10px 10px 10px;
   border-bottom: 1px solid rgb(210, 210, 210);
 
+  .expand-sidebar{
+    display: none;
+  }
+
   .title {
     font-size: $fs-title;
     color: $uoa-dark;
     font-weight: bold;
+    display: flex;
+    align-items: center;
+  }
+
+  @media (max-width: 540px) {
+    .expand-sidebar{
+      display: inline;
+    }
+    .title{
+      font-size: 25px;
+    }
   }
 
   .info-card {

@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import {UploadFilled, Avatar, Key, Management, Plus} from '@element-plus/icons-vue'
 import {computed, onBeforeMount, reactive, ref, watch, defineAsyncComponent} from 'vue';
-import {ElMessage, FormInstance, FormRules} from 'element-plus'
+import {ElMessage, FormInstance, FormRules, ElNotification} from 'element-plus'
 import {useThrottleFn} from '@vueuse/core'
 import {} from 'element-plus'
 import {get, post} from '@/utils/request'
 import {useRoute, useRouter} from 'vue-router'
 import * as dayjs from "dayjs";
 import ApplicationPreferCourseList from '@/components/applicationUseful/ApplicationPreferCourseList.vue'
+import 'element-plus/theme-chalk/display.css';
+
 
 const ApplicationCourse = defineAsyncComponent(() => import('@/components/applicationUseful/ApplicationCourse.vue'))
 
@@ -24,6 +26,7 @@ type ApplicationMetaInfo = {
   termID: number
   createdDateTime: string
   status: string
+  type: string
 }
 
 type applicationData = {
@@ -128,6 +131,8 @@ get('api/application/' + applicationID.value).then(res => {
   applicationMetaInfo.value.status = res.status;
   applicationMetaInfo.value.createdDateTime = res.createdDateTime;
   applicationMetaInfo.value.termID = res.termID;
+  applicationMetaInfo.value.type = res.type;
+
   metaLoading.value = true;
 
 }).catch((err) => {
@@ -471,6 +476,16 @@ const submitEvent = () => {
     router.push("/applicationlist")
   }).catch(res => {
     console.log(res)
+    let errorMessage = "<p style='font-weight: bold'>Don't forget SAVE application first</p>"
+    res.response.data.message.forEach((item: any) => {
+      errorMessage += `<p>${item}</p>`
+    })
+    ElNotification({
+      title: 'Submit Error',
+      message: errorMessage,
+      dangerouslyUseHTMLString: true,
+      type: 'error'
+    })
   })
 }
 
@@ -479,7 +494,7 @@ const submitEvent = () => {
 <template>
   <div class="application-header">
     <img src="@/assets/logo/uoa.svg" alt="">
-    <el-card class="application-meta-box-card">
+    <el-card class="application-meta-box-card hidden-sm-and-down">
       <div v-loading="!(metaLoading && userProfileLoading && saveLoading)">
         <p>ApplicationID: {{ applicationID }}</p>
         <p>UserID: {{ userID }}</p>
@@ -493,17 +508,26 @@ const submitEvent = () => {
   </div>
   <div v-loading="!(metaLoading && userProfileLoading && saveLoading)">
     <el-row justify="center">
-      <p style="font-size: 30px">Apply for {{ termName }} Tutor or Marker</p>
+      <p style="font-size: 30px">Apply for {{ termName }} {{ applicationMetaInfo.type }}</p>
     </el-row>
 
     <div class="application-container">
 
-      <div class="progress-bar">
-        <el-steps :active="step" simple process-status="process" finish-status="finish" space="200px">
-          <el-step title="Identity Information" description="" :status="statusArr[0]" :icon="Key"/>
+      <div class="progress-bar hidden-sm-and-down">
+        <el-steps :active="step" simple process-status="process" finish-status="finish">
+          <el-step title="Identity Information" description="" :status="statusArr[0]" :icon="Key"></el-step>
           <el-step title="Personal Detail" description="" :status="statusArr[1]" :icon="Avatar"/>
           <el-step title="Courses" description="" :status="statusArr[2]" :icon="Management"/>
           <el-step title="File Upload" description="" :status="statusArr[3]" :icon="UploadFilled"/>
+        </el-steps>
+      </div>
+
+      <div class="progress-bar hidden-md-and-up">
+        <el-steps :active="step" process-status="process" finish-status="finish" simple>
+          <el-step :status="statusArr[0]" :icon="Key"></el-step>
+          <el-step :status="statusArr[1]" :icon="Avatar"/>
+          <el-step :status="statusArr[2]" :icon="Management"/>
+          <el-step :status="statusArr[3]" :icon="UploadFilled"/>
         </el-steps>
       </div>
 
@@ -636,7 +660,7 @@ const submitEvent = () => {
 
         <Transition>
           <div v-show="stepArr[3]">
-            <el-divider>Upload your CV</el-divider>
+            <el-divider>Upload CV</el-divider>
 
             <el-upload class="upload-cv" drag
                        ref="upload_cv"
@@ -659,7 +683,7 @@ const submitEvent = () => {
               </template>
             </el-upload>
 
-            <el-divider>Upload your Transcript</el-divider>
+            <el-divider>Upload Transcript</el-divider>
             <el-upload class="upload-academicData" drag
                        ref="upload_ad"
                        accept="application/pdf"
@@ -718,8 +742,8 @@ const submitEvent = () => {
   background-color: rgb(241, 241, 241);
   height: 80px;
   margin-bottom: 50px;
-  justify-content: flex-end;
-  align-items: flex-end;
+  justify-content: flex-start;
+  align-items: flex-start;
   display: flex;
 
   img {
@@ -732,7 +756,7 @@ const submitEvent = () => {
 }
 
 .application-meta-box-card {
-  margin-right: 20px;
+  margin-left: 25px;
   position: absolute;
   top: 25px;
 
@@ -740,7 +764,7 @@ const submitEvent = () => {
 
 
 .application-container {
-  width: 800px;
+  width: 99%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -748,11 +772,11 @@ const submitEvent = () => {
   padding-bottom: 92px; // 预留92px空位给表单，防止挡住内容
 
   .progress-bar {
-    z-index: 999;
+    z-index: 1;
     position: sticky;
     top: 0;
     padding: 20px 0;
-    width: 100%;
+    width: 900px;
     background-color: rgb(255, 255, 255, 0.8);
   }
 
@@ -762,7 +786,6 @@ const submitEvent = () => {
     .step2 {
       display: flex;
       flex-direction: column;
-      // row-gap: 20px;
     }
   }
 }
@@ -775,6 +798,7 @@ const submitEvent = () => {
   padding-bottom: 50px;
   position: fixed;
   bottom: 0;
+  z-index: 999;
 
   .el-button:first-child {
     margin-right: auto;
@@ -788,6 +812,26 @@ const submitEvent = () => {
     position: relative;
     left: -18px;
   }
+}
+
+
+@media screen and (max-width: 768px) {
+  .application-control-btns {
+    width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .application-container {
+    .application-form-container {
+      width: 90%;
+    }
+    .progress-bar {
+      width: 95%;
+      font-size: large;
+    }
+  }
+
+
 }
 
 .indent {
@@ -806,6 +850,7 @@ const submitEvent = () => {
 
 .step3 {
   width: 100%;
+  margin-bottom: 20px;
 }
 
 

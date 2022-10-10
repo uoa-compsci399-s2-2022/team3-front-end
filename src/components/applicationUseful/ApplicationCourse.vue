@@ -1,8 +1,6 @@
 <template>
-  <el-drawer v-model="visible.visible" :show-close="false" size="45%">
-    <template #header="{ titleId, titleClass }">
-      <h4 :id="titleId" :class="titleClass" style="font-size: x-large">Add Prefer Course</h4>
-    </template>
+  <el-drawer v-model="visible.visible" title="Add Prefer Course" :size="drawerSize"
+             :direction="drawerDirection">
     <el-input
         v-model="searchCourseNum"
         size="large"
@@ -22,6 +20,16 @@
         <template #default="props">
 
           <div class="courseInformation-container">
+
+            <h2 style="font-size: medium; font-weight: bold">Prerequisite</h2>
+            <p>{{ props.row.prerequisite }}</p>
+
+            <br/>
+
+            <h2 style="font-size: medium; font-weight: bold">Tutor Responsibility</h2>
+            <p>{{ props.row.tutorResponsibility }}</p>
+
+            <br/>
 
             <h2 style="font-size: medium; font-weight: bold">Marker Responsibility</h2>
             <p>{{ props.row.markerResponsibility }}</p>
@@ -65,17 +73,14 @@
     </el-table>
 
     <el-row style="margin-top: 30px" justify="center">
-      <el-popover
-          :visible="noCourseSelected"
-          placement="bottom"
-          title="Tips"
-          :width="200"
-          content="You must choose a course"
-      >
-        <template #reference>
-          <el-button @click="sendCourse">Confirm</el-button>
-        </template>
-      </el-popover>
+      <el-button @click="sendCourse" class="hidden-sm-and-down botton-fix-button" type="primary" size="large">Confirm
+      </el-button>
+
+      <el-button @click="()=>{let result = sendCourse(); if (result) visible.visible = false}" class="hidden-md-and-up botton-fix-button"
+                 type="primary"
+                 size="large">Confirm
+      </el-button>
+
     </el-row>
 
   </el-drawer>
@@ -88,6 +93,7 @@ import {ElButton, ElDrawer, ElMessage, ElTable} from 'element-plus'
 import {get, post} from "@/utils/request";
 import {useRouter, useRoute} from 'vue-router';
 import {Search} from '@element-plus/icons-vue'
+import 'element-plus/theme-chalk/display.css';
 import dayjs from "dayjs";
 
 const router = useRouter()
@@ -104,21 +110,26 @@ const courseTableRef = ref<InstanceType<typeof ElTable>>()
 const tableData: courseList[] = reactive([] as courseList[])
 const currentRow = ref()
 const emit = defineEmits(['added_course'])
-const noCourseSelected = ref(false)
+
 const sendCourse = () => {
   if (currentRow.value) {
     emit('added_course', currentRow.value)
+    return true
   } else {
-    noCourseSelected.value = true
-    setTimeout(() => {
-      noCourseSelected.value = false
-    }, 1000)
+    ElMessage({
+      message: 'Please select a course',
+      type: 'warning',
+      grouping: true,
+      customClass: 'message-z-top'
+    })
+    return false
   }
 
 }
 
 interface courseList {
   [key: string]: any;
+
   courseID: number;
   courseNum: string;
   courseName: string;
@@ -132,8 +143,6 @@ interface courseList {
   prerequisite: string;
 
 }
-
-
 
 
 const handleCurrentChange = (val: courseList | undefined) => {
@@ -160,6 +169,27 @@ get('api/getCourseByTerm/' + props.termID).then((res) => {
   courseLoaded.value = true;
 })
 
+const drawerSize = ref()
+const drawerDirection = ref()
+
+setInterval(() => {
+  responsiveLayout()
+}, 2000)
+
+
+const getWidth = () => {
+  return window.innerWidth
+}
+
+const responsiveLayout = () => {
+  drawerSize.value = getWidth() > 768 ? '45%' : '100%'
+  drawerDirection.value = getWidth() > 768 ? 'rtl' : 'btt'
+}
+
+onBeforeMount(() => {
+  responsiveLayout()
+})
+
 
 </script>
 
@@ -167,6 +197,12 @@ get('api/getCourseByTerm/' + props.termID).then((res) => {
 .courseInformation-container {
   margin-left: 15px;
   margin-right: 15px;
+}
+
+.botton-fix-button {
+  position: fixed;
+  bottom: 20px;
+  z-index: 999999;
 }
 
 </style>
