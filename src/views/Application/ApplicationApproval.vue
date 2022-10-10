@@ -41,6 +41,7 @@
                        v-model:course="course"
                        v-model:isCourseLoading="isCourseLoading"
                        v-model:tutorOrMarker="tutorOrMarker"
+                       v-model:tagIndex="selectedTab"
                        @reloadApplicationApprovalList="executePendingApplication"/>
       </el-tab-pane>
       <el-tab-pane label="Accepted">
@@ -54,7 +55,7 @@
         </template>
         <ApprovalTable v-model:applicationApprovalList="stateAcceptedApplication"
                        v-model:isLoading="isLoadingAcceptedApplication" v-model:course="course"
-                       v-model:isCourseLoading="isCourseLoading" v-model:tutorOrMarker="tutorOrMarker"/>
+                       v-model:isCourseLoading="isCourseLoading" v-model:tutorOrMarker="tutorOrMarker" v-model:tagIndex="selectedTab"/>
       </el-tab-pane>
       <el-tab-pane label="Rejected">
         <template #label>
@@ -67,7 +68,7 @@
         </template>
         <ApprovalTable v-model:applicationApprovalList="stateRejectedApplication"
                        v-model:isLoading="isLoadingRejectedApplication" v-model:course="course"
-                       v-model:isCourseLoading="isCourseLoading" v-model:tutorOrMarker="tutorOrMarker"/>
+                       v-model:isCourseLoading="isCourseLoading" v-model:tutorOrMarker="tutorOrMarker" v-model:tagIndex="selectedTab"/>
       </el-tab-pane>
       <el-tab-pane label="Published">
         <template #label>
