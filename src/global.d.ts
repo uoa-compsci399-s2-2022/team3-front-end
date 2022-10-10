@@ -16,6 +16,7 @@ interface Course {
     termID: number;
     courseName: string;
     totalAvailableHours: number;
+    currentAvailableHours: number;
     estimatedNumOfStudents: number;
     currentlyNumOfStudents: number;
     needTutors: boolean;
@@ -26,7 +27,8 @@ interface Course {
     tutorResponsibility: string;
     markerResponsibility: string;
     canPreAssign: boolean;
-    deadLine: string;
+    markerDeadLine: string;
+    tutorDeadLine: string;
     prerequisite: string;
 
 }
