@@ -167,9 +167,15 @@
             <el-button @click="cancelRowEvent(row)" type="primary" :icon="SemiSelect" circle plain/>
           </template>
           <template v-else>
-            <el-button @click="editRowEvent(row)" type="primary" :icon="Edit" circle plain/>
-            <el-button type="success" :icon="Check" @click="acceptEvent(row)" circle/>
-            <el-button type="danger" :icon="Close" circle/>
+            <el-tooltip content="Edit" placement="bottom" :show-after="400">
+              <el-button @click="editRowEvent(row)" type="primary" :icon="Edit" circle plain/>
+            </el-tooltip>
+            <el-tooltip content="Accept" placement="bottom" :show-after="400">
+              <el-button type="success" :icon="Check" @click="acceptEvent(row)" circle/>
+            </el-tooltip>
+            <el-tooltip content="Reject" placement="bottom" :show-after="400">
+              <el-button type="danger" :icon="Close" circle/>
+            </el-tooltip>
           </template>
         </div>
       </template>
