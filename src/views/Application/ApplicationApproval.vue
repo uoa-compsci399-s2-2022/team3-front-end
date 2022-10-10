@@ -2,7 +2,8 @@
   <div class="page-container">
     <el-row style="align-items: center;">
       <el-col :md="12">
-        <el-select v-model="selectedTerm" class="m-2" placeholder="Term" style="margin-right: 10px" v-loading="isLoadingTerm">
+        <el-select v-model="selectedTerm" class="m-2" placeholder="Term" style="margin-right: 10px"
+                   v-loading="isLoadingTerm">
           <el-option
               v-for="item in stateTerm"
               :key="item.termID"
@@ -11,15 +12,18 @@
           />
         </el-select>
         <el-select v-model="tutorOrMarker" class="m-2" placeholder="Marker or Tutor">
-          <el-option key="Marker" label="Marker" value="Marker"/>
-          <el-option key="Tutor" label="Tutor" value="Tutor"/>
+          <el-option key="marker" label="Marker" value="marker" v-permission="7"/>
+          <el-option key="tutor" label="Tutor" value="tutor" v-permission="6"/>
         </el-select>
       </el-col>
       <el-col :md="9">
-        <el-alert title="Tips: Rows in the table can be expanded or clicked" type="info" show-icon />
+        <el-alert title="Tips: Rows in the table can be expanded or clicked" type="info" show-icon/>
       </el-col>
       <el-col style="text-align: end" :md="3">
-        <el-button type="success" size="large"><font-awesome-icon style="margin-right: 4px; font-size: 20px" icon="fa-solid fa-bullhorn" /> Publish</el-button>
+        <el-button type="success" size="large">
+          <font-awesome-icon style="margin-right: 4px; font-size: 20px" icon="fa-solid fa-bullhorn"/>
+          Publish
+        </el-button>
       </el-col>
     </el-row>
     <br/>
@@ -33,37 +37,51 @@
           </div>
         </template>
         <ApprovalTable v-model:applicationApprovalList="statePendingApplication"
-                       v-model:isLoading="isLoadingPendingApplication"/>
+                       v-model:isLoading="isLoadingPendingApplication"
+                       v-model:course="course"
+                       v-model:isCourseLoading="isCourseLoading"
+                       v-model:tutorOrMarker="tutorOrMarker"
+                       v-model:tagIndex="selectedTab"
+                       @reloadApplicationApprovalList="executePendingApplication"/>
       </el-tab-pane>
       <el-tab-pane label="Accepted">
         <template #label>
           <div :class="{selected_item: selectedTab==='1'}" class="tabs-label">
-            <el-icon><CircleCheckFilled /></el-icon> &nbsp;
+            <el-icon>
+              <CircleCheckFilled/>
+            </el-icon> &nbsp;
             Accepted
           </div>
         </template>
         <ApprovalTable v-model:applicationApprovalList="stateAcceptedApplication"
-                       v-model:isLoading="isLoadingAcceptedApplication"/>
+                       v-model:isLoading="isLoadingAcceptedApplication" v-model:course="course"
+                       v-model:isCourseLoading="isCourseLoading" v-model:tutorOrMarker="tutorOrMarker" v-model:tagIndex="selectedTab"/>
       </el-tab-pane>
       <el-tab-pane label="Rejected">
         <template #label>
           <div :class="{selected_item: selectedTab==='2'}" class="tabs-label">
-            <el-icon><CircleCloseFilled /></el-icon> &nbsp;
+            <el-icon>
+              <CircleCloseFilled/>
+            </el-icon> &nbsp;
             Rejected
           </div>
         </template>
         <ApprovalTable v-model:applicationApprovalList="stateRejectedApplication"
-                       v-model:isLoading="isLoadingRejectedApplication"/>
+                       v-model:isLoading="isLoadingRejectedApplication" v-model:course="course"
+                       v-model:isCourseLoading="isCourseLoading" v-model:tutorOrMarker="tutorOrMarker" v-model:tagIndex="selectedTab"/>
       </el-tab-pane>
       <el-tab-pane label="Published">
         <template #label>
           <div :class="{selected_item: selectedTab==='3'}" class="tabs-label">
-            <font-awesome-icon icon="fa-solid fa-bullhorn" /> &nbsp;
+            <font-awesome-icon icon="fa-solid fa-bullhorn"/> &nbsp;
             Published
           </div>
         </template>
         <ApprovalTable v-model:applicationApprovalList="statePublishedApplication"
-                       v-model:isLoading="isLoadingPublishedApplication" v-model:tagIndex="selectedTab" />
+                       v-model:isLoading="isLoadingPublishedApplication"
+                       v-model:tagIndex="selectedTab"
+                       v-model:course="course"
+                       v-model:isCourseLoading="isCourseLoading" v-model:tutorOrMarker="tutorOrMarker"/>
       </el-tab-pane>
     </el-tabs>
 
@@ -78,7 +96,7 @@ import {useAsyncState} from "@vueuse/core";
 import {get} from "@/utils/request";
 import ApprovalTable from '@/components/applicationUseful/ApprovalTable.vue'
 import {CircleCheckFilled, CircleCloseFilled} from '@element-plus/icons-vue'
-
+import {usePermissionStore} from '@/store'
 
 const selectedTerm = ref()
 const tutorOrMarker = ref("")
@@ -102,7 +120,7 @@ const {
   execute: executePendingApplication
 } = useAsyncState(
     (args) => {
-      return get(`api/applicationListByTerm/${selectedTerm.value}/Pending`)
+      return get(`api/applicationListByTerm/${selectedTerm.value}/Pending/${tutorOrMarker.value}`)
     },
     [],
     {
@@ -119,7 +137,7 @@ const {
   execute: executeAcceptedApplication
 } = useAsyncState(
     (args) => {
-      return get(`api/applicationListByTerm/${selectedTerm.value}/Accepted`)
+      return get(`api/applicationListByTerm/${selectedTerm.value}/Accepted/${tutorOrMarker.value}`)
     },
     [],
     {
@@ -136,7 +154,7 @@ const {
   execute: executeRejectedApplication
 } = useAsyncState(
     (args) => {
-      return get(`api/applicationListByTerm/${selectedTerm.value}/Rejected`)
+      return get(`api/applicationListByTerm/${selectedTerm.value}/Rejected/${tutorOrMarker.value}`)
     },
     [],
     {
@@ -153,7 +171,7 @@ const {
   execute: executePublishedApplication
 } = useAsyncState(
     (args) => {
-      return get(`api/applicationListByTerm/${selectedTerm.value}/Published`)
+      return get(`api/applicationListByTerm/${selectedTerm.value}/Published/${tutorOrMarker.value}`)
     },
     [],
     {
@@ -164,38 +182,84 @@ const {
 
 
 
-watch(selectedTab, (newVal, oldVal) => {
-  if (selectedTerm.value) {
-    if (selectedTab.value === '0'){
-      executePendingApplication()
-    } else if (selectedTab.value === '1'){
+const getApplicationApprovalList = () => {
+  if (selectedTerm.value && tutorOrMarker.value) {
+    if (selectedTab.value === '0') {
+      executePendingApplication().then((res) => {
+        console.log(res)
+      }).catch((err) => {
+        console.log(err)
+      })
+    } else if (selectedTab.value === '1') {
       executeAcceptedApplication()
-    } else if (selectedTab.value === '2'){
+    } else if (selectedTab.value === '2') {
       executeRejectedApplication()
-    } else if (selectedTab.value === '3'){
+    } else if (selectedTab.value === '3') {
       executePublishedApplication()
     }
   }
+}
+
+watch(tutorOrMarker, (newVal, oldVal) => {
+  getApplicationApprovalList()
 })
 
+watch(selectedTab, (newVal, oldVal) => {
+  getApplicationApprovalList()
+})
 
 watch(selectedTerm, (newVal, oldVal) => {
+  getCourseByTermFromServer(selectedTerm.value)
   if (selectedTerm.value) {
-    if (selectedTab.value === '0'){
-      executePendingApplication()
-    } else if (selectedTab.value === '1'){
-      executeAcceptedApplication()
-    } else if (selectedTab.value === '2'){
-      executeRejectedApplication()
-    } else if (selectedTab.value === '3'){
-      executePublishedApplication()
-    }
-
+    getApplicationApprovalList()
     localStorage.setItem('selectedTerm', selectedTerm.value)
   }
 })
 
+
+const course = ref([] as Course[])
+const isCourseLoading = ref(false)
+
+const getCourseByTermFromServer = (termID: number) => {
+  isCourseLoading.value = true;
+  get('api/getCourseByTerm/' + termID).then((res) => {
+    course.value = []
+    res.forEach((item: any) => {
+      course.value.push({
+        courseID: item.courseID,
+        courseNum: item.courseNum,
+        courseName: item.courseName,
+        estimatedNumOfStudents: item.estimatedNumOfStudents,
+        currentlyNumOfStudents: item.currentlyNumOfStudents,
+        numOfAssignments: item.numOfAssignments,
+        numOfLabsPerWeek: item.numOfLabsPerWeek,
+        numOfTutorialsPerWeek: item.numOfTutorialsPerWeek,
+        tutorResponsibility: item.tutorResponsibility,
+        markerResponsibility: item.markerResponsibility,
+        prerequisite: item.prerequisite,
+        termID: item.termID,
+        termName: item.termName,
+        totalAvailableHours: item.totalAvailableHours,
+        currentAvailableHours: item.currentAvailableHours,
+        needTutors: item.needTutors,
+        needMarkers: item.needMarkers,
+        canPreAssign: item.canPreAssign,
+        tutorDeadLine: item.tutorDeadLine,
+        markerDeadLine: item.markerDeadLine
+      })
+    })
+    isCourseLoading.value = false;
+  })
+}
+
+
 onBeforeMount(() => {
+  const permission = usePermissionStore()
+  if (Array.from(permission.key).includes("7")){
+    tutorOrMarker.value = "marker"
+  } else if (Array.from(permission.key).includes("6")){
+    tutorOrMarker.value = "tutor"
+  }
   executeTerm().then(
       () => {
         stateTerm.value.sort((a: Term, b: Term) => {
@@ -203,11 +267,10 @@ onBeforeMount(() => {
         })
         if (localStorage.getItem('selectedTerm')) {
           selectedTerm.value = stateTerm.value.filter((t: { termID: number; }) => t.termID === parseInt(localStorage.getItem('selectedTerm')!))[0].termID
-          executePendingApplication()
+          getApplicationApprovalList()
         } else {
           selectedTerm.value = stateTerm.value[0].termID
         }
-
       }
   )
 })

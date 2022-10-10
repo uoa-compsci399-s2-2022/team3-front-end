@@ -17,13 +17,22 @@
       <el-table-column prop="term" label="Term"
                        :filters="termList"
                        :filter-method="filterHandler"/>
-      <el-table-column prop="createdDateTime" label="Created DateTime"/>
-      <el-table-column prop="submittedDateTime" label="Submitted DateTime"/>
+      <el-table-column prop="createdDateTime" label="Created DateTime" sortable/>
+      <el-table-column prop="submittedDateTime" label="Submitted DateTime" sortable/>
+      <el-table-column
+          prop="type"
+          label="Type"
+          :filters="[
+        { text: 'Marker', value: 'marker' },
+        { text: 'Tutor', value: 'tutor' }
+      ]"
+          :filter-method="filterHandler"
+          filter-placement="bottom-end"/>
       <el-table-column
           prop="status"
           label="Status"
           :filters="[
-        { text: 'Success', value: 'Success' },
+        { text: 'Accepted', value: 'Accepted' },
         { text: 'Pending', value: 'Pending' },
         { text: 'Failed', value: 'Failed' },
         { text: 'Unsubmit', value: 'Unsubmit' },
@@ -58,6 +67,8 @@ const router = useRouter();
 const route = useRoute();
 
 
+const applicationListLoading = ref(false)
+
 const applicationVisible = reactive({
   visible: false
 })
@@ -66,21 +77,26 @@ const showApplication = () => {
 }
 
 const statusType = {
-  'Success': 'success',
+  'Accepted': 'success',
   'Pending': 'info',
   'Failed': 'danger',
   'Unsubmit': 'warning'
 }
 const tableData: ApplicationList[] = reactive([] as ApplicationList[])
 const termList = reactive([] as object[])
+
 interface ApplicationList {
   [key: string]: any;
+
   applicationID: number
   term: string
   createdDateTime: string
   submittedDateTime: string
   status: string
+  type: string
+
 }
+
 const tableRef = ref<InstanceType<typeof ElTable>>()
 
 
@@ -109,16 +125,18 @@ const tableRowClick = (row: ApplicationList) => {
 
 onBeforeMount(() => {
   get('api/currentStudentApplicationList').then((res) => {
-    console.log(res)
+    applicationListLoading.value = true
+    tableData.splice(0, tableData.length)
     res.forEach((item: ApplicationList) => {
-      if (dayjs(item.createdDateTime).isValid()){
+      if (dayjs(item.createdDateTime).isValid()) {
         item.createdDateTime = dayjs(item.createdDateTime).format('DD-MM-YYYY HH:mm:ss')
       }
-      if (dayjs(item.submittedDateTime).isValid()){
+      if (dayjs(item.submittedDateTime).isValid()) {
         item.submittedDateTime = dayjs(item.submittedDateTime).format('DD-MM-YYYY HH:mm:ss')
       }
     })
     tableData.push(...res)
+    applicationListLoading.value = false
   })
 
   get('api/availableTerm').then((res) => {

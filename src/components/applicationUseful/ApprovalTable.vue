@@ -45,7 +45,7 @@
                   AUID
                 </div>
               </template>
-              {{row.auid}}
+              {{ row.auid }}
             </el-descriptions-item>
             <el-descriptions-item>
               <template #label>
@@ -53,7 +53,7 @@
                   Submitted DateTime
                 </div>
               </template>
-              {{row.submittedDateTime}}
+              {{ row.submittedDateTime }}
             </el-descriptions-item>
             <el-descriptions-item>
               <template #label>
@@ -61,10 +61,10 @@
                   Other contracts
                 </div>
               </template>
-              {{row.otherContracts}}
+              {{ row.otherContracts }}
             </el-descriptions-item>
           </el-descriptions>
-          <br />
+          <br/>
           <p class="emphasis">Preference Course</p>
           <vxe-table
               border
@@ -83,7 +83,6 @@
               No Preference Course
             </template>
           </vxe-table>
-
         </div>
       </template>
     </vxe-column>
@@ -99,35 +98,39 @@
         <vxe-input v-model="row.name" type="text"></vxe-input>
       </template>
     </vxe-column>
-    <vxe-column field="gpa" title="GPA" :edit-render="{}" width="70" sortable >
+    <vxe-column field="gpa" title="GPA" :edit-render="{}" width="70" sortable>
       <template #edit="{ row }">
         <vxe-input v-model="row.gpa" type="number"></vxe-input>
       </template>
     </vxe-column>
-    <vxe-column field="PreferCourseGPA" title="PreferCourse GPA" width="110" sortable >
+    <vxe-column field="PreferCourseGPA" title="PreferCourse GPA" width="110" sortable>
     </vxe-column>
-    <vxe-column field="currentlyOverseas" title="Currently Overseas" width="95" :edit-render="{}" :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
+    <vxe-column field="currentlyOverseas" title="Currently Overseas" width="95" :edit-render="{}"
+                :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.currentlyOverseas" clearable transfer>
           <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
         </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="willBackToNZ" title="Will back to NZ" width="88" :edit-render="{}" :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
+    <vxe-column field="willBackToNZ" title="Will back to NZ" width="88" :edit-render="{}"
+                :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.willBackToNZ" clearable transfer>
           <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
         </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="isCitizenOrPR" title="is Citizen or PR" width="79" :edit-render="{}" :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
+    <vxe-column field="isCitizenOrPR" title="is Citizen or PR" width="79" :edit-render="{}"
+                :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.isCitizenOrPR" clearable transfer>
           <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
         </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="haveValidVisa" title="have Valid Visa" width="100" :edit-render="{}" :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
+    <vxe-column field="haveValidVisa" title="have Valid Visa" width="100" :edit-render="{}"
+                :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.haveValidVisa" clearable transfer>
           <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
@@ -139,21 +142,24 @@
         <vxe-input v-model="row.enrolDetails" type="text"></vxe-input>
       </template>
     </vxe-column>
-    <vxe-column field="studentDegree" title="Student Degree" :edit-render="{}" width="123" :filters="[{label: 'Undergraduate', value: 'Undergraduate'}, {label: 'Postgraduate', value: 'Postgraduate'}]" :filter-multiple=false>
+    <vxe-column field="studentDegree" title="Student Degree" :edit-render="{}" width="123"
+                :filters="[{label: 'Undergraduate', value: 'Undergraduate'}, {label: 'Postgraduate', value: 'Postgraduate'}]"
+                :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.studentDegree" clearable transfer>
           <vxe-option v-for="item in studentDegree" :key="item" :value="item" :label="item"></vxe-option>
         </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="haveOtherContracts" width="100" title="Have other contracts" :edit-render="{}" :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
+    <vxe-column field="haveOtherContracts" width="100" title="Have other contracts" :edit-render="{}"
+                :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.haveOtherContracts" clearable transfer>
           <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
         </vxe-select>
       </template>
     </vxe-column>
-    <vxe-column field="maximumWorkingHours" title="Max working hours" width="108" :edit-render="{}" sortable >
+    <vxe-column field="maximumWorkingHours" title="Max working hours" width="108" :edit-render="{}" sortable>
       <template #edit="{ row }">
         <vxe-input v-model="row.maximumWorkingHours" type="number"></vxe-input>
       </template>
@@ -170,10 +176,10 @@
             <el-tooltip content="Edit" placement="bottom" :show-after="400">
               <el-button @click="editRowEvent(row)" type="primary" :icon="Edit" circle plain/>
             </el-tooltip>
-            <el-tooltip content="Accept" placement="bottom" :show-after="400">
+            <el-tooltip content="Accept" placement="bottom" :show-after="400" v-if="tagIndexSync!=='1'">
               <el-button type="success" :icon="Check" @click="acceptEvent(row)" circle/>
             </el-tooltip>
-            <el-tooltip content="Reject" placement="bottom" :show-after="400">
+            <el-tooltip content="Reject" placement="bottom" :show-after="400" v-if="tagIndexSync!=='2'">
               <el-button type="danger" :icon="Close" circle/>
             </el-tooltip>
           </template>
@@ -181,7 +187,7 @@
       </template>
     </vxe-column>
     <template #empty>
-      <el-empty description="No data. Please select Terms and Approval Type (Marker or Tutor)."/>
+      <el-empty description="No data. Please select other Terms and Approval Type (Marker or Tutor)."/>
     </template>
   </vxe-table>
 
@@ -225,20 +231,100 @@
   </el-drawer>
 
 
-  <el-dialog v-model="enrollDialogVisible" title="Accept & Enroll">
+  <el-dialog v-model="enrollDialogVisible" title="Accept" v-loading="acceptToServerLoading">
+    <el-alert
+        type="warning"
+        effect="dark"
+        title="Note: After Accept, there are not direct enrolled. It will be enrolled after clicking Publish."
+        style="margin-bottom: 11px; margin-top: 0"
+        show-icon
+        center
+        :closable="false"
+    />
+    <el-alert
+        type="warning"
+        title="Below is the preference course for this student, and you can modify them."
+        style="margin-bottom: 9px; margin-top: 0"
+        show-icon
+    />
+    <el-form :model="singleEnrollForm">
+      <el-form-item
+          v-for="(domain, index) in singleEnrollForm.domains"
+          :key="index"
+          :label="'Course' + (index+1)"
+          :prop="'domains.'+index+'.courseID'"
+          :rules="{
+            required: true,
+            message: 'You must choose a course',
+            trigger: 'blur',
+      }">
+        <el-select v-model="domain.courseID" placeholder="Input Course Num" filterable>
+          <div v-for="item in course">
+            <el-popover
+                placement="right"
+                :title="item.courseNum + ' - ' + item.courseName"
+                :width="520"
+                trigger="hover"
+                :hide-after="0"
+            >
+              <template #reference>
+                <el-option
+                    :key="item.courseID"
+                    :label="item.courseNum"
+                    :value="item.courseID"
+                >
+                  <span style="float: left">{{ item.courseNum }}</span>
+                  <span class="course-select-option"
+                        style="float: right">Available Hour: {{ item.currentAvailableHours }}</span>
+                </el-option>
+              </template>
+              <el-alert
+                  v-show="closedCourseAvailableHoursAlert"
+                  title="Available Hours"
+                  type="info"
+                  effect="dark"
+                  description="This number of Available Hours means(for this course): Total Available Hours - Pre assigned Tutor & Marker Hours - the total estimated hours that have been accepted and enrolled(include: No Published & Published)"
+                  show-icon
+                  @close="setClosedCourseAvailableHoursAlert"
+              />
+              <p class="emphasis">Prerequisite</p>
+              <p>{{ item.prerequisite }}</p>
+              <div v-if="tutorOrMarker === 'Tutor'">
+                <p class="emphasis">Tutor Responsibility</p>
+                <p>{{ item.tutorResponsibility }}</p>
+              </div>
+              <div v-else-if="tutorOrMarker === 'Marker'">
+                <p class="emphasis">Marker Responsibility</p>
+                <p>{{ item.markerResponsibility }}</p>
+              </div>
+            </el-popover>
+          </div>
+        </el-select>
+        <el-tooltip
+            effect="dark"
+            content="Input estimated working hours for the course"
+            placement="left"
+        >
+          <el-input-number v-model="domain.estimatedHours" :step="1" style="margin-left: 8px"
+                           :min="0"/>
+        </el-tooltip>
+        <el-button style="margin-left: 8px" @click.prevent="removeDomain(domain)" icon="Delete" type="danger" circle
+                   plain/>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="addDomain" type="primary">Add a course</el-button>
+      </el-form-item>
+    </el-form>
 
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="enrollDialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="enrollDialogVisible = false"
-        >Confirm</el-button
+        <el-button type="success" @click="acceptToServer"
+        >Accept</el-button
         >
       </span>
     </template>
   </el-dialog>
-
-
-
 
 
 </template>
@@ -246,16 +332,18 @@
 <script setup lang="ts">
 import {VXETable, VxeTableEvents, VxeTableInstance} from 'vxe-table'
 import {ref, reactive, computed, watch, toRef, onBeforeMount, onUpdated} from 'vue'
-import {Edit, Check, Close, Select, SemiSelect} from '@element-plus/icons-vue'
+import {Edit, Check, Close, Select, SemiSelect, Delete} from '@element-plus/icons-vue'
 import 'element-plus/theme-chalk/display.css';
-import {post} from "@/utils/request";
+import {get, post, put} from "@/utils/request";
 import {ElMessage} from "element-plus";
+import type {FormInstance} from 'element-plus'
 
 // *********************
 // * Sync Parameter
 // *********************
-const props = defineProps(['applicationApprovalList', 'isLoading', 'tagIndex'])
-const emit = defineEmits(['update:applicationApprovalList', 'update:isLoading', 'update:tagIndex'])
+const props = defineProps(['applicationApprovalList', 'isLoading', 'tagIndex', 'course', 'isCourseLoading', 'tutorOrMarker'])
+const emit = defineEmits(['update:applicationApprovalList', 'update:isLoading', 'update:tagIndex', 'reloadApplicationApprovalList'])
+
 const applicationApprovalListSync = computed({
   get() {
     return props.applicationApprovalList as applicationApprovalList[]
@@ -283,6 +371,10 @@ const tagIndexSync = computed({
   }
 })
 
+const reloadApplicationApprovalList = () => {
+  emit('reloadApplicationApprovalList')
+}
+
 
 // *********************
 // * Layout
@@ -305,9 +397,6 @@ const responsiveLayout = () => {
 }
 
 
-onBeforeMount(() => {
-  responsiveLayout()
-})
 
 
 
@@ -332,11 +421,73 @@ interface eventProps {
 // * Enroll Dialog
 // *********************
 const enrollDialogVisible = ref(false)
+const closedCourseAvailableHoursAlert = ref()
+const currentApplicationID = ref()
+const acceptToServerLoading = ref(false)
 
-const acceptEvent = (row:any) => {
+const setClosedCourseAvailableHoursAlert = () => {
+  localStorage.setItem('closedCourseAvailableHoursAlert', 'false')
+  closedCourseAvailableHoursAlert.value = false
+}
+
+const acceptEvent = (row: any) => {
+  singleEnrollForm.domains = []
+  row.PreferCourse.forEach((item: any) => {
+    singleEnrollForm.domains.push({
+      courseID: item.courseID,
+      estimatedHours: 0
+    })
+  })
+  currentApplicationID.value = row.applicationID
   enrollDialogVisible.value = true
 }
 
+const formRef = ref<FormInstance>()
+const singleEnrollForm = reactive<{
+  domains: DomainItem[]
+}>({
+  domains: []
+})
+
+interface DomainItem {
+  courseID: number | null
+  estimatedHours: number
+}
+
+const removeDomain = (item: DomainItem) => {
+  const index = singleEnrollForm.domains.indexOf(item)
+  if (index !== -1) {
+    singleEnrollForm.domains.splice(index, 1)
+  }
+}
+
+const addDomain = () => {
+  singleEnrollForm.domains.push({
+    courseID: null,
+    estimatedHours: 0
+  })
+  console.log(singleEnrollForm.domains)
+}
+
+const acceptToServer = () => {
+  acceptToServerLoading.value = true
+  put(`api/applicationApproval/${currentApplicationID.value}/Accepted`, {data:singleEnrollForm.domains})
+    .then((res) => {
+        reloadApplicationApprovalList()
+        ElMessage.success('Accept successfully!')
+        acceptToServerLoading.value = false
+        enrollDialogVisible.value = false
+    })
+    .catch((err) => {
+      console.log(err)
+      ElMessage({
+        message: err.response.data.message,
+        type: 'error'
+      })
+      acceptToServerLoading.value = false
+    })
+
+}
 
 
 // *********************
@@ -382,13 +533,13 @@ const autoSaveUpdateEvent = async (row: any, applicationID: number) => {
             message: 'Save success',
             type: 'success'
           })
-          isLoadingSync.value = false
+          reloadApplicationApprovalList()
         }).catch((err) => {
       ElMessage({
         message: err.response.data['message'],
         type: 'error'
       })
-      isLoadingSync.value = false
+      reloadApplicationApprovalList()
     })
   } catch (e: any) {
     if (e && e.message) {
@@ -397,7 +548,7 @@ const autoSaveUpdateEvent = async (row: any, applicationID: number) => {
         type: 'error'
       })
     }
-    isLoadingSync.value = false
+    reloadApplicationApprovalList()
   }
 }
 
@@ -407,11 +558,11 @@ const editRowEvent = (row: any) => {
   $table.setEditRow(row)
 }
 
-const saveRowEvent = (row:any) => {
+const saveRowEvent = (row: any) => {
   const $table = xTable.value
   $table.clearEdit().then(() => {
     isLoadingSync.value = true
-    const toServerRow:saveApplicationApprovalList = {
+    const toServerRow: saveApplicationApprovalList = {
       upi: row.upi,
       name: row.name,
       studentDegree: row.studentDegree,
@@ -441,8 +592,10 @@ const toggleExpandChangeEvent = ({row}: eventProps) => {
 }
 
 
-
-
+onBeforeMount(() => {
+  responsiveLayout()
+  closedCourseAvailableHoursAlert.value = localStorage.getItem('closedCourseAvailableHoursAlert') === null
+})
 
 </script>
 
@@ -463,6 +616,12 @@ const toggleExpandChangeEvent = ({row}: eventProps) => {
 .fixed-table {
   height: calc(100vh - 222px);
   margin-bottom: 0;
+}
+
+.course-select-option {
+  margin-left: 20px;
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
 }
 
 </style>

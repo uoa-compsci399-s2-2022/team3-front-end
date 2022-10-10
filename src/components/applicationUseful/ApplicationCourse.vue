@@ -129,6 +129,7 @@ interface courseList {
   numOfTutorialsPerWeek: number;
   tutorResponsibility: string;
   markerResponsibility: string;
+  prerequisite: string;
 
 }
 
@@ -153,6 +154,7 @@ get('api/getCourseByTerm/' + props.termID).then((res) => {
       numOfTutorialsPerWeek: item.numOfTutorialsPerWeek,
       tutorResponsibility: item.tutorResponsibility,
       markerResponsibility: item.markerResponsibility,
+      prerequisite: item.prerequisite,
     })
   })
   courseLoaded.value = true;

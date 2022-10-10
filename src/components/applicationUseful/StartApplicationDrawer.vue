@@ -3,17 +3,32 @@
     <template #header="{ titleId, titleClass }">
       <h4 :id="titleId" :class="titleClass" style="font-size: x-large">Start an Application</h4>
     </template>
-    <el-row justify="center" >
-      <el-icon :size="40"><DocumentAdd /></el-icon>
+    <el-row justify="center">
+      <el-icon :size="40">
+        <DocumentAdd/>
+      </el-icon>
     </el-row>
 
     <br/>
     Please select a term:
-    <br/> <br/>
+    <br/><br/>
     <el-row justify="center">
-      <el-select v-model="value" class="m-2" placeholder="Terms" size="large">
+      <el-select v-model="termValue" class="m-2" placeholder="Terms" size="large">
         <el-option
             v-for="item in termList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+        />
+      </el-select>
+    </el-row>
+    <br/><br/>
+    Please select your application type:
+    <br/><br/>
+    <el-row justify="center">
+      <el-select v-model="typeValue" class="m-2" placeholder="Terms" size="large">
+        <el-option
+            v-for="item in typeList"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -44,8 +59,10 @@ type Props = {
 }
 defineProps<Props>()
 
-const value = ref()
+const termValue = ref()
 const termList = reactive([] as object[])
+const typeValue = ref()
+const typeList = ref([{value:'tutor', label:'Tutor'}, {value: 'marker', label: 'Marker'}])
 onBeforeMount(() => {
   get('api/availableTerm').then((res) => {
     console.log(res)
@@ -59,17 +76,25 @@ onBeforeMount(() => {
 
 const startApplication = () => {
   let applicationID: number = -1;
-  if (value.value === undefined) {
+  if (termValue.value === undefined || termValue.value === null) {
     ElMessage.error('Please select a term.')
     return
   }
-  get('api/newApplication/' + value.value).then(res => {
-    console.log(res)
+  if (typeValue.value === undefined || typeValue.value === null) {
+    ElMessage.error('Please select your application type.')
+    return
+  }
+  get(`api/newApplication/${termValue.value}/${typeValue.value}`).then(res => {
     applicationID = res['application_id']
   }).then(res => {
         router.push('/application/' + applicationID)
       }
-  )
+  ).catch(err => {
+    ElMessage({
+      message: err.response.data.message,
+      type: 'error'
+    })
+  })
 
 }
 
@@ -89,8 +114,6 @@ const responsiveLayout = () => {
   drawerSize.value = getWidth() > 768 ? '30%' : '80%'
   drawerDirection.value = getWidth() > 768 ? 'rtl' : 'btt'
 }
-
-
 
 
 </script>
