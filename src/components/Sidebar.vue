@@ -97,6 +97,13 @@ const mobileAutoCollapse = () => {
   }
 }
 
+
+setInterval(() => {
+  if (sidebar.collapse){
+    sidebar.display = !isMobile();
+  }
+}, 3000)
+
 onBeforeMount(() => {
   sidebar.display = !isMobile();
 })
