@@ -13,9 +13,18 @@
       <el-form-item label="Email" :label-width="formLabelWidth">
         <el-input v-model="form.email" autocomplete="off" />
       </el-form-item>
+      <el-form-item label="EnrollDetails" :label-width="formLabelWidth">
+        <el-input v-model="form.enrolDetails" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="StudentDegree" :label-width="formLabelWidth">
+        <el-select v-model="form.studentDegree" placeholder="Please select the user Degree">
+          <el-option label="Undergraduate" value = "Undergraduate"></el-option>
+          <el-option label="Postgraduate" value = "Postgraduate"></el-option>
+        </el-select>
+      </el-form-item>
 
       <el-form-item label="Groups" :label-width="formLabelWidth">
-        <el-select multiple v-model="form.groups" placeholder="Please select the user groups">
+        <el-select multiple v-model="editgroups.groups" placeholder="Please select the user groups">
           <el-option
               v-for="g in groups"
               :key="g.groupName"
@@ -35,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import {get, post} from "@/utils/request";
+import {get, post, put} from "@/utils/request";
 import {ElMessage} from 'element-plus'
 import { reactive, ref } from 'vue'
 import {stringify} from "querystring";
@@ -60,32 +69,43 @@ const refreshUserTable = () => {
 }
 
 const formLabelWidth = '140px'
-console.log(props.currentUser.id)
-
 
 type editUser = {
-  name: string
-  auid: string
-  upi: string
   email: string
-  groups: Array<string>
+  name: string
+  upi: string
+  auid: string
+  enrolDetails: string
+  studentDegree: string
 }
-
 
 type Group = {
   groupID: number
   groupName: string
 }
+type editGroup = {
+  groups: Array<string>
+}
 const groups = ref([] as Group[])
 const form = reactive({} as editUser)
 const usercurrentinfor = ref({} as editUser)
+const editgroups = reactive({} as editGroup)
+
 
 get('api/UserProfile/'+ props.currentUser.id).then((res) => {
   usercurrentinfor.value.name = res.name
   usercurrentinfor.value.auid =res.auid
   usercurrentinfor.value.upi = res.upi
   usercurrentinfor.value.email = res.email
-  usercurrentinfor.value.groups = res.groups;
+  usercurrentinfor.value.enrolDetails = res.enrolDetails
+  usercurrentinfor.value.studentDegree = res.studentDegree
+
+  form.name = res.name
+  form.auid =res.auid
+  form.upi = res.upi
+  form.email = res.email
+  form.enrolDetails = res.enrolDetails
+  form.studentDegree = res.studentDegree
 }).catch(err => console.log(err))
 
 get('api/groups').then((res) => {
@@ -94,26 +114,34 @@ get('api/groups').then((res) => {
 })
 
 const EditUserEvent = () => {
-  console.log(props.currentUser.id)
-  console.log(usercurrentinfor.value.name)
-  console.log(usercurrentinfor.value.auid)
-  console.log(usercurrentinfor.value.upi)
-  console.log(usercurrentinfor.value.email)
-  console.log(usercurrentinfor.value.groups)
-  // post('api/users', form).then((res) => {
-  //   ElMessage({
-  //     message: 'Add user successfully',
-  //     type: 'success'
-  //   })
-  //   props.visible.visible  = false
-  //   refreshUserTable()
-  //
-  // }).catch((err) => {
-  //   ElMessage({
-  //     message: err.response.data['message'],
-  //     type: 'error'
-  //   })
-  // })
+  put('api/UserProfile/'+props.currentUser.id, {data: form}).then((res) => {
+    ElMessage({
+      message: 'Edit user successfully',
+      type: 'success'
+    })
+    props.visible.visible  = false
+    refreshUserTable()
+
+  }).catch((err) => {
+    ElMessage({
+      message: err.response.data['message'],
+      type: 'error'
+    })
+  })
+  put('api/userGroupManagement/'+props.currentUser.id, {data: editgroups}).then((res) => {
+    ElMessage({
+      message: 'Edit user groups successfully',
+      type: 'success'
+    })
+    props.visible.visible  = false
+    refreshUserTable()
+
+  }).catch((err) => {
+    ElMessage({
+      message: err.response.data['message'],
+      type: 'error'
+    })
+  })
 }
 
 
