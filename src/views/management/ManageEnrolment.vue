@@ -81,7 +81,7 @@
 
   <AddUserDrawer :visible="UserVisible" direction="ltr" :currentCourse="currentCourse" @refresh="freshtable"/>
 
-    <el-dialog
+  <el-dialog
       v-model="deleteConfirmVisible"
       title="Delete Confirm"
       width="30%"
@@ -105,12 +105,12 @@ import {get, post,Delete} from "@/utils/request";
 import {ElMessage, ElTable} from 'element-plus'
 import {Plus} from '@element-plus/icons-vue'
 import AddUserDrawer from '@/components/ManageUseful/AddUserDrawer.vue'
+import {stringify} from "querystring";
 interface User {
   id: string
   email: string
   name: string
-  groups: Array<string>
-  createDateTime: string
+  roleInCourse: string
 }
 const currentTerm = ref<Term>();
 const currentCourse = ref<Course>();
@@ -119,22 +119,32 @@ const wantToDeleteUser = ref({} as User)
 const handleremove = (row: User) => {
   deleteConfirmVisible.value = true;
   wantToDeleteUser.value = row;
+
 }
+type deleteform = {
+  courseID: number
+  userID: string
+  role:string
+}
+const  form = reactive({} as deleteform)
 const deleteUser = () => {
-  console.log(1)
-  // Delete('api/users/' + wantToDeleteUser.value.id).then(r => {
-  //   ElMessage({
-  //     message: 'Delete user success',
-  //     type: 'success'
-  //   })
-  //   deleteConfirmVisible.value = false;
-  //   freshtable()
-  // }).catch(err => {
-  //   ElMessage({
-  //     message: err.response.data['message'],
-  //     type: 'error'
-  //   })
-  // })
+  form.courseID = currentCourse.value.courseID
+  form.userID = wantToDeleteUser.value.id
+  form.role = wantToDeleteUser.value.roleInCourse
+
+  Delete('/api/enrolment',{data:form}).then(r => {
+    ElMessage({
+      message: 'Remove user success',
+      type: 'success'
+    })
+    deleteConfirmVisible.value = false;
+    freshtable()
+  }).catch(err => {
+    ElMessage({
+      message: err.response.data['message'],
+      type: 'error'
+    })
+  })
 }
 const { isLoading:isLoadingTerm, state:stateTerm, isReady:isReadyTerm, execute:executeTerm } = useAsyncState(
     (args) => {
