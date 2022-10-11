@@ -179,9 +179,14 @@
             <el-tooltip content="Accept" placement="bottom" :show-after="400" v-if="tagIndexSync!=='1'">
               <el-button type="success" :icon="Check" @click="acceptEvent(row)" circle/>
             </el-tooltip>
-            <el-tooltip content="Reject" placement="bottom" :show-after="400" v-if="tagIndexSync!=='2'">
-              <el-button type="danger" :icon="Close" circle/>
-            </el-tooltip>
+            <el-popconfirm title="Are you sure to reject the application?" @confirm="rejectToServer(row)" width="50" v-if="tagIndexSync!=='2'">
+              <template #reference>
+<!--                <el-tooltip content="Reject" placement="bottom" :show-after="400" v-if="tagIndexSync!=='2'">-->
+                  <el-button type="danger" :icon="Close" circle/>
+<!--                </el-tooltip>-->
+              </template>
+            </el-popconfirm>
+
           </template>
         </div>
       </template>
@@ -302,7 +307,7 @@
         </el-select>
         <el-tooltip
             effect="dark"
-            content="Input estimated working hours for the course"
+            content="Estimated working hours for the course"
             placement="left"
         >
           <el-input-number v-model="domain.estimatedHours" :step="1" style="margin-left: 8px"
@@ -486,8 +491,31 @@ const acceptToServer = () => {
       })
       acceptToServerLoading.value = false
     })
-
 }
+
+// *********************
+// * Reject
+// *********************
+const rejectToServerLoading = ref(false)
+const rejectToServer = (row: any) => {
+  rejectToServerLoading.value = true
+  put(`api/applicationApproval/${row.applicationID}/Rejected`, {})
+      .then((res) => {
+        reloadApplicationApprovalList()
+        ElMessage.success('Reject successfully!')
+        rejectToServerLoading.value = false
+      })
+      .catch((err) => {
+        console.log(err)
+        ElMessage({
+          message: err.response.data.message,
+          type: 'error'
+        })
+        rejectToServerLoading.value = false
+      })
+}
+
+
 
 
 // *********************

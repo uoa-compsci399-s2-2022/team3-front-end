@@ -1,6 +1,6 @@
 <template>
   <h3>Prefer Courses List</h3>
-  <SlickList axis="y" v-model:list="value" class="list-container" @update:list="changePreference" :pressDelay="pressDelay" :useWindowAsScrollContainer="true">
+  <SlickList axis="y" v-model:list="value" class="list-container" @update:list="changePreference" distance="20" :pressDelay="pressDelay" :useWindowAsScrollContainer="true">
     <SlickItem  v-for="(c, i) in value" :key="c.courseID" :index="i" class="list-item">
       <el-icon><DCaret /></el-icon>
       {{ c.courseNum }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Preference: {{ c.preference}}

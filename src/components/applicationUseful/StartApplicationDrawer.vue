@@ -65,7 +65,6 @@ const typeValue = ref()
 const typeList = ref([{value:'tutor', label:'Tutor'}, {value: 'marker', label: 'Marker'}])
 onBeforeMount(() => {
   get('api/availableTerm').then((res) => {
-    console.log(res)
     res.forEach((e: { termName: string; termID: number; }) => {
       termList.push({label: e.termName, value: e.termID})
     })

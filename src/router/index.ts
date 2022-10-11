@@ -92,7 +92,12 @@ const routes = [
         meta: { title:'Apply for the position', permission: '2' },
         component: () => import('@/views/Application/Application.vue')
     },
-
+    {
+        path: '/congratulation',
+        name: "congratulation",
+        meta: { title:'Congratulation', permission: '1' },
+        component: () => import('@/views/CongratulationPage.vue')
+    },
     {
         path: "/403",
         component: () => import('@/views/403.vue')

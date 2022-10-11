@@ -20,10 +20,13 @@
         <el-alert title="Tips: Rows in the table can be expanded or clicked" type="info" show-icon/>
       </el-col>
       <el-col style="text-align: end" :md="3">
-        <el-button type="success" size="large">
-          <font-awesome-icon style="margin-right: 4px; font-size: 20px" icon="fa-solid fa-bullhorn"/>
-          Publish
-        </el-button>
+        <el-badge :value="stateNum.unpublished" type="primary" v-loading="isLoadingNum">
+          <el-button type="success" size="large">
+            <font-awesome-icon style="margin-right: 4px; font-size: 20px" icon="fa-solid fa-bullhorn"/>
+            Publish
+          </el-button>
+        </el-badge>
+
       </el-col>
     </el-row>
     <br/>
@@ -34,6 +37,7 @@
           <div :class="{selected_item: selectedTab==='0'}" class="tabs-label">
             <font-awesome-icon icon="fa-solid fa-file-circle-question"/> &nbsp;
             Pending
+            <el-badge :value="stateNum.pending" type="warning" />
           </div>
         </template>
         <ApprovalTable v-model:applicationApprovalList="statePendingApplication"
@@ -42,7 +46,7 @@
                        v-model:isCourseLoading="isCourseLoading"
                        v-model:tutorOrMarker="tutorOrMarker"
                        v-model:tagIndex="selectedTab"
-                       @reloadApplicationApprovalList="executePendingApplication"/>
+                       @reloadApplicationApprovalList="getApplicationApprovalList"/>
       </el-tab-pane>
       <el-tab-pane label="Accepted">
         <template #label>
@@ -51,11 +55,16 @@
               <CircleCheckFilled/>
             </el-icon> &nbsp;
             Accepted
+            <el-badge :value="stateNum.accepted" type="success" />
           </div>
         </template>
         <ApprovalTable v-model:applicationApprovalList="stateAcceptedApplication"
-                       v-model:isLoading="isLoadingAcceptedApplication" v-model:course="course"
-                       v-model:isCourseLoading="isCourseLoading" v-model:tutorOrMarker="tutorOrMarker" v-model:tagIndex="selectedTab"/>
+                       v-model:isLoading="isLoadingAcceptedApplication"
+                       v-model:course="course"
+                       v-model:isCourseLoading="isCourseLoading"
+                       v-model:tutorOrMarker="tutorOrMarker"
+                       v-model:tagIndex="selectedTab"
+                       @reloadApplicationApprovalList="getApplicationApprovalList"/>
       </el-tab-pane>
       <el-tab-pane label="Rejected">
         <template #label>
@@ -64,24 +73,29 @@
               <CircleCloseFilled/>
             </el-icon> &nbsp;
             Rejected
+            <el-badge :value="stateNum.rejected" />
           </div>
         </template>
         <ApprovalTable v-model:applicationApprovalList="stateRejectedApplication"
                        v-model:isLoading="isLoadingRejectedApplication" v-model:course="course"
-                       v-model:isCourseLoading="isCourseLoading" v-model:tutorOrMarker="tutorOrMarker" v-model:tagIndex="selectedTab"/>
+                       v-model:isCourseLoading="isCourseLoading" v-model:tutorOrMarker="tutorOrMarker"
+                       v-model:tagIndex="selectedTab"
+                       @reloadApplicationApprovalList="getApplicationApprovalList"/>
       </el-tab-pane>
       <el-tab-pane label="Published">
         <template #label>
           <div :class="{selected_item: selectedTab==='3'}" class="tabs-label">
             <font-awesome-icon icon="fa-solid fa-bullhorn"/> &nbsp;
             Published
+            <el-badge :value="stateNum.published" type="primary" />
           </div>
         </template>
         <ApprovalTable v-model:applicationApprovalList="statePublishedApplication"
                        v-model:isLoading="isLoadingPublishedApplication"
                        v-model:tagIndex="selectedTab"
                        v-model:course="course"
-                       v-model:isCourseLoading="isCourseLoading" v-model:tutorOrMarker="tutorOrMarker"/>
+                       v-model:isCourseLoading="isCourseLoading" v-model:tutorOrMarker="tutorOrMarker"
+                       @reloadApplicationApprovalList="getApplicationApprovalList"/>
       </el-tab-pane>
     </el-tabs>
 
@@ -180,10 +194,27 @@ const {
     },
 )
 
+const {
+  isLoading: isLoadingNum,
+  state: stateNum,
+  isReady: isReadyNum,
+  execute: executeNum
+} = useAsyncState(
+    (args) => {
+      return get(`api/getNumOfApplicationStatus/${selectedTerm.value}/${tutorOrMarker.value}`)
+    },
+    [],
+    {
+      resetOnExecute: false,
+      immediate: false
+    },
+)
+
 
 
 const getApplicationApprovalList = () => {
   if (selectedTerm.value && tutorOrMarker.value) {
+    executeNum()
     if (selectedTab.value === '0') {
       executePendingApplication().then((res) => {
         console.log(res)
@@ -255,9 +286,9 @@ const getCourseByTermFromServer = (termID: number) => {
 
 onBeforeMount(() => {
   const permission = usePermissionStore()
-  if (Array.from(permission.key).includes("7")){
+  if (Array.from(permission.key).includes("7")) {
     tutorOrMarker.value = "marker"
-  } else if (Array.from(permission.key).includes("6")){
+  } else if (Array.from(permission.key).includes("6")) {
     tutorOrMarker.value = "tutor"
   }
   executeTerm().then(
@@ -267,12 +298,14 @@ onBeforeMount(() => {
         })
         if (localStorage.getItem('selectedTerm')) {
           selectedTerm.value = stateTerm.value.filter((t: { termID: number; }) => t.termID === parseInt(localStorage.getItem('selectedTerm')!))[0].termID
-          getApplicationApprovalList()
         } else {
           selectedTerm.value = stateTerm.value[0].termID
         }
+        getApplicationApprovalList()
       }
   )
+
+
 })
 
 
@@ -293,5 +326,6 @@ onBeforeMount(() => {
   display: flex;
   align-items: center;
 }
+
 
 </style>

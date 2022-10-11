@@ -18,7 +18,7 @@
                        :filters="termList"
                        :filter-method="filterHandler"/>
       <el-table-column prop="createdDateTime" label="Created DateTime" sortable/>
-      <el-table-column prop="submittedDateTime" label="Submitted DateTime" sortable/>
+      <el-table-column prop="submittedDateTime" label="Submitted DateTime" :min-width="90" sortable/>
       <el-table-column
           prop="type"
           label="Type"
@@ -34,7 +34,7 @@
           :filters="[
         { text: 'Accepted', value: 'Accepted' },
         { text: 'Pending', value: 'Pending' },
-        { text: 'Failed', value: 'Failed' },
+        { text: 'Rejected', value: 'Rejected' },
         { text: 'Unsubmit', value: 'Unsubmit' },
       ]"
           :filter-method="filterHandler"
@@ -49,6 +49,23 @@
         </template>
       </el-table-column>
 
+      <el-table-column align="right">
+        <template #default="scope">
+          <el-popconfirm title="Are you sure to delete?" @confirm.stop="handleAppDelete(scope.$index, scope.row)"
+                         v-show="scope.row.status === 'Unsubmit'"
+                          width="30">
+            <template #reference>
+              <el-button
+                  size="small"
+                  type="danger"
+                  @click.stop=""
+                  v-show="scope.row.status === 'Unsubmit'"
+              >Delete
+              </el-button>
+            </template>
+          </el-popconfirm>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
   <StartApplicationDrawer :visible="applicationVisible"/>
@@ -56,9 +73,9 @@
 
 <script setup lang="ts">
 import {onBeforeMount, reactive, ref} from 'vue'
-import {ElTable} from 'element-plus'
+import {ElMessage, ElTable} from 'element-plus'
 import type {TableColumnCtx} from 'element-plus/es/components/table/src/table-column/defaults'
-import {get, post} from '@/utils/request'
+import {get, post, Delete} from '@/utils/request'
 import StartApplicationDrawer from '@/components/applicationUseful/StartApplicationDrawer.vue'
 import {useRouter, useRoute} from 'vue-router';
 import dayjs from "dayjs";
@@ -79,7 +96,7 @@ const showApplication = () => {
 const statusType = {
   'Accepted': 'success',
   'Pending': 'info',
-  'Failed': 'danger',
+  'Rejected': 'danger',
   'Unsubmit': 'warning'
 }
 const tableData: ApplicationList[] = reactive([] as ApplicationList[])
@@ -87,7 +104,6 @@ const termList = reactive([] as object[])
 
 interface ApplicationList {
   [key: string]: any;
-
   applicationID: number
   term: string
   createdDateTime: string
@@ -122,6 +138,17 @@ const tableRowClick = (row: ApplicationList) => {
   }
 }
 
+const handleAppDelete = (index: number, row: ApplicationList) => {
+  Delete(`api/application/${row.applicationID}`).then(() => {
+    tableData.splice(index, 1)
+  }).catch((err) => {
+    ElMessage({
+      message: err.response.data.message,
+      type: 'error'
+    })
+  })
+}
+
 
 onBeforeMount(() => {
   get('api/currentStudentApplicationList').then((res) => {
@@ -140,7 +167,6 @@ onBeforeMount(() => {
   })
 
   get('api/availableTerm').then((res) => {
-    console.log(res)
     res.forEach((e: { termName: string; }) => {
       termList.push({text: e.termName, value: e.termName})
     })
