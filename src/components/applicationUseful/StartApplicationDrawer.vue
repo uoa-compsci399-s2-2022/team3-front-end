@@ -121,8 +121,4 @@ const responsiveLayout = () => {
 <style scoped>
 
 
-@media (max-width: 540px) {
-
-}
-
 </style>

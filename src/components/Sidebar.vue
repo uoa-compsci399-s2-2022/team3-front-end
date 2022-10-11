@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import {useSidebarStore} from '@/store/modules/sidebar/sidebar';
-import {computed} from 'vue';
+import {computed, onBeforeMount} from 'vue';
 import {useRoute} from 'vue-router';
+import {isMobile} from '@/utils/isMoblie'
 
 type sidebarSubMenu = {
   index: string;
@@ -90,13 +91,28 @@ const modalDisplay = computed(() => {
 })
 
 
+const mobileAutoCollapse = () => {
+  if (isMobile()) {
+    sidebar.handleCollase();
+  }
+}
 
+
+setInterval(() => {
+  if (sidebar.collapse){
+    sidebar.display = !isMobile();
+  }
+}, 3000)
+
+onBeforeMount(() => {
+  sidebar.display = !isMobile();
+})
 
 </script>
 
 <template>
-  <div class="sidebar">
-    <el-menu :default-active="onRoutes" :collapse="sidebar.collapse" :router="true" class="menu">
+  <div class="sidebar" v-if="sidebar.display">
+    <el-menu :default-active="onRoutes" :collapse="sidebar.collapse" :router="true" class="menu" @select="mobileAutoCollapse">
 
       <div class="control-collase">
         <el-icon v-show="sidebar.collapse" @click="sidebar.handleCollase">
@@ -166,7 +182,7 @@ const modalDisplay = computed(() => {
 @media (max-width: 730px) {
   .sidebar {
     position: fixed !important;
-    z-index: 999;
+    z-index: 99999;
   }
 }
 
@@ -184,15 +200,15 @@ const modalDisplay = computed(() => {
   height: 100%;
   width: 100vw;
   backdrop-filter: blur(4px);
-  z-index: 1;
+  z-index: 9999;
   background-color: rgba($color: #000000, $alpha: 0.1);
 }
 
-@media (max-width: 540px) {
-  .sidebar {
-    display: none;
-  }
-}
+//@media (max-width: 540px) {
+//  .sidebar {
+//    display: none;
+//  }
+//}
 
 .sidebar {
   position: sticky;

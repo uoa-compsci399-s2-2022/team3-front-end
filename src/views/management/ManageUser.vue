@@ -50,6 +50,7 @@
     </template>
   </el-dialog>
   <AddUser :visible="addUserVisible" @refreshUserTable="refresh"/>
+  <EditUser :visible="editUserVisible" @refreshUserTable="refresh" :currentUser = 'wantToEditUser.value'/>
 </template>
 
 <script lang="ts" setup>
@@ -58,6 +59,7 @@ import {get, Delete} from "@/utils/request";
 import dayjs from "dayjs";
 import {Plus, Ticket} from '@element-plus/icons-vue'
 import AddUser from '@/components/userUseful/AddUser.vue'
+import EditUser from '@/components/userUseful/EditUser.vue'
 import {ElMessage} from 'element-plus'
 import {useRouter, useRoute} from "vue-router";
 
@@ -67,13 +69,18 @@ const route = useRoute()
 const addUserVisible = reactive({
   visible: false
 })
+const editUserVisible = reactive({
+  visible: false
+})
 const deleteConfirmVisible = ref(false)
 const wantToDeleteUser = ref({} as User)
+const wantToEditUser = ref({} as User)
 const tableLoading = ref(true)
 
 const showAddUser = () => {
   addUserVisible.visible = true
 }
+
 
 interface User {
   id: string
@@ -92,7 +99,8 @@ const filterTableData = computed(() =>
     )
 )
 const handleEdit = (index: number, row: User) => {
-  console.log(index, row)
+  editUserVisible.visible = true
+  wantToEditUser.value = row;
 }
 
 

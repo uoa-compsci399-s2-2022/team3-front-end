@@ -8,4 +8,5 @@
 <style lang="scss">
 @import '@/styles/scrollbar.scss'; // set the scrollbar style
 
+
 </style>

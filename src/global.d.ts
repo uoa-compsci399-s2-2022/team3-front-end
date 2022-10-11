@@ -49,7 +49,8 @@ type courseFormType = {
     totalAvailableHours: string | number;
     needMarkers: boolean;
     currentlyNumOfStudents: string | number;
-    deadLine: string
+    markerDeadLine: string;
+    tutorDeadLine: string;
 }
 
 

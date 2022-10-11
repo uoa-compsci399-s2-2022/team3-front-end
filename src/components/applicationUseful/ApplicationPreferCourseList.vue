@@ -1,7 +1,7 @@
 <template>
   <h3>Prefer Courses List</h3>
-  <SlickList axis="y" v-model:list="value" class="list-container" @update:list="changePreference" :distance="10">
-    <SlickItem v-for="(c, i) in value" :key="c.courseID" :index="i" class="list-item">
+  <SlickList axis="y" v-model:list="value" class="list-container" @update:list="changePreference" :pressDelay="pressDelay" :useWindowAsScrollContainer="true">
+    <SlickItem  v-for="(c, i) in value" :key="c.courseID" :index="i" class="list-item">
       <el-icon><DCaret /></el-icon>
       {{ c.courseNum }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Preference: {{ c.preference}}
         <el-button @click="deleteCourse(i)" class="delete-button" type="danger" :icon="Delete" circle/>
@@ -37,9 +37,10 @@
 
 <script setup lang="ts">
 import { SlickList, SlickItem } from 'vue-slicksort';
-import {computed, ref, toRef, watch, reactive} from "vue";
+import {computed, ref, toRef, watch, reactive, onBeforeMount} from "vue";
 import {DCaret, Delete} from "@element-plus/icons-vue";
 import {FormRules} from "element-plus";
+import {isMobile} from "@/utils/isMoblie";
 
 type preferCourse = {
   courseID: number;
@@ -108,6 +109,21 @@ const rules = reactive<FormRules>({
   ],
 })
 
+const pressDelay = ref(0)
+
+const responsiveLayout = () => {
+  if (isMobile()) {
+    pressDelay.value = 200
+  }else {
+    pressDelay.value = 0
+  }
+}
+
+onBeforeMount(() => {
+  responsiveLayout()
+})
+
+
 </script>
 
 <style scoped>
@@ -123,7 +139,7 @@ h3{
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
-
+  overflow: auto;
 }
 .list-item{
   position: relative;

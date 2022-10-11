@@ -73,11 +73,19 @@ const handleTermEdit = (index: number, row: term) => {
     termDTO.startDate = row.startDate;
     termDTO.isAvailable = row.isAvailable;
     termDTO.endDate = row.endDate;
-    termDTO.defaultMarkerDeadLine = row.defaultMarkerDeadLine;
-    termDTO.defaultTutorDeadLine = row.defaultTutorDeadLine;
     dateRange.value = [new Date(row.startDate), new Date(row.endDate)];
-    defaultMarkerDeadLine.value = new Date(row.defaultMarkerDeadLine);
-    defaultTutorDeadLine.value = new Date(row.defaultTutorDeadLine);
+    // if two deadline exists
+    if (row.defaultMarkerDeadLine && row.defaultTutorDeadLine) {
+        termDTO.defaultMarkerDeadLine = row.defaultMarkerDeadLine;
+        termDTO.defaultTutorDeadLine = row.defaultTutorDeadLine;
+        defaultMarkerDeadLine.value = new Date(row.defaultMarkerDeadLine);
+        defaultTutorDeadLine.value = new Date(row.defaultTutorDeadLine);
+    } else { // if two deadline doesn't exist, then set the current Time as deadline
+        termDTO.defaultMarkerDeadLine = new Date().toISOString();
+        termDTO.defaultTutorDeadLine = new Date().toISOString();
+        defaultMarkerDeadLine.value = new Date();
+        defaultTutorDeadLine.value = new Date();
+    }
     return function () {
         put(`/api/modifyTerm/${row.termID}`, { data: termDTO })
             .then(
@@ -186,8 +194,6 @@ watchDebounced(defaultMarkerDeadLine, (date) => {
         let ISOtime = new Date(date).getTime();
         let localTimeOffset = new Date(date).getTimezoneOffset() * 60 * 1000
         let localTime = ISOtime - localTimeOffset
-        console.log(ISOtime)
-        console.log(localTimeOffset)
         termDTO.defaultMarkerDeadLine = new Date(localTime).toISOString()
     }
 }, { debounce: 300, maxWait: 1000 })
@@ -222,8 +228,8 @@ const termDTO = reactive<term>({
  */
 const handleTermAdd = () => {
     if (termDTO.termName && termDTO.startDate &&
-     termDTO.endDate && termDTO.defaultMarkerDeadLine &&
-      termDTO.defaultTutorDeadLine) {
+        termDTO.endDate && termDTO.defaultMarkerDeadLine &&
+        termDTO.defaultTutorDeadLine) {
         post('api/term', termDTO)
             .then(() => {
                 getTermList();
@@ -265,7 +271,8 @@ type courseDTO = {
     courseName: string;
     courseNum: string;
     currentlyNumOfStudents: number;
-    deadLine: string;
+    markerDeadLine: string;
+    tutorDeadLine: string;
     estimatedNumOfStudents: number;
     markerResponsibility: string;
     needMarkers: boolean;
@@ -288,7 +295,8 @@ type course = {
     'pre-assignable': boolean;
     numberOfStudents: number;
     estimatedNumberOfStudent: number;
-    deadLine: string;
+    markerDeadLine: string;
+    tutorDeadLine: string;
     numberOfAssignments: number;
     numberOfLabsPerWeek: number;
     markerResponsibility: string;
@@ -309,7 +317,8 @@ let titles = [
     'Pre-assignable',
     'Number of students',
     'Estimated number of student',
-    'DeadLine',
+    'Marker DeadLine',
+    'Tutor DeadLine',
     'Number of Assignments',
     'Number of Labs per week',
     'Marker Responsibility',
@@ -332,7 +341,8 @@ const toDomainModel = (dto: courseDTO): course => {
         'pre-assignable': dto.canPreAssign,
         numberOfStudents: dto.currentlyNumOfStudents,
         estimatedNumberOfStudent: dto.estimatedNumOfStudents,
-        deadLine: dto.deadLine,
+        markerDeadLine: dto.markerDeadLine,
+        tutorDeadLine: dto.tutorDeadLine,
         numberOfAssignments: dto.numOfAssignments,
         numberOfLabsPerWeek: dto.numOfLabsPerWeek,
         markerResponsibility: dto.markerResponsibility,
@@ -362,7 +372,6 @@ const toCamel = (str: string): string => {
  */
 let columns: Column<any>[] = Array.from(titles, (v, i) => {
     let camelCaseV = toCamel(v);
-    console.log(camelCaseV)
     return {
         key: camelCaseV,
         dataKey: camelCaseV,
@@ -407,6 +416,7 @@ let courses: Ref<course[]> = ref([])
 const getCourseList = async () => {
     let res = await get(`api/getCourseByTerm/${onSelect.value}`)
     courses.value.length = 0 // clear the array
+    console.log(res)
     res.forEach((row: courseDTO) => courses.value.push(toDomainModel(row)))
 }
 
@@ -460,16 +470,28 @@ const handleCourseAdd = () => {
 /**
  * @description deaLine is a intermediate variable used to get the correct date form.
  */
-const deadLine = ref<any>();
+const markerDeadLine = ref<any>();
+const tutorDeadLine = ref<any>();
 /**
-* @description gennerate correct Date form once the deadLine has been changed
+* @description gennerate correct Date form once the markerDeadLine has been changed
 */
-watch(deadLine, (date) => {
+watchDebounced(markerDeadLine, (date) => {
     if (date) {
-        courseForm.deadLine = new Date(date).toISOString();
+        let ISOtime = new Date(date).getTime();
+        let localTimeOffset = new Date(date).getTimezoneOffset() * 60 * 1000
+        let localTime = ISOtime - localTimeOffset
+        courseForm.markerDeadLine = new Date(localTime).toISOString()
     }
-})
+}, { debounce: 300, maxWait: 1000 })
 
+watchDebounced(tutorDeadLine, (date) => {
+    if (date) {
+        let ISOtime = new Date(date).getTime();
+        let localTimeOffset = new Date(date).getTimezoneOffset() * 60 * 1000
+        let localTime = ISOtime - localTimeOffset
+        courseForm.tutorDeadLine = new Date(localTime).toISOString()
+    }
+}, { debounce: 300, maxWait: 1000 })
 /**
  * @description courseForm instance
  */
@@ -488,7 +510,8 @@ const courseForm = reactive<courseFormType>({
     totalAvailableHours: '',
     needMarkers: false,
     currentlyNumOfStudents: '',
-    deadLine: ''
+    markerDeadLine: '',
+    tutorDeadLine: '',
 })
 
 /**
@@ -531,6 +554,7 @@ const rules = reactive<FormRules>({
 const addCourse = async () => {
     try {
         await post('api/courseManagement', courseForm);
+        console.log(courseForm)
         await getCourseList();
         courseModalOpened.value = false;
         ElMessage({
@@ -583,7 +607,8 @@ const clearCourseForm = () => {
     courseForm.totalAvailableHours = '';
     courseForm.needMarkers = false;
     courseForm.currentlyNumOfStudents = '';
-    courseForm.deadLine = ''
+    courseForm.markerDeadLine = '';
+    courseForm.tutorDeadLine = '';
 }
 
 /**
@@ -602,7 +627,8 @@ const courseEditRef = ref<FormInstance>();
 const closeEditCourse = () => {
     courseEditRef.value!.resetFields();
     clearCourseForm();
-    deadLine.value = undefined;
+    markerDeadLine.value = undefined;
+    tutorDeadLine.value = undefined;
     courseEditModalOpened.value = false;
 }
 
@@ -640,7 +666,8 @@ let editCourse = ref<any>(null);
 const handleCourseEdit = (row: number) => {
     courseEditModalOpened.value = true;
     setCourseForm(row);
-    deadLine.value = new Date(courses.value[row].deadLine)
+    markerDeadLine.value = new Date(courses.value[row].markerDeadLine);
+    tutorDeadLine.value = new Date(courses.value[row].tutorDeadLine);
     const courseID = courses.value[row].courseID;
     return function () {
         put(`/api/courseManagement/${courseID}`, { data: courseForm }).then(() => {
@@ -685,7 +712,7 @@ const handleCourseEdit = (row: number) => {
                     <el-table-column label="Start Date" prop="startDate" />
                     <el-table-column label="End Date" prop="endDate" />
                     <el-table-column label="Is available" prop="isAvailable" />
-                    <el-table-column label="Marker deadline" prop="defaultMarkerDeadLine" />
+                    <el-table-column label="Marker DeadLine" prop="defaultMarkerDeadLine" />
                     <el-table-column label="Tutor deadline" prop="defaultTutorDeadLine" />
                     <el-table-column align="right">
                         <template #header>
@@ -878,11 +905,14 @@ const handleCourseEdit = (row: number) => {
                                 placeholder="Please input" />
                         </el-form-item>
 
-                        <el-form-item label="Deadline" prop="deadLine">
-                            <el-date-picker v-model="deadLine" type="datetime" placeholder="Pick a Date"
+                        <el-form-item label="Marker Deadline" prop="deadLine">
+                            <el-date-picker v-model="markerDeadLine" type="datetime" placeholder="Pick a Date"
                                 format="YYYY/MM/DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ssZ" />
                         </el-form-item>
-
+                        <el-form-item label="Tutor Deadline" prop="deadLine">
+                            <el-date-picker v-model="tutorDeadLine" type="datetime" placeholder="Pick a Date"
+                                format="YYYY/MM/DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ssZ" />
+                        </el-form-item>
                     </div>
                     <div class="modal-btns">
                         <el-form-item>
@@ -964,9 +994,16 @@ const handleCourseEdit = (row: number) => {
                                 placeholder="Please input" />
                         </el-form-item>
 
-                        <el-form-item label="Deadline" prop="deadLine">
-                            <el-date-picker v-model="courseForm.deadLine" type="datetime" placeholder="Pick a Date"
-                                format="YYYY/MM/DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ssZ" />
+                        <el-form-item label="Marker Deadline" prop="deadLine">
+                            <el-date-picker v-model="courseForm.markerDeadLine" type="datetime"
+                                placeholder="Pick a Date" format="YYYY/MM/DD HH:mm:ss"
+                                value-format="YYYY-MM-DDTHH:mm:ssZ" />
+                        </el-form-item>
+
+                        <el-form-item label="Tutor Deadline" prop="deadLine">
+                            <el-date-picker v-model="courseForm.tutorDeadLine" type="datetime"
+                                placeholder="Pick a Date" format="YYYY/MM/DD HH:mm:ss"
+                                value-format="YYYY-MM-DDTHH:mm:ssZ" />
                         </el-form-item>
                     </div>
                     <div class="modal-btns">
@@ -1067,6 +1104,7 @@ const handleCourseEdit = (row: number) => {
     }
 }
 
+
 .manage-course-container {
     display: flex;
     flex-direction: column;
@@ -1095,6 +1133,20 @@ const handleCourseEdit = (row: number) => {
 
             button {
                 margin-left: 20px;
+            }
+        }
+
+        @media (max-width: 540px) {
+            .manage-course-subtitle {
+                flex-direction: column;
+                row-gap: 10px;
+                .el-input {
+                    width: 100%;
+                }
+
+                button {
+                    margin-left: 0;
+                }
             }
         }
     }
