@@ -467,13 +467,8 @@ const submitLoading = ref(false)
 const submitEvent = () => {
   submitLoading.value = true
   get('api/submitApplication/' + applicationID.value).then(res => {
-    ElMessage({
-      showClose: true,
-      message: 'Save successfully',
-      type: 'success',
-    })
     submitLoading.value = false
-    router.push("/applicationlist")
+    router.push({path: "/congratulation", query: {text: "Submit Successful!", next: "/applicationlist"}})
   }).catch(res => {
     console.log(res)
     let errorMessage = "<p style='font-weight: bold'>Don't forget SAVE application first</p>"

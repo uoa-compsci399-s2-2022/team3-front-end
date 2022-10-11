@@ -71,7 +71,7 @@
   </div>
 
   <AddUserDrawer :visible="UserVisible" direction="ltr" 
-  :currentCourse="currentCourse!"
+  :currentCourse="currentCourse"
    v-if="UserVisible.visible" @refresh="freshtable"
    :user-role-arr="userRoleArr"
    />
@@ -166,7 +166,7 @@ const { isLoading: isLoadingCourse, state: stateCourse, isReady: isReadyCourse, 
 const { isLoading: isLoadingUser, state: stateUser, isReady: isReadyUser, execute: executeUser } = useAsyncState(
   (args) => {
     const courseID = args.courseID
-    return get('api/getCourseUser/' + courseID);
+    return get(`api/getCourseUser/${courseID}/true`);
   },
   [],
   {
