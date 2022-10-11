@@ -19,7 +19,7 @@
           <el-input v-model="search" size="small" placeholder="Type to search" />
         </template>
         <template #default="scope">
-          <el-button size="small" @click="handleAddUser1(scope.row)">
+          <!-- <el-button size="small" @click="handleAddUser1(scope.row)">
             Appoint as Tutor
           </el-button>
           <el-button size="small" @click="handleAddUser2(scope.row)">
@@ -27,8 +27,16 @@
           </el-button>
           <el-button size="small" @click="handleAddUser3(scope.row)">
             Appoint as CourseCoordinator
-          </el-button>
+          </el-button> -->
+          <el-select v-model="roles[scope.$index]" multiple :placeholder="`Appoint position for ${scope.row.name}`" 
+          style="width: 240px" @change="role => appointPosition(role, scope.row)">
 
+            <el-option key="marker" label="Marker" value="marker" />
+            <el-option key="tutor" label="Tutor" value="tutor" />
+            <el-option key="student" label="Student" value="student" />
+            <el-option key="courseCoordinator" label="Course Coordinator" value="courseCoordinator" />
+            {{roles}}
+          </el-select>
         </template>
 
       </el-table-column>
@@ -51,8 +59,11 @@ import { useRoute, useRouter } from 'vue-router';
 import dayjs from "dayjs";
 
 
+
+
+
 type Props = {
-  visible: {visible: boolean};
+  visible: { visible: boolean };
   currentCourse: Course
 }
 
@@ -160,6 +171,34 @@ const refresh = () => {
 
 getUser()
 
+
+
+
+const roles = ref<any[][]>([])
+for (let i=0; i<tableData.value.length; i++) {
+  roles.value.push([])
+}
+
+const appointPosition = (role: string[], user: User) => {
+  console.log("123", role.at(-1));
+  console.log("321", user);
+  // const data: Enrollment = {
+  //   courseID: props.currentCourse.courseID,
+  //   userID: user.id,
+  //   role: role.at(-1)!,
+  // }
+  // post('api/enrolment', data).then(_ => {
+  //   ElMessage({
+  //     message: `${user.name} is appoint as an ${role.at(-1)} now!`,
+  //     type: 'success'
+  //   })
+  // }).catch(err => {
+  //   ElMessage({
+  //     message: err.response.data['message'],
+  //     type: 'error'
+  //   })
+  // })
+}
 </script>
 
 <style scoped>
