@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="visible.visible" :show-close="false" size=60%>
+  <el-drawer v-model="visible.visible" :show-close="false" size=80%>
     <template #header="{ titleId, titleClass }">
       <h4 :id="titleId" :class="titleClass" style="font-size: x-large">Appoint position</h4>
     </template>
@@ -28,7 +28,6 @@
           <el-button size="small" @click="handleAddUser3(scope.row)">
             Appoint as CourseCoordinator
           </el-button>
-
         </template>
 
       </el-table-column>
@@ -51,13 +50,15 @@ import { useRoute, useRouter } from 'vue-router';
 import dayjs from "dayjs";
 
 
+
 type Props = {
   visible: {visible: boolean};
-  currentCourse: Course
+  currentCourse: Course;
 }
 
 
 const props = defineProps<Props>()
+const emit = defineEmits(['refresh'])
 
 
 
@@ -146,6 +147,7 @@ const addUser = () => {
       type: 'success'
     })
     addUserConfirmVisible.value = false;
+    emit('refresh')
   }).catch(err => {
     ElMessage({
       message: err.response.data['message'],

@@ -48,16 +48,24 @@
             highlight-current-row
             style="width: 100%"
         >
-          <el-table-column property="id" label="ID" width="120" />
-          <el-table-column property="email" label="Email" width="200" />
-          <el-table-column property="name" label="Name"  />
-          <el-table-column label="Position"  width="150">
+          <el-table-column property="id" label="ID" width="100" />
+          <el-table-column property="email" label="Email" width="150" />
+          <el-table-column property="name" label="Name" width="100"/>
+          <el-table-column label="Position"  width="100">
             <template #default="scope">
               <el-tag>
                 {{scope.row.roleInCourse}}
               </el-tag>
             </template>
             
+          </el-table-column>
+          <el-table-column>
+            <template #default="scope">
+              <el-button size="small" @click="handleremove(scope.row)" type="danger">
+                Remove
+              </el-button>
+            </template>
+
           </el-table-column>
           <template #empty>
             <el-empty description="No Data" />
@@ -71,8 +79,23 @@
     </el-row>
   </div>
 
-  <AddUserDrawer :visible="UserVisible" direction="ltr" :currentCourse="currentCourse!"/>
+  <AddUserDrawer :visible="UserVisible" direction="ltr" :currentCourse="currentCourse" @refresh="freshtable"/>
 
+    <el-dialog
+      v-model="deleteConfirmVisible"
+      title="Delete Confirm"
+      width="30%"
+  >
+    <span>Please confirm to delete the user: {{ wantToDeleteUser.id }}</span>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="deleteConfirmVisible = false">Cancel</el-button>
+        <el-button type="danger" @click="deleteUser"
+        >Confirm</el-button
+        >
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -82,12 +105,37 @@ import {get, post,Delete} from "@/utils/request";
 import {ElMessage, ElTable} from 'element-plus'
 import {Plus} from '@element-plus/icons-vue'
 import AddUserDrawer from '@/components/ManageUseful/AddUserDrawer.vue'
-
+interface User {
+  id: string
+  email: string
+  name: string
+  groups: Array<string>
+  createDateTime: string
+}
 const currentTerm = ref<Term>();
 const currentCourse = ref<Course>();
-
-
-
+const  deleteConfirmVisible = ref(false)
+const wantToDeleteUser = ref({} as User)
+const handleremove = (row: User) => {
+  deleteConfirmVisible.value = true;
+  wantToDeleteUser.value = row;
+}
+const deleteUser = () => {
+  console.log(1)
+  // Delete('api/users/' + wantToDeleteUser.value.id).then(r => {
+  //   ElMessage({
+  //     message: 'Delete user success',
+  //     type: 'success'
+  //   })
+  //   deleteConfirmVisible.value = false;
+  //   freshtable()
+  // }).catch(err => {
+  //   ElMessage({
+  //     message: err.response.data['message'],
+  //     type: 'error'
+  //   })
+  // })
+}
 const { isLoading:isLoadingTerm, state:stateTerm, isReady:isReadyTerm, execute:executeTerm } = useAsyncState(
     (args) => {
       return get('api/term')
@@ -147,7 +195,9 @@ const UserVisible = reactive({
 const showUser = () => {
   UserVisible.visible = true
 }
-
+const freshtable = () => {
+  executeUser(0,{courseID: currentCourse.value.courseID})
+}
 
 </script>
 
