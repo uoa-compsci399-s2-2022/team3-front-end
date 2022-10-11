@@ -1104,6 +1104,7 @@ const handleCourseEdit = (row: number) => {
     }
 }
 
+
 .manage-course-container {
     display: flex;
     flex-direction: column;
@@ -1132,6 +1133,20 @@ const handleCourseEdit = (row: number) => {
 
             button {
                 margin-left: 20px;
+            }
+        }
+
+        @media (max-width: 540px) {
+            .manage-course-subtitle {
+                flex-direction: column;
+                row-gap: 10px;
+                .el-input {
+                    width: 100%;
+                }
+
+                button {
+                    margin-left: 0;
+                }
             }
         }
     }
