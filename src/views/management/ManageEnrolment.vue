@@ -47,25 +47,31 @@
             :data="stateUser"
             highlight-current-row
             style="width: 100%"
-            @current-change="handleCurrentChange"
         >
           <el-table-column property="id" label="ID" width="120" />
-          <el-table-column property="email" label="Email" width="250" />
-          <el-table-column property="name" label="Name" />
+          <el-table-column property="email" label="Email" width="200" />
+          <el-table-column property="name" label="Name"  />
+          <el-table-column label="Position"  width="150">
+            <template #default="scope">
+              <el-tag>
+                {{scope.row.roleInCourse}}
+              </el-tag>
+            </template>
+            
+          </el-table-column>
           <template #empty>
             <el-empty description="No Data" />
           </template>
         </el-table>
 
         <el-row justify="center" v-if="isReadyUser" style="margin-top: 10px">
-          <el-button @click="showUser" type="primary" :icon="Plus" style="margin-left: 16px ;">Add User</el-button>
-
+          <el-button @click="showUser" type="primary" :icon="Plus" style="margin-left: 16px ;">Appoint position</el-button>
         </el-row>
       </el-col>
     </el-row>
   </div>
 
-  <AddUserDrawer :visible="UserVisible" direction="ltr" :currentCourse="currentCourse"/>
+  <AddUserDrawer :visible="UserVisible" direction="ltr" :currentCourse="currentCourse!"/>
 
 </template>
 
@@ -125,7 +131,7 @@ const handleTermChange = () => {
 
 const singleTableRef = ref<InstanceType<typeof ElTable>>()
 
-const setCurrent = (row?: User) => {
+const setCurrent = (row?: any) => {
   singleTableRef.value!.setCurrentRow(row)
 }
 

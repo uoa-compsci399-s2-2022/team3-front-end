@@ -1,31 +1,34 @@
 <template>
   <el-drawer v-model="visible.visible" :show-close="false" size=60%>
     <template #header="{ titleId, titleClass }">
-      <h4 :id="titleId" :class="titleClass" style="font-size: x-large">Add User</h4>
+      <h4 :id="titleId" :class="titleClass" style="font-size: x-large">Appoint position</h4>
     </template>
-    <el-row justify="center" >
-      <el-icon :size="40" align-items: center ><User /></el-icon>
+    <el-row justify="center">
+      <el-icon :size="40" align-items: center>
+        <User />
+      </el-icon>
     </el-row>
-    <br/>
+    <br />
 
-    <el-table :data="filterTableData" style="width: 100%" v-loading="tableLoading" >
-      <el-table-column label="ID" prop="id" width="100px"/>
-      <el-table-column label="Name" prop="name" width="100px"/>
-      <el-table-column label="Groups" prop="groups" width="200px"/>
-      <el-table-column >
+    <el-table :data="filterTableData" style="width: 100%" v-loading="tableLoading">
+      <el-table-column label="ID" prop="id" width="100px" />
+      <el-table-column label="Name" prop="name" width="100px" />
+      <el-table-column label="Groups" prop="groups" width="200px" />
+      <el-table-column>
         <template #header>
-          <el-input v-model="search" size="small" placeholder="Type to search"/>
+          <el-input v-model="search" size="small" placeholder="Type to search" />
         </template>
         <template #default="scope">
-          <el-button size="small" @click="handleAddUser1(scope.row)" >
-            Add Tutor
+          <el-button size="small" @click="handleAddUser1(scope.row)">
+            Appoint as Tutor
           </el-button>
-          <el-button size="small" @click="handleAddUser2(scope.row)" >
-            Add Marker
+          <el-button size="small" @click="handleAddUser2(scope.row)">
+            Appoint as Marker
           </el-button>
-          <el-button size="small" @click="handleAddUser3(scope.row)" >
-            Add CourseCoordinator
+          <el-button size="small" @click="handleAddUser3(scope.row)">
+            Appoint as CourseCoordinator
           </el-button>
+
         </template>
 
       </el-table-column>
@@ -40,19 +43,16 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onBeforeMount, reactive, ref} from 'vue'
-import {ElButton, ElDrawer, ElMessage} from 'element-plus'
-import {CircleCloseFilled} from '@element-plus/icons-vue'
-import {Delete, get, post} from "@/utils/request";
-import {useRoute, useRouter} from 'vue-router';
+import { computed, onBeforeMount, reactive, ref } from 'vue'
+import { ElButton, ElDrawer, ElMessage } from 'element-plus'
+import { CircleCloseFilled } from '@element-plus/icons-vue'
+import { Delete, get, post } from "@/utils/request";
+import { useRoute, useRouter } from 'vue-router';
 import dayjs from "dayjs";
 
 
-
-
-
 type Props = {
-  visible: object
+  visible: {visible: boolean};
   currentCourse: Course
 }
 
@@ -75,13 +75,12 @@ interface User {
 
 const search = ref('')
 const filterTableData = computed(() =>
-    tableData.value.filter(
-        (data) =>
-            !search.value ||
-            data.id.toLowerCase().includes(search.value.toLowerCase())
-    )
+  tableData.value.filter(
+    (data) =>
+      !search.value ||
+      data.id.toLowerCase().includes(search.value.toLowerCase())
+  )
 )
-
 
 
 const tableData = ref([] as User[])
@@ -112,31 +111,31 @@ type Enrollment = {
   role: string
 }
 
-const form = reactive ({} as Enrollment)
+const form = reactive({} as Enrollment)
 
 
 const handleAddUser1 = (row: User) => {
   addUserConfirmVisible.value = true;
   wantToAddUser.value = row;
-  form.courseID=props.currentCourse.courseID
-  form.userID=wantToAddUser.value.id
-  form.role="tutor"
+  form.courseID = props.currentCourse.courseID
+  form.userID = wantToAddUser.value.id
+  form.role = "tutor"
   addUser()
 }
 const handleAddUser2 = (row: User) => {
   addUserConfirmVisible.value = true;
   wantToAddUser.value = row;
-  form.courseID=props.currentCourse.courseID
-  form.userID=wantToAddUser.value.id
-  form.role="marker"
+  form.courseID = props.currentCourse.courseID
+  form.userID = wantToAddUser.value.id
+  form.role = "marker"
   addUser()
 }
 const handleAddUser3 = (row: User) => {
   addUserConfirmVisible.value = true;
   wantToAddUser.value = row;
-  form.courseID=props.currentCourse.courseID
-  form.userID=wantToAddUser.value.id
-  form.role="courseCoordinator"
+  form.courseID = props.currentCourse.courseID
+  form.userID = wantToAddUser.value.id
+  form.role = "courseCoordinator"
   addUser()
 }
 
@@ -164,10 +163,5 @@ getUser()
 </script>
 
 <style scoped>
-
-
-@media (max-width: 540px) {
-
-}
-
+@media (max-width: 540px) {}
 </style>
