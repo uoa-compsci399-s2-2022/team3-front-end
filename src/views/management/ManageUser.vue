@@ -50,7 +50,7 @@
     </template>
   </el-dialog>
   <AddUser :visible="addUserVisible" @refreshUserTable="refresh"/>
-  <EditUser :visible="editUserVisible" @refreshUserTable="refresh" :currentUserID = 'wantToEditUser.value'/>
+  <EditUser :visible="editUserVisible" @refreshUserTable="refresh" :currentUser = 'wantToEditUser.value'/>
 </template>
 
 <script lang="ts" setup>
