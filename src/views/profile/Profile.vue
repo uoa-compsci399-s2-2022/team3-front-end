@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import {reactive, ref} from 'vue';
 import {get, post, put} from '@/utils/request'
-import {ElNotification} from "element-plus";
+import {ElNotification, genFileId, UploadInstance, UploadProps, UploadRawFile, UploadUserFile} from "element-plus";
+import { warningNotification, errorNotification, normalNotification, successNotification } from '@/utils/notification';
 
 const id = ref<string>();
 const name = ref<string>();
@@ -35,8 +36,8 @@ type usertype = {
   haveOtherContracts: boolean;
   otherContracts: string;
   maximumWorkingHours: number;
-  cv : string;
-  academicRecord: string;
+  // cv : string;
+  // academicRecord: string;
   createDateTime: string;
 }
 
@@ -105,7 +106,7 @@ async function getAcademicRecord() {
     let bloburl = window.URL.createObjectURL(Blob);
     window.open(bloburl);
   }else{
-    alert("No Academic Record, please upload your Academic Record")
+    warningNotification('Did not detect your academic transcript, please upload your academic transcript')
   }
 
 }
@@ -123,7 +124,7 @@ async function getCV() {
     window.open(bloburl);
   }
   else{
-    alert("No CV uploaded, please upload your CV")
+    warningNotification('Did not detect your CV, please upload your CV')
   }
 
 }
@@ -132,13 +133,22 @@ getUserProfile()
 // -------------------- update profile -------------------- start
 
 const dialogVisible = ref(false);
+const dialogUploadVisible = ref(false);
+import {Upload } from '@element-plus/icons-vue'
+import {UploadFilled} from "@element-plus/icons-vue";
 
 const updateProfile = ref({} as usertype)
+
+const showUploadDialog= () => {
+  dialogUploadVisible.value = true;
+  dialog_openEvent()
+}
 
 const showDiaglog = () => {
   dialogVisible.value = true;
   dialog_openEvent()
 }
+
 
 const dialog_update_name = ref(true);
 const dialog_update_email = ref(true);
@@ -149,6 +159,10 @@ const dialog_update_studentDegree = ref(true);
 const dialog_check_email = ref(false);
 const dialog_validated_email = ref(false);
 
+const dialog_upload_cv = ref(true);
+const dialog_upload_ad = ref(true);
+
+
 const showinfo = () => {
   ElNotification({
     title: 'Info',
@@ -157,37 +171,6 @@ const showinfo = () => {
   })
 }
 
-const warningNotification = (message : string) => {
-  ElNotification({
-    title: 'Warning',
-    message: message,
-    type: 'warning',
-  })
-}
-
-const errorNotification = (message : string) => {
-  ElNotification({
-    title: 'Error',
-    message: message,
-    type: 'error',
-    position:'bottom-right'
-  })
-}
-
-const normalNotification = (title: string,  message : string) => {
-  ElNotification({
-    title: title,
-    message: message,
-  })
-}
-
-const successNotification = (message : string) => {
-  ElNotification({
-    title: 'Success',
-    message: message,
-    type: 'success',
-  })
-}
 
 const validationCode = ref('')
 
@@ -276,7 +259,111 @@ const dialog_openEvent = () =>{
   dialog_check_email.value = false;
   validationCode.value = ''
   dialog_validated_email.value = false;
+
+  fileBase_cv.value = ''
+  fileList_cv.value = []
+
 }
+
+const fileList_cv = ref<UploadUserFile[]>([]);
+const fileBase_cv = ref<string>('')    // 上传的文件的base64
+const upload_cv = ref<UploadInstance>()
+const handleChange_cv: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
+  if (fileList_cv.value.length == 0) {
+    fileList_cv.value.push(uploadFile)
+    const reader = new FileReader()
+    reader.readAsDataURL(uploadFile.raw as Blob)
+    reader.onload = () => {
+      const base64data = reader.result
+      const img = base64data as string;
+      fileBase_cv.value = img.split('data:application/pdf;base64,')[1]
+    }
+  } else {
+    fileList_cv.value[0] = uploadFile
+    const reader = new FileReader()
+    reader.readAsDataURL(uploadFile.raw as Blob)
+    reader.onload = () => {
+      const base64data = reader.result
+      const img = base64data as string;
+      fileBase_cv.value = img.split('data:application/pdf;base64,')[1]
+    }
+  }
+}
+// 当上传的文件超过1 个时， 则替换之前的那一个
+const handleExceed_cv: UploadProps['onExceed'] = (files, fileList) => {
+  upload_cv.value!.clearFiles()
+  const file = files[0] as UploadRawFile
+  file.uid = genFileId()
+  upload_cv.value!.handleStart(file)
+}
+
+const handleRemove_cv: UploadProps['onRemove'] = (file, uploadFiles) => {
+  fileBase_cv.value = ''
+}
+
+
+async function testUPloadCV() {
+  if (fileBase_cv.value == ''){
+    errorNotification('Please upload your CV')
+  }
+  else{
+    await post('/api/getCV/' + detil.value.id, {"cv": fileBase_cv.value})
+    successNotification('uploading your CV successfully')
+    dialog_upload_cv.value = false;
+  }
+}
+
+
+const fileList_ad = ref<UploadUserFile[]>([]);
+const fileBase_ad = ref<string>('')    // 上传的文件的base64
+const upload_ad = ref<UploadInstance>()
+const handleChange_ad: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
+  if (fileList_ad.value.length == 0) {
+    fileList_ad.value.push(uploadFile)
+    const reader = new FileReader()
+    reader.readAsDataURL(uploadFile.raw as Blob)
+    reader.onload = () => {
+      const base64data = reader.result
+      const img = base64data as string;
+      fileBase_ad.value = img.split('data:application/pdf;base64,')[1]
+    }
+  } else {
+    fileList_ad.value[0] = uploadFile
+    const reader = new FileReader()
+    reader.readAsDataURL(uploadFile.raw as Blob)
+    reader.onload = () => {
+      const base64data = reader.result
+      const img = base64data as string;
+      fileBase_ad.value = img.split('data:application/pdf;base64,')[1]
+    }
+  }
+}
+// 当上传的文件超过1 个时， 则替换之前的那一个
+const handleExceed_ad: UploadProps['onExceed'] = (files, fileList) => {
+  upload_ad.value!.clearFiles()
+  const file = files[0] as UploadRawFile
+  file.uid = genFileId()
+  upload_ad.value!.handleStart(file)
+}
+
+const handleRemove_ad: UploadProps['onRemove'] = (file, uploadFiles) => {
+  fileBase_ad.value = ''
+}
+
+
+async function testUPloadAD() {
+  if (fileBase_ad.value == ''){
+    errorNotification('Please upload your application document')
+  }
+  else{
+    await post('/api/getAcademicTranscript/' + detil.value.id, {"AcademicTranscript": fileBase_ad.value})
+    successNotification('uploading your Academic transcript successfully')
+    dialog_upload_ad.value = false;
+  }
+
+}
+
+
 // -------------------- update profile -------------------- end
 </script>
 
@@ -331,15 +418,95 @@ const dialog_openEvent = () =>{
         <div class="profile-download">
             <p>Personal documents</p>
 <!--            <div>visa.pdf</div>-->
-            <div @click="getCV">cv
-
-            </div>
+            <div @click="getCV">cv</div>
             <div @click="getAcademicRecord">Academic Transcript</div>
+          <el-button @click="showUploadDialog" >
+            Upload<el-icon class="el-icon--right"><Upload/></el-icon>
+          </el-button>
         </div>
+
     </div>
-    
+
     <el-button class="profile-update" @click="showDiaglog">Update profile</el-button>
 <!--    <el-button class="profile-update" @click="">Change Password</el-button>-->
+
+  <el-dialog v-model="dialogUploadVisible" title="Upload File"  class="dialog-Upload-container" >
+    <el-button @click="dialog_upload_cv=true" v-if="dialog_upload_cv===false">Upload CV</el-button>
+    <el-button @click="dialog_upload_ad=true" v-if="dialog_upload_ad===false">Upload Academic transcript</el-button>
+
+
+    <div>
+    <div class="dialog-upload-ad" v-if="dialog_upload_ad===true">
+      <p>Upload your Academic transcript</p>
+      <div>
+        <el-upload
+            :limit = "1"
+            ref="upload_cv"
+            accept="application/pdf"
+            v-model:file-list="fileList_ad"
+            :on-change="handleChange_ad"
+            :on-exceed="handleExceed_ad"
+            :on-remove="handleRemove_ad"
+            action = ""
+            drag>
+          <el-icon class="el-icon--upload">
+            <upload-filled/>
+          </el-icon>
+          <div class="el-upload__text">
+            Drop your Academic transcript here or <em>click to upload</em>
+          </div>
+          <template #tip>
+            <div class="el-upload__tip">
+              Require: PDF files with a size less than 2MB
+            </div>
+          </template>
+
+        </el-upload>
+        <div>
+          <el-button @click="testUPloadAD">Test</el-button>
+          <el-button @click="dialog_upload_ad=false">Cancel</el-button>
+        </div>
+      </div>
+    </div>
+
+    </div>
+    <el-divider></el-divider>
+    <div>
+    <div class="dialog-upload-cv" v-if="dialog_upload_cv===true">
+      <p>Upload your cv</p>
+      <div>
+        <el-upload
+            :limit = "1"
+            ref="upload_cv"
+            accept="application/pdf"
+            v-model:file-list="fileList_cv"
+            :on-change="handleChange_cv"
+            :on-exceed="handleExceed_cv"
+            :on-remove="handleRemove_cv"
+            action = ""
+            drag>
+          <el-icon class="el-icon--upload">
+            <upload-filled/>
+          </el-icon>
+          <div class="el-upload__text">
+            Drop your CV here or <em>click to upload</em>
+          </div>
+          <template #tip>
+            <div class="el-upload__tip">
+              Require: PDF files with a size less than 2MB
+            </div>
+          </template>
+
+        </el-upload>
+      </div>
+      <div>
+        <el-button @click="testUPloadCV">Test</el-button>
+        <el-button @click="dialog_upload_cv=false">Cancel</el-button>
+      </div>
+    </div>
+    </div>
+  </el-dialog>
+
 
     <el-dialog v-model="dialogVisible" title="Quick Update"  class="dialog-container" >
       <el-header>
