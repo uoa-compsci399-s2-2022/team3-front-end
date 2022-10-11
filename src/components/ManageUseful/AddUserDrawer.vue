@@ -28,14 +28,14 @@
           <el-button size="small" @click="handleAddUser3(scope.row)">
             Appoint as CourseCoordinator
           </el-button> -->
-          <el-select v-model="roles[scope.$index]" multiple :placeholder="`Appoint position for ${scope.row.name}`" 
-          style="width: 240px" @change="role => appointPosition(role, scope.row)">
+          <el-select v-model="roles[scope.$index]" multiple :placeholder="`Appoint position for ${scope.row.name}`"
+            style="width: 240px" @change="role => appointPosition(role, scope.row)"
+            @remove-tag="role => dismissPosition(role, scope.row)">
 
             <el-option key="marker" label="Marker" value="marker" />
             <el-option key="tutor" label="Tutor" value="tutor" />
             <el-option key="student" label="Student" value="student" />
             <el-option key="courseCoordinator" label="Course Coordinator" value="courseCoordinator" />
-            {{roles}}
           </el-select>
         </template>
 
@@ -51,28 +51,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, reactive, ref } from 'vue'
-import { ElButton, ElDrawer, ElMessage } from 'element-plus'
-import { CircleCloseFilled } from '@element-plus/icons-vue'
+import { computed, ref } from 'vue'
+import { ElDrawer, ElMessage } from 'element-plus'
 import { Delete, get, post } from "@/utils/request";
-import { useRoute, useRouter } from 'vue-router';
 import dayjs from "dayjs";
-
-
 
 
 
 type Props = {
   visible: { visible: boolean };
-  currentCourse: Course
+  currentCourse: Course;
+  userRoleArr: any[][];
 }
 
 
 const props = defineProps<Props>()
-
-
-
-const router = useRouter()
+// const emit = defineEmits(['refresh'])
 
 const tableLoading = ref(true)
 
@@ -96,8 +90,8 @@ const filterTableData = computed(() =>
 
 const tableData = ref([] as User[])
 
-const getUser = () => {
-  get('api/users').then((res) => {
+const getUser = async () => {
+  return get('api/users').then((res) => {
     tableData.value = []
     res.forEach((e: User) => {
       tableData.value.push({
@@ -113,8 +107,8 @@ const getUser = () => {
   })
 }
 
-const addUserConfirmVisible = ref(false)
-const wantToAddUser = ref({} as User)
+// const addUserConfirmVisible = ref(false)
+// const wantToAddUser = ref({} as User)
 
 type Enrollment = {
   courseID: number
@@ -122,82 +116,125 @@ type Enrollment = {
   role: string
 }
 
-const form = reactive({} as Enrollment)
+// const form = reactive({} as Enrollment)
 
 
-const handleAddUser1 = (row: User) => {
-  addUserConfirmVisible.value = true;
-  wantToAddUser.value = row;
-  form.courseID = props.currentCourse.courseID
-  form.userID = wantToAddUser.value.id
-  form.role = "tutor"
-  addUser()
-}
-const handleAddUser2 = (row: User) => {
-  addUserConfirmVisible.value = true;
-  wantToAddUser.value = row;
-  form.courseID = props.currentCourse.courseID
-  form.userID = wantToAddUser.value.id
-  form.role = "marker"
-  addUser()
-}
-const handleAddUser3 = (row: User) => {
-  addUserConfirmVisible.value = true;
-  wantToAddUser.value = row;
-  form.courseID = props.currentCourse.courseID
-  form.userID = wantToAddUser.value.id
-  form.role = "courseCoordinator"
-  addUser()
-}
+// const handleAddUser1 = (row: User) => {
+//   addUserConfirmVisible.value = true;
+//   wantToAddUser.value = row;
+//   form.courseID = props.currentCourse.courseID
+//   form.userID = wantToAddUser.value.id
+//   form.role = "tutor"
+//   addUser()
+// }
+// const handleAddUser2 = (row: User) => {
+//   addUserConfirmVisible.value = true;
+//   wantToAddUser.value = row;
+//   form.courseID = props.currentCourse.courseID
+//   form.userID = wantToAddUser.value.id
+//   form.role = "marker"
+//   addUser()
+// }
+// const handleAddUser3 = (row: User) => {
+//   addUserConfirmVisible.value = true;
+//   wantToAddUser.value = row;
+//   form.courseID = props.currentCourse.courseID
+//   form.userID = wantToAddUser.value.id
+//   form.role = "courseCoordinator"
+//   addUser()
+// }
 
-const addUser = () => {
-  post('api/enrolment', form).then(r => {
-    ElMessage({
-      message: 'Add user success',
-      type: 'success'
-    })
-    addUserConfirmVisible.value = false;
-  }).catch(err => {
-    ElMessage({
-      message: err.response.data['message'],
-      type: 'error'
-    })
-  })
-}
+// const addUser = () => {
+//   post('api/enrolment', form).then(r => {
+//     ElMessage({
+//       message: 'Add user success',
+//       type: 'success'
+//     })
+//     addUserConfirmVisible.value = false;
+//     emit('refresh')
+//   }).catch(err => {
+//     ElMessage({
+//       message: err.response.data['message'],
+//       type: 'error'
+//     })
+//   })
+// }
 
-const refresh = () => {
-  getUser()
-}
-
-getUser()
-
-
+// const refresh = () => {
+//   getUser()
+// }
 
 
 const roles = ref<any[][]>([])
-for (let i=0; i<tableData.value.length; i++) {
-  roles.value.push([])
+
+
+const getUserRoles = async () => {
+  await getUser()
+  for (let i = 0; i < tableData.value.length; i++) {
+    for (let user of props.userRoleArr) {
+      if (tableData.value[i].id === user[0]) {
+        roles.value[i] = user[1];
+        break;
+      }
+    }
+  }
 }
 
-const appointPosition = (role: string[], user: User) => {
-  console.log("123", role.at(-1));
-  console.log("321", user);
-  // const data: Enrollment = {
-  //   courseID: props.currentCourse.courseID,
-  //   userID: user.id,
-  //   role: role.at(-1)!,
-  // }
-  // post('api/enrolment', data).then(_ => {
-  //   ElMessage({
-  //     message: `${user.name} is appoint as an ${role.at(-1)} now!`,
-  //     type: 'success'
-  //   })
-  // }).catch(err => {
-  //   ElMessage({
-  //     message: err.response.data['message'],
-  //     type: 'error'
-  //   })
-  // })
+getUserRoles()
+
+const deleting = ref<boolean>(false);
+const appointPosition = async (role: string[], user: User) => {
+  await new Promise(resolve => setTimeout(() => { resolve("") }, 100)); //等个0.1秒检查这次操作是增加还是删除
+  if (!deleting.value) {
+    const data: Enrollment = {
+      courseID: props.currentCourse.courseID,
+      userID: user.id,
+      role: role.at(-1)!,
+    }
+    post('api/enrolment', data).then(_ => {
+      ElMessage({
+        message: `${user.name} is appoint as an ${role.at(-1)} now!`,
+        type: 'success'
+      })
+    }).catch(err => {
+      ElMessage({
+        message: err.response.data['message'],
+        type: 'error'
+      })
+    })
+  } else {
+    console.log("deleting!!!")
+  }
+}
+
+type dismissal = {
+    courseID: number;
+    role:     string;
+    userID:   string;
+}
+
+
+const dismissPosition = async (role: string, user: User) => {
+  deleting.value = true;
+  const data: dismissal = {
+      courseID: props.currentCourse.courseID,
+      userID: user.id,
+      role: role!,
+    }
+
+  Delete('/api/enrolment', {data: data}).then(_ => {
+      ElMessage({
+        message: `${user.name} has been dismissed from ${role} position.`,
+        type: 'success'
+      })
+    }).catch(err => {
+      ElMessage({
+        message: err.response.data['message'],
+        type: 'error'
+      })
+    })
+  await new Promise(resolve => setTimeout(() => { resolve("") }, 110)); //缓冲0.11秒
+  deleting.value = false;
 }
 </script>
 

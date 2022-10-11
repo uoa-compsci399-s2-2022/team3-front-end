@@ -31,12 +31,17 @@
           <span class="tableTitle">Student List</span>
         </el-row>
 
-        <el-table v-loading="isLoadingUser" ref="singleTableRef" :data="stateUser" highlight-current-row
-          style="width: 100%">
-          <el-table-column property="id" label="ID" width="120" />
-          <el-table-column property="email" label="Email" width="200" />
+        <el-table
+            v-loading="isLoadingUser"
+            ref="singleTableRef"
+            :data="stateUser"
+            highlight-current-row
+            style="width: 100%"
+        >
+          <el-table-column property="id" label="ID" width="100" />
+          <el-table-column property="email" label="Email" width="250" />
           <el-table-column property="name" label="Name" />
-          <el-table-column label="Position" width="150">
+          <el-table-column label="Position" >
             <template #default="scope">
               <el-tag>
                 {{scope.row.roleInCourse}}
@@ -44,6 +49,14 @@
             </template>
 
           </el-table-column>
+          <!-- <el-table-column>
+            <template #default="scope">
+              <el-button size="small" @click="handleremove(scope.row)" type="danger">
+                Remove
+              </el-button>
+            </template>
+
+          </el-table-column> -->
           <template #empty>
             <el-empty description="No Data" />
           </template>
@@ -54,38 +67,88 @@
         </el-row>
       </el-col>
     </el-row>
-    {{stateUser[4]}}
-    <br />
-    {{stateUser[5]}}
-    <br />
 
   </div>
 
-  <AddUserDrawer :visible="UserVisible" direction="ltr" :currentCourse="currentCourse!" v-if="UserVisible.visible"/>
+  <AddUserDrawer :visible="UserVisible" direction="ltr" 
+  :currentCourse="currentCourse!"
+   v-if="UserVisible.visible" @refresh="freshtable"
+   :user-role-arr="userRoleArr"
+   />
 
+  <!-- <el-dialog
+      v-model="deleteConfirmVisible"
+      title="Delete Confirm"
+      width="30%"
+  >
+    <span>Please confirm to delete the user: {{ wantToDeleteUser.id }}</span>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="deleteConfirmVisible = false">Cancel</el-button>
+        <el-button type="danger" @click="deleteUser"
+        >Confirm</el-button
+        >
+      </span>
+    </template>
+  </el-dialog> -->
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 import { useAsyncState } from '@vueuse/core'
-import { get, post, Delete } from "@/utils/request";
-import { ElMessage, ElTable } from 'element-plus'
+import { get} from "@/utils/request";
+import { ElTable } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import AddUserDrawer from '@/components/ManageUseful/AddUserDrawer.vue'
 
+interface User {
+  id: string
+  email: string
+  name: string
+  roleInCourse: string
+}
 const currentTerm = ref<Term>();
 const currentCourse = ref<Course>();
+const  deleteConfirmVisible = ref(false)
+const wantToDeleteUser = ref({} as User)
+// const handleremove = (row: User) => {
+//   deleteConfirmVisible.value = true;
+//   wantToDeleteUser.value = row;
 
+// }
+// type deleteform = {
+//   courseID: number
+//   userID: string
+//   role:string
+// }
+// const  form = reactive({} as deleteform)
+// const deleteUser = () => {
+//   form.courseID = currentCourse.value.courseID
+//   form.userID = wantToDeleteUser.value.id
+//   form.role = wantToDeleteUser.value.roleInCourse
 
-
-const { isLoading: isLoadingTerm, state: stateTerm, isReady: isReadyTerm, execute: executeTerm } = useAsyncState(
-  (args) => {
-    return get('api/term')
-  },
-  {},
-  {
-    resetOnExecute: false,
-  },
+//   Delete('/api/enrolment',{data:form}).then(r => {
+//     ElMessage({
+//       message: 'Remove user success',
+//       type: 'success'
+//     })
+//     deleteConfirmVisible.value = false;
+//     freshtable()
+//   }).catch(err => {
+//     ElMessage({
+//       message: err.response.data['message'],
+//       type: 'error'
+//     })
+//   })
+// }
+const { isLoading:isLoadingTerm, state:stateTerm, isReady:isReadyTerm, execute:executeTerm } = useAsyncState(
+    (args) => {
+      return get('api/term')
+    },
+    {},
+    {
+      resetOnExecute: false,
+    },
 )
 
 const { isLoading: isLoadingCourse, state: stateCourse, isReady: isReadyCourse, execute: executeCourse } = useAsyncState(
@@ -137,7 +200,9 @@ const UserVisible = reactive({
 const showUser = () => {
   UserVisible.visible = true
 }
-
+const freshtable = () => {
+  executeUser(0,{courseID: currentCourse.value.courseID})
+}
 
 // 每个元素：[用户id, 用户在这门课的权限]
 // [["aiden", ["tutor"]], ["jack", ["tutor", "marker"]]]
