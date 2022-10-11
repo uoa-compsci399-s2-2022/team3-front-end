@@ -37,6 +37,9 @@
 <script setup lang="ts">
 import {get, post} from "@/utils/request";
 import {ElMessage} from 'element-plus'
+import { reactive, ref } from 'vue'
+import {stringify} from "querystring";
+import router from "@/router";
 
 type User = {
   id: string
@@ -56,10 +59,6 @@ const refreshUserTable = () => {
   emit('refreshUserTable')
 }
 
-
-import { reactive, ref } from 'vue'
-import {stringify} from "querystring";
-import router from "@/router";
 const formLabelWidth = '140px'
 console.log(props.currentUser.id)
 
@@ -82,7 +81,6 @@ const form = reactive({} as editUser)
 const usercurrentinfor = ref({} as editUser)
 
 get('api/UserProfile/'+ props.currentUser.id).then((res) => {
-  console.log(res)
   usercurrentinfor.value.name = res.name
   usercurrentinfor.value.auid =res.auid
   usercurrentinfor.value.upi = res.upi
