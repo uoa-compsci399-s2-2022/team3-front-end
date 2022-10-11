@@ -9,21 +9,21 @@
     <br/>
 
     <el-table :data="filterTableData" style="width: 100%" v-loading="tableLoading" >
-      <el-table-column label="ID" prop="id" width="150px"/>
-      <el-table-column label="Name" prop="name" width="150px"/>
+      <el-table-column label="ID" prop="id" width="100px"/>
+      <el-table-column label="Name" prop="name" width="100px"/>
       <el-table-column label="Groups" prop="groups" width="200px"/>
       <el-table-column >
         <template #header>
           <el-input v-model="search" size="small" placeholder="Type to search"/>
         </template>
         <template #default="scope">
-          <el-button size="small" @click="handleAddUser1(scope.row)" type="danger">
+          <el-button size="small" @click="handleAddUser1(scope.row)" >
             Add Tutor
           </el-button>
-          <el-button size="small" @click="handleAddUser2(scope.row)" type="danger">
+          <el-button size="small" @click="handleAddUser2(scope.row)" >
             Add Marker
           </el-button>
-          <el-button size="small" @click="handleAddUser3(scope.row)" type="danger">
+          <el-button size="small" @click="handleAddUser3(scope.row)" >
             Add CourseCoordinator
           </el-button>
         </template>
