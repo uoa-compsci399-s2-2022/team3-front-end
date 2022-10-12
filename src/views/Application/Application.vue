@@ -332,7 +332,7 @@ const validateStep = async (step: number) => {
           // console.log(flag)
         })
   } else if (step === 2) {
-    check()
+    await check()
     flag = prefercourseisvalid.value
 
   } else {
@@ -496,7 +496,6 @@ const backTohome =()=>{
 }
 
 const prefercourseisvalid = ref(false)
-
 
 const changevaild =()=>{
   prefercourseisvalid.value=true
