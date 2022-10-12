@@ -56,5 +56,6 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
-  }
+  },
+  base: '/team3-front-end/',
 })
