@@ -31,17 +31,12 @@
           <span class="tableTitle">Student List</span>
         </el-row>
 
-        <el-table
-            v-loading="isLoadingUser"
-            ref="singleTableRef"
-            :data="stateUser"
-            highlight-current-row
-            style="width: 100%"
-        >
+        <el-table v-loading="isLoadingUser" ref="singleTableRef" :data="stateUser" highlight-current-row
+          style="width: 100%">
           <el-table-column property="id" label="ID" width="100" />
           <el-table-column property="email" label="Email" width="250" />
           <el-table-column property="name" label="Name" />
-          <el-table-column label="Position" >
+          <el-table-column label="Position">
             <template #default="scope">
               <el-tag>
                 {{scope.row.roleInCourse}}
@@ -70,11 +65,8 @@
 
   </div>
 
-  <AddUserDrawer :visible="UserVisible" direction="ltr" 
-  :currentCourse="currentCourse"
-   v-if="UserVisible.visible" @refresh="freshtable"
-   :user-role-arr="userRoleArr"
-   />
+  <AddUserDrawer :visible="UserVisible" direction="ltr" :currentCourse="currentCourse!" v-if="UserVisible.visible"
+    @refresh="freshtable" :user-role-arr="userRoleArr" />
 
   <!-- <el-dialog
       v-model="deleteConfirmVisible"
@@ -96,7 +88,7 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from "vue";
 import { useAsyncState } from '@vueuse/core'
-import { get} from "@/utils/request";
+import { get } from "@/utils/request";
 import { ElTable } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import AddUserDrawer from '@/components/ManageUseful/AddUserDrawer.vue'
@@ -109,7 +101,7 @@ interface User {
 }
 const currentTerm = ref<Term>();
 const currentCourse = ref<Course>();
-const  deleteConfirmVisible = ref(false)
+const deleteConfirmVisible = ref(false)
 const wantToDeleteUser = ref({} as User)
 // const handleremove = (row: User) => {
 //   deleteConfirmVisible.value = true;
@@ -141,14 +133,14 @@ const wantToDeleteUser = ref({} as User)
 //     })
 //   })
 // }
-const { isLoading:isLoadingTerm, state:stateTerm, isReady:isReadyTerm, execute:executeTerm } = useAsyncState(
-    (args) => {
-      return get('api/term')
-    },
-    {},
-    {
-      resetOnExecute: false,
-    },
+const { isLoading: isLoadingTerm, state: stateTerm, isReady: isReadyTerm, execute: executeTerm } = useAsyncState(
+  (args) => {
+    return get('api/term')
+  },
+  {},
+  {
+    resetOnExecute: false,
+  },
 )
 
 const { isLoading: isLoadingCourse, state: stateCourse, isReady: isReadyCourse, execute: executeCourse } = useAsyncState(
@@ -166,7 +158,8 @@ const { isLoading: isLoadingCourse, state: stateCourse, isReady: isReadyCourse, 
 const { isLoading: isLoadingUser, state: stateUser, isReady: isReadyUser, execute: executeUser } = useAsyncState(
   (args) => {
     const courseID = args.courseID
-    return get(`api/getCourseUser/${courseID}/true`);
+    // return get(`api/getCourseUser/${courseID}/true`);
+    return get(`api/getCourseUserWithPublishInformation/${courseID}`)
   },
   [],
   {
@@ -201,31 +194,46 @@ const showUser = () => {
   UserVisible.visible = true
 }
 const freshtable = () => {
-  executeUser(0,{courseID: currentCourse.value.courseID})
+  executeUser(0, { courseID: currentCourse.value!.courseID })
 }
 
-// 每个元素：[用户id, 用户在这门课的权限]
-// [["aiden", ["tutor"]], ["jack", ["tutor", "marker"]]]
-let userRoleArr = ref<any[][]>([])
+type role = {
+  role: string,
+  isPublished: boolean,
+}
+
+type roleInfo = {
+  id: string;
+  roles: role[];
+};
+
+let userRoleArr = ref<roleInfo[]>([])
 
 watch(stateUser, _ => {
   userRoleArr.value.length = 0;
   for (let user of stateUser.value) {
     let hasThisUser = false;
-    for (let i=0; i<userRoleArr.value.length; i++) {
+    for (let i = 0; i < userRoleArr.value.length; i++) {
       let item = userRoleArr.value[i]
-      if (item[0] == user.id) {
-        userRoleArr.value[i][1].push(user.roleInCourse)
+      if (item.id == user.id) {
+        userRoleArr.value[i].roles.push({
+          role: user.roleInCourse,
+          isPublished: user.isPublished,
+        })
         hasThisUser = true;
         break
       }
     }
-
     if (!hasThisUser) {
-      userRoleArr.value.push([user.id, [user.roleInCourse]])
+      userRoleArr.value.push({
+        id: user.id,
+        roles: [{
+          role: user.roleInCourse,
+          isPublished: user.isPublished,
+        }],
+      })
     }
   }
-
 })
 
 
