@@ -39,7 +39,7 @@
 import { SlickList, SlickItem } from 'vue-slicksort';
 import {computed, ref, toRef, watch, reactive, onBeforeMount} from "vue";
 import {DCaret, Delete} from "@element-plus/icons-vue";
-import {FormRules} from "element-plus";
+import {FormInstance, FormRules} from "element-plus";
 import {isMobile} from "@/utils/isMoblie";
 
 type preferCourse = {
@@ -54,8 +54,19 @@ type preferCourse = {
 }
 
 
-const props = defineProps(['preferCourseList'])
-const emit = defineEmits(['update:preferCourseList'])
+//
+// const courseFormRef = ref<FormInstance[]>();
+//
+//
+// watch(courseFormRef, (val) => {
+//   console.log(val);
+//   courseFormRef.value!.forEach((item) => {
+//     console.log(item);
+//   });
+// })
+
+const props = defineProps(['preferCourseList', 'preferCourseListFormRef'])
+const emit = defineEmits(['update:preferCourseList', 'update:preferCourseListFormRef'])
 const GRADE = ref(['A+','A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'CPL', 'Pass', 'D+', 'D', 'D-', 'DNC', 'DNS', 'Fail'])
 
 const value = computed({

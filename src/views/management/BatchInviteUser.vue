@@ -175,14 +175,13 @@ const send = async () => {
     ElMessage.warning('Please add users who need to be invited!')
     return
   }
-  if (sendEmail.processing) {
+  if (sendEmail.status !== '') {
     ElMessage({
       message: 'Please wait for the previous email to be sent!',
       type: 'warning'
     })
     return
   }
-  sendEmail.processing = true
   sendEmail.status = 'processing'
 
   get('api/inviteUser', null, 0).then((res) => {
@@ -191,7 +190,6 @@ const send = async () => {
       message: '',
       type: 'success'
     })
-    sendEmail.processing = false
     sendEmail.status = 'success'
   }).catch((err) => {
     console.log(err)
@@ -199,7 +197,6 @@ const send = async () => {
       message: err.response.data['message'],
       type: 'error'
     })
-    sendEmail.processing = false
     sendEmail.status = 'error'
   })
 }

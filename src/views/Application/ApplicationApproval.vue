@@ -21,7 +21,7 @@
       </el-col>
       <el-col style="text-align: end" :md="3">
         <el-badge :value="stateNum.unpublished" type="primary" v-loading="isLoadingNum">
-          <el-button type="success" size="large">
+          <el-button type="success" size="large" @click="publishEvent">
             <font-awesome-icon style="margin-right: 4px; font-size: 20px" icon="fa-solid fa-bullhorn"/>
             Publish
           </el-button>
@@ -37,7 +37,7 @@
           <div :class="{selected_item: selectedTab==='0'}" class="tabs-label">
             <font-awesome-icon icon="fa-solid fa-file-circle-question"/> &nbsp;
             Pending
-            <el-badge :value="stateNum.pending" type="warning" />
+            <el-badge :value="stateNum.pending" type="warning"/>
           </div>
         </template>
         <ApprovalTable v-model:applicationApprovalList="statePendingApplication"
@@ -55,7 +55,7 @@
               <CircleCheckFilled/>
             </el-icon> &nbsp;
             Accepted
-            <el-badge :value="stateNum.accepted" type="success" />
+            <el-badge :value="stateNum.accepted" type="success"/>
           </div>
         </template>
         <ApprovalTable v-model:applicationApprovalList="stateAcceptedApplication"
@@ -73,7 +73,7 @@
               <CircleCloseFilled/>
             </el-icon> &nbsp;
             Rejected
-            <el-badge :value="stateNum.rejected" />
+            <el-badge :value="stateNum.rejected"/>
           </div>
         </template>
         <ApprovalTable v-model:applicationApprovalList="stateRejectedApplication"
@@ -87,7 +87,7 @@
           <div :class="{selected_item: selectedTab==='3'}" class="tabs-label">
             <font-awesome-icon icon="fa-solid fa-bullhorn"/> &nbsp;
             Published
-            <el-badge :value="stateNum.published" type="primary" />
+            <el-badge :value="stateNum.published" type="primary"/>
           </div>
         </template>
         <ApprovalTable v-model:applicationApprovalList="statePublishedApplication"
@@ -98,16 +98,42 @@
                        @reloadApplicationApprovalList="getApplicationApprovalList"/>
       </el-tab-pane>
     </el-tabs>
-
   </div>
+
+  <el-dialog
+      v-model="publishDialogVisible"
+      title="Publish confirmation"
+      width="60%"
+  >
+      <el-table
+          ref="publishTableRef"
+          :data="publishTableData"
+          style="width: 100%"
+          @selection-change="handlePublishSelectionChange" v-loading="publishTableLoading"
+      >
+        <el-table-column type="selection" width="55"/>
+        <el-table-column property="applicationID" label="Application ID"/>
+        <el-table-column property="status" label="Status" />
+        <el-table-column property="name" label="Name"/>
+        <el-table-column property="upi" label="UPI"/>
+      </el-table>
+
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="publishDialogVisible = false">Cancel</el-button>
+        <el-button type="success" @click="submitPublishEvent"  v-loading="publishTableLoading" plain>Confirm</el-button>
+      </span>
+    </template>
+  </el-dialog>
+
 </template>
 
 <script lang="ts" setup>
 import {computed, ref, watch, reactive, onBeforeMount} from 'vue'
-import {ElTable} from 'element-plus'
+import {ElMessage, ElTable} from 'element-plus'
 import type {TableColumnCtx} from 'element-plus/es/components/table/src/table-column/defaults'
 import {useAsyncState} from "@vueuse/core";
-import {get} from "@/utils/request";
+import {get, post} from "@/utils/request";
 import ApprovalTable from '@/components/applicationUseful/ApprovalTable.vue'
 import {CircleCheckFilled, CircleCloseFilled} from '@element-plus/icons-vue'
 import {usePermissionStore} from '@/store'
@@ -211,7 +237,6 @@ const {
 )
 
 
-
 const getApplicationApprovalList = () => {
   if (selectedTerm.value && tutorOrMarker.value) {
     executeNum()
@@ -304,9 +329,83 @@ onBeforeMount(() => {
         getApplicationApprovalList()
       }
   )
-
-
 })
+
+
+type PublishApplication = {
+  applicationID: number,
+  userID: string,
+  name: string,
+  email: string,
+  upi: string,
+  status: string
+}
+
+const publishTableData = ref([] as PublishApplication[])
+const publishTableLoading = ref(false)
+const publishDialogVisible = ref(false)
+const publishTableRef = ref<InstanceType<typeof ElTable>>()
+const submitPublishData = ref([] as number[])
+
+const handlePublishSelectionChange = (val: PublishApplication[]) => {
+  submitPublishData.value = val.map(item => item.applicationID)
+}
+
+function timeout(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+const publishEvent = async () => {
+  publishTableLoading.value = true
+  publishDialogVisible.value = true
+  publishTableData.value = []
+  await executeAcceptedApplication()
+  await executeRejectedApplication()
+  stateAcceptedApplication.value.forEach((item: any) => {
+    publishTableData.value.push({
+      applicationID: item.applicationID,
+      userID: item.userID,
+      name: item.name,
+      email: item.email,
+      upi: item.upi,
+      status: "Accepted"
+    })
+  })
+  stateRejectedApplication.value.forEach((item: any) => {
+    publishTableData.value.push({
+      applicationID: item.applicationID,
+      userID: item.userID,
+      name: item.name,
+      email: item.email,
+      upi: item.upi,
+      status: "Rejected"
+    })
+  })
+  publishTableRef.value?.toggleAllSelection()
+  submitPublishData.value = publishTableData.value.map(item => item.applicationID)
+  publishTableLoading.value = false
+}
+
+
+const submitPublishEvent = () => {
+  publishTableLoading.value = true
+  post('api/publishApplication', submitPublishData.value).then((res) => {
+    getApplicationApprovalList()
+    ElMessage({
+      message: 'Publish Application Result Successfully!',
+      type: 'success'
+    })
+    publishTableLoading.value = false
+    publishDialogVisible.value = false
+  }).catch((err) => {
+    ElMessage({
+      message: err.response.data.message,
+      type: 'error'
+    })
+    publishTableLoading.value = false
+    publishDialogVisible.value = false
+  })
+}
 
 
 </script>
