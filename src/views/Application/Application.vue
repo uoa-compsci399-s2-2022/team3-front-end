@@ -647,7 +647,7 @@ const backTohome =()=>{
 
         <Transition>
           <div v-show="stepArr[2]" class="step3">
-            <ApplicationPreferCourseList v-model:preferCourseList="preferCourseList"/>
+            <ApplicationPreferCourseList v-model:preferCourseList="preferCourseList" v-model:preferCourseListFormRef="preferCourseListFormRef"/>
             <el-row justify="center">
               <el-button type="primary" :icon="Plus" size="large" @click="showCourseChooser">Add Prefer Courses
               </el-button>

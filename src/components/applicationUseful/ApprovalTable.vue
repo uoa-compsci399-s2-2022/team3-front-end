@@ -72,7 +72,7 @@
               :row-config="{isHover: true}"
               :data="row.PreferCourse"
               @cell-click="showCourseDrawer">
-            <vxe-column field="preference" title="#" width="30"></vxe-column>
+            <vxe-column field="preference" title="#" width="40"></vxe-column>
             <vxe-column field="courseNum" title="Course Num" width="110"></vxe-column>
             <vxe-column field="courseName" title="Course Name"></vxe-column>
             <vxe-column field="hasLearned" title="has Learned" width="100"></vxe-column>
