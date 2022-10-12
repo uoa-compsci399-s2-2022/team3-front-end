@@ -23,16 +23,16 @@ const cv = ref<string>();
 
 type usertype = {
   id: string;
-  name : string
-  upi: string;
-  auid: number;
-  email: string;
+  name? : string
+  upi?: string;
+  auid?: number;
+  email?: string;
   currentlyOverseas: boolean;
   willBackToNZ: boolean;
   isCitizenOrPR: boolean;
   haveValidVisa: boolean;
-  enrolDetails: string;
-  studentDegree: string;
+  enrolDetails?: string;
+  studentDegree?: string;
   haveOtherContracts: boolean;
   otherContracts: string;
   maximumWorkingHours: number;
@@ -580,7 +580,6 @@ defineExpose({
         <div class="dialog-update-auid" v-if="dialog_update_auid===true">
           <el-form-item
               label="AUID"
-              :prop="Number === true"
               :rules="{
             required: true,
             message: 'auid can not be empty and auid must be a number',

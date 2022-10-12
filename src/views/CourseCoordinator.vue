@@ -213,7 +213,7 @@
       <el-table-column label="AUID" prop="auid"/>
       <el-table-column align="right">
         <template #default="scope">
-          <el-button size="small" @click="handleEnroll(scope.$index, scope.row)"
+          <el-button size="small"
           >Enroll
           </el-button
           >
@@ -234,7 +234,7 @@
 </template>
 
 <script setup lang="ts">
-import {Check, Edit} from '@element-plus/icons-vue';
+import {Check, Edit, Search} from '@element-plus/icons-vue';
 import {reactive, ref} from 'vue';
 import {get, put} from "@/utils/request";
 import {useRoute} from "vue-router";
@@ -284,7 +284,7 @@ const courseForm = reactive<courseFormCCType>({
 const courseInformation = ref({})
 const editCourseLoading = ref(false)
 
-const handleCourseEdit = (row: number) => {
+const handleCourseEdit = () => {
   editCourseLoading.value = true;
   put(`/api/courseManagement/${route.params.courseId}`, {data: courseForm}).then(() => {
     getCourseInfo();

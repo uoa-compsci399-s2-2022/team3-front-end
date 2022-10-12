@@ -10,7 +10,7 @@
     <br/><br/>
     <el-table
         v-loading="!courseLoaded"
-        :ref="courseTableRef"
+        ref="courseTableRef"
         :data="tableData"
         highlight-current-row
         style="width: 100%"

@@ -9,7 +9,8 @@ import {useRoute, useRouter} from 'vue-router'
 import * as dayjs from "dayjs";
 import ApplicationPreferCourseList from '@/components/applicationUseful/ApplicationPreferCourseList.vue'
 import 'element-plus/theme-chalk/display.css';
-
+import type {UploadProps, UploadUserFile, UploadInstance, UploadRawFile} from "element-plus";
+import {genFileId} from 'element-plus';
 
 const ApplicationCourse = defineAsyncComponent(() => import('@/components/applicationUseful/ApplicationCourse.vue'))
 const route = useRoute();
@@ -314,7 +315,7 @@ watch(step, async (newStep, oldStep) => {
 
 
 
-const showApplicationPreferCourseList = ref(null)
+const showApplicationPreferCourseList = ref()
 const validateStep = async (step: number) => {
   let flag = true;
   if (step === 0) {
@@ -350,10 +351,7 @@ const validateStep = async (step: number) => {
 
 // -----Work by laiyu -------
 // -----Testing upload file ------ start
-import type {UploadProps, UploadUserFile, UploadInstance, UploadRawFile} from "element-plus";
-import axios from "axios";
-import {getBaseURL} from "xe-utils";
-import {genFileId} from 'element-plus'
+
 // 上传文件后对文件的预览于删除
 // uploadFile 对于当个文件上传， uploadFiles 对于多个文件上传
 // 目前考虑的是上传单个文件， 后续又修改在添加功能
@@ -502,7 +500,7 @@ const changevaild =()=>{
   // console.log(prefercourseisvalid.value)
 }
 const check =async ()=>{
-  let isvaild = await showApplicationPreferCourseList.value.validateStep()
+  let isvaild = await showApplicationPreferCourseList!.value!.validateStep()
   // console.log(isvaild)
   prefercourseisvalid.value = await  isvaild
 }
@@ -512,7 +510,7 @@ const check =async ()=>{
 <template>
   <div class="application-header">
     <img src="@/assets/logo/uoa.svg" alt="">
-    <el-button size="medium" style="position: absolute; right: 20px;top: 20px" type="danger" @click="backTohome">Back</el-button>
+    <el-button style="position: absolute; right: 20px;top: 20px" type="danger" @click="backTohome">Back</el-button>
     <el-card class="application-meta-box-card hidden-sm-and-down">
       <div v-loading="!(metaLoading && userProfileLoading && saveLoading)">
         <p>ApplicationID: {{ applicationID }}</p>

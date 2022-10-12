@@ -408,8 +408,20 @@ const responsiveLayout = () => {
 // *********************
 // * Prefer Course Drawer
 // *********************
+type CourseDrawer = {
+  preference: number;
+  courseID: number;
+  courseName: string;
+  courseNum: string;
+  grade: string;
+  hasLearned: boolean;
+  explanation: string;
+  preExperience: string;
+}
+
+
 const coursedrawer = ref(false)
-const coursedrawerData = ref({})
+const coursedrawerData = ref({} as CourseDrawer)
 
 const showCourseDrawer = ({row}: eventProps) => {
   coursedrawerData.value = row

@@ -4,7 +4,7 @@
       <h4 :id="titleId" :class="titleClass" style="font-size: x-large">Appoint position</h4>
     </template>
     <el-row justify="center">
-      <el-icon :size="40" align-items: center>
+      <el-icon :size="40" align-items="center">
         <User />
       </el-icon>
     </el-row>
