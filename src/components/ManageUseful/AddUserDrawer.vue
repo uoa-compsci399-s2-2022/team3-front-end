@@ -170,7 +170,8 @@ const appointPosition = async (role: string[], user: User, index: number) => {
       return role
     }
   })
-  if (arr.length > 0 || toDelete) {
+
+  if (arr.length > 0 || (toDelete !== null && toDelete.match(/.*\(not published\)$/))) {
     ElMessageBox.confirm(
       `You have unpublished position(s) '${arr.join(' ')}'. \n You can wait for its publication. \n Are you sure you want to add now?`,
       'Warning',
