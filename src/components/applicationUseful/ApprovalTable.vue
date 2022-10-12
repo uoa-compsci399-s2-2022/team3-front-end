@@ -437,12 +437,14 @@ const setClosedCourseAvailableHoursAlert = () => {
 
 const acceptEvent = (row: any) => {
   singleEnrollForm.domains = []
-  row.PreferCourse.forEach((item: any) => {
-    singleEnrollForm.domains.push({
-      courseID: item.courseID,
-      estimatedHours: 0
+  if (row.PreferCourse !== null && row.PreferCourse !== undefined){
+    row.PreferCourse.forEach((item: any) => {
+      singleEnrollForm.domains.push({
+        courseID: item.courseID,
+        estimatedHours: 0
+      })
     })
-  })
+  }
   currentApplicationID.value = row.applicationID
   enrollDialogVisible.value = true
 }

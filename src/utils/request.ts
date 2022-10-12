@@ -40,7 +40,10 @@ instance.interceptors.response.use((responce: AxiosResponse) => {
 })
 
 
-export function get(url: string, params: any=null, timeout:number=20000): Promise<any> {
+export function get(url: string, params?: any, timeout?:number): Promise<any> {
+    if (timeout === undefined){
+        timeout = 10000;
+    }
     const config: AxiosRequestConfig = {
         method: 'get',
         url: url,
@@ -50,12 +53,13 @@ export function get(url: string, params: any=null, timeout:number=20000): Promis
     return instance(config);
 }
 
-export function post(url: string, data: any=null): Promise<any>{
+export function post(url: string, data: any=null, header?:any): Promise<any>{
     
     const config: AxiosRequestConfig = {
         method: 'post',
         url: url,
-        data:data
+        data:data,
+        headers: header
     }
     console.log(config)
     return instance(config);

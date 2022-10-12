@@ -20,7 +20,9 @@ import {
     faBookOpenReader,
     faGraduationCap,
     faTriangleExclamation,
-    faBullhorn
+    faBullhorn,
+    faMarker,
+    faBookOpen
 } from '@fortawesome/free-solid-svg-icons'
 import {faTwitter} from '@fortawesome/free-brands-svg-icons'
 // import {  } from '@fortawesome/free-regular-svg-icons'
@@ -45,7 +47,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 
 // register fontawesome icons
-library.add(faUserSecret, faTwitter, faCloudArrowUp, faFileCircleQuestion, faChalkboardUser, faFileCircleCheck, faBookOpenReader, faGraduationCap, faTriangleExclamation, faBullhorn)
+library.add(faUserSecret, faTwitter, faCloudArrowUp, faFileCircleQuestion, faChalkboardUser, faFileCircleCheck, faBookOpenReader, faGraduationCap, faTriangleExclamation, faBullhorn, faMarker, faBookOpen)
 app.component('font-awesome-icon', FontAwesomeIcon)
 
 // customized directive v-permission, if v-permission not in the whiteList, then hide that element

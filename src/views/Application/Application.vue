@@ -687,7 +687,8 @@ const check =async ()=>{
                        :on-change="handleChange_cv"
                        :on-exceed="handleExceed_cv"
                        :on-remove="handleRemove_cv"
-                       :limit="1">
+                       :limit="1"
+                       :auto-upload="false">
               <el-icon class="el-icon--upload">
                 <upload-filled/>
               </el-icon>
@@ -709,7 +710,8 @@ const check =async ()=>{
                        :on-change="handleChange_ad"
                        :on-exceed="handleExceed_ad"
                        :on-remove="handleRemove_ad"
-                       :limit="1">
+                       :limit="1"
+                       :auto-upload="false">
               <el-icon class="el-icon--upload">
                 <upload-filled/>
               </el-icon>
