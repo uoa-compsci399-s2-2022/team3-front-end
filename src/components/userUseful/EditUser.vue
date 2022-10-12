@@ -77,6 +77,7 @@ type editUser = {
   auid: string
   enrolDetails: string
   studentDegree: string
+  groups: Array<string>
 }
 
 type Group = {
@@ -99,6 +100,7 @@ get('api/UserProfile/'+ props.currentUser.id).then((res) => {
   usercurrentinfor.value.email = res.email
   usercurrentinfor.value.enrolDetails = res.enrolDetails
   usercurrentinfor.value.studentDegree = res.studentDegree
+  usercurrentinfor.value.groups=res.groups
 
   form.name = res.name
   form.auid =res.auid
@@ -106,6 +108,7 @@ get('api/UserProfile/'+ props.currentUser.id).then((res) => {
   form.email = res.email
   form.enrolDetails = res.enrolDetails
   form.studentDegree = res.studentDegree
+  editgroups.groups=res.groups
 }).catch(err => console.log(err))
 
 get('api/groups').then((res) => {
