@@ -547,14 +547,30 @@ const rules = reactive<FormRules>({
     //     { type: 'number', message: 'Must be a number' },
     // ]
 })
-
+const defaultRemovedCourseForm = (courseForm: courseFormType) => {
+    let output = {
+        courseName: courseForm.courseName,
+        courseNum: courseForm.courseNum,
+        termID: courseForm.termID,
+        needTutors: courseForm.needTutors,
+        needMarkers: courseForm.needMarkers,
+        canPreAssign: courseForm.canPreAssign,
+    } as courseFormType
+    Object.keys(courseForm).forEach((key) => {
+       if (!(courseForm[key as keyof courseFormType] === '')) {
+        (output[key as keyof courseFormType] as any) = courseForm[key as keyof courseFormType]
+       } 
+    })
+    return output
+    
+}
 /**
  * @description function for adding new course
  */
 const addCourse = async () => {
+    console.log(defaultRemovedCourseForm(courseForm));
     try {
-        await post('api/courseManagement', courseForm);
-        console.log(courseForm)
+        await post('api/courseManagement', defaultRemovedCourseForm(courseForm));
         await getCourseList();
         courseModalOpened.value = false;
         ElMessage({
