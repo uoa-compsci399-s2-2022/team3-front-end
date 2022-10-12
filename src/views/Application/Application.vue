@@ -12,7 +12,6 @@ import 'element-plus/theme-chalk/display.css';
 
 
 const ApplicationCourse = defineAsyncComponent(() => import('@/components/applicationUseful/ApplicationCourse.vue'))
-
 const route = useRoute();
 const router = useRouter();
 
@@ -44,6 +43,7 @@ type applicationData = {
   otherContracts: string;
   maximumWorkingHours: number;
   gpa: number;
+
 }
 
 type preferCourse = {
@@ -311,6 +311,10 @@ watch(step, async (newStep, oldStep) => {
  * It will check whether all the input fields in that step is validate or not.
  * For example, if the user forgot to input a field, it will pops up an warning message.
  */
+
+
+
+const showApplicationPreferCourseList = ref(null)
 const validateStep = async (step: number) => {
   let flag = true;
   if (step === 0) {
@@ -325,8 +329,11 @@ const validateStep = async (step: number) => {
           'haveValidVisa', 'studentDegree', 'hasOtherContract', 'maximumWorkingHours'],
         (valid) => {
           flag = valid;
+          // console.log(flag)
         })
   } else if (step === 2) {
+    check()
+    flag = prefercourseisvalid.value
 
   } else {
 
@@ -487,6 +494,20 @@ const submitEvent = () => {
 const backTohome =()=>{
   router.push('/applicationList')
 }
+
+const prefercourseisvalid = ref(false)
+
+
+const changevaild =()=>{
+  prefercourseisvalid.value=true
+  // console.log(prefercourseisvalid.value)
+}
+const check =async ()=>{
+  let isvaild = await showApplicationPreferCourseList.value.validateStep()
+  // console.log(isvaild)
+  prefercourseisvalid.value = await  isvaild
+}
+
 </script>
 
 <template>
@@ -647,7 +668,7 @@ const backTohome =()=>{
 
         <Transition>
           <div v-show="stepArr[2]" class="step3">
-            <ApplicationPreferCourseList v-model:preferCourseList="preferCourseList" v-model:preferCourseListFormRef="preferCourseListFormRef"/>
+            <ApplicationPreferCourseList v-model:preferCourseList="preferCourseList" @isvaild="changevaild" ref="showApplicationPreferCourseList"/>
             <el-row justify="center">
               <el-button type="primary" :icon="Plus" size="large" @click="showCourseChooser">Add Prefer Courses
               </el-button>
