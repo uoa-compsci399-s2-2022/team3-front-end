@@ -74,12 +74,12 @@ export function put(url: string, params: {params?: any, data?: any}): Promise<an
     return instance(config);
 }
 
-export function Delete(url: string, params: {params?: any, data?: any}): Promise<any> {
+export function Delete(url: string, params: {params?: any, data?: any}={}): Promise<any> {
     const config: AxiosRequestConfig = {
         method: 'delete',
         url: url,
-        params: params,
-        data:params.data
+        params: params.params,
+        data: params.data
     }
     return instance(config);
 }

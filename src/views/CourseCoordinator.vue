@@ -377,7 +377,7 @@ const currentTutorLoading = ref(false)
 const {isLoading: isLoadingUser, state: stateUser, isReady: isReadyUser, execute: executeUser} = useAsyncState(
     (args) => {
       const courseID = route.params.courseId
-      return get('api/getCourseUser/' + courseID);
+      return get(`api/getCourseUser/${courseID}/true`);
     },
     [],
     {

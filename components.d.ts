@@ -51,8 +51,6 @@ declare module '@vue/runtime-core' {
     ElOptionGroup: typeof import('element-plus/es')['ElOptionGroup']
     ElPopconfirm: typeof import('element-plus/es')['ElPopconfirm']
     ElPopover: typeof import('element-plus/es')['ElPopover']
-    ElRadio: typeof import('element-plus/es')['ElRadio']
-    ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElRow: typeof import('element-plus/es')['ElRow']
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElStep: typeof import('element-plus/es')['ElStep']
@@ -66,7 +64,6 @@ declare module '@vue/runtime-core' {
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTag: typeof import('element-plus/es')['ElTag']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
-    ElUpload: typeof import('element-plus/es')['ElUpload']
     Header: typeof import('./src/components/header/Header.vue')['default']
     LoadingBar: typeof import('./src/components/LoadingBar.vue')['default']
     LoginBackground: typeof import('./src/components/backgrounds/LoginBackground.vue')['default']
@@ -76,6 +73,8 @@ declare module '@vue/runtime-core' {
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
     StartApplicationDrawer: typeof import('./src/components/applicationUseful/StartApplicationDrawer.vue')['default']
     Test: typeof import('./src/components/cards/Test.vue')['default']
+    UpdateDialog: typeof import('./src/components/profiledialog/UpdateDialog.vue')['default']
+    ValidateEmail: typeof import('./src/components/profiledialog/ValidateEmail.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

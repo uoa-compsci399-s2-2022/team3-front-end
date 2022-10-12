@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {reactive, ref} from 'vue';
+import {defineExpose, reactive, ref} from 'vue';
 import {get, post, put} from '@/utils/request'
 import {ElNotification, genFileId, UploadInstance, UploadProps, UploadRawFile, UploadUserFile} from "element-plus";
 import { warningNotification, errorNotification, normalNotification, successNotification } from '@/utils/notification';
@@ -136,6 +136,7 @@ const dialogVisible = ref(false);
 const dialogUploadVisible = ref(false);
 import {Upload } from '@element-plus/icons-vue'
 import {UploadFilled} from "@element-plus/icons-vue";
+import UpdateDialog from '@/components/profiledialog/UpdateDialog.vue'
 
 const updateProfile = ref({} as usertype)
 
@@ -363,7 +364,9 @@ async function testUPloadAD() {
 
 }
 
+defineExpose({
 
+})
 // -------------------- update profile -------------------- end
 </script>
 
@@ -508,7 +511,8 @@ async function testUPloadAD() {
   </el-dialog>
 
 
-    <el-dialog v-model="dialogVisible" title="Quick Update"  class="dialog-container" >
+    <el-dialog v-model="dialogVisible" title="Quick Update"  class="dialog-container" width="80%" >
+<!--      <UpdateDialog/>-->
       <el-header>
         <el-button @click="dialog_update_name=true" v-if="dialog_update_name===false">update name</el-button>
         <el-button @click="dialog_update_email=true" v-if="dialog_update_email===false">update email</el-button>
@@ -518,6 +522,7 @@ async function testUPloadAD() {
         <el-button @click="dialog_update_studentDegree=true" v-if="dialog_update_studentDegree===false">update student degree</el-button>
       </el-header>
       <el-form :label-position="left" :model="updateProfile" >
+
 
         <div class="dialog-update-name" v-if="dialog_update_name===true">
           <el-form-item
@@ -617,15 +622,19 @@ async function testUPloadAD() {
       </el-form>
     <el-footer class="dialog-footer"><el-button @click="showinfo">Test</el-button>
       <el-button @click="submitUpdateForm(updateProfile)">submit</el-button></el-footer>
-
     </el-dialog>
-    
+
+
 </template>
 
 <style scoped lang="scss">
 .dialog-container{
   width: 70%;
   height: 70%;
+  .dialog-basic-info{
+    width: 100%;
+    height: 250px;
+  }
 
 }
 

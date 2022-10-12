@@ -23,6 +23,7 @@
     "js-base64": "^3.7.2",
     "pinia": "^2.0.21",
     "vue": "^3.2.37",
+    "vue-confetti-explosion": "^1.0.1",
     "vue-i18n": "^9.2.2",
     "vue-pdf": "^4.3.0",
     "vue-router": "^4.1.3",

@@ -20,7 +20,7 @@ const sidebar = useSidebarStore()
 
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 @media (max-width: 730px) {
   .container-main {
     margin-left: 50px;

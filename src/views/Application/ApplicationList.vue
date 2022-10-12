@@ -6,7 +6,7 @@
       </el-col>
     </el-row>
     <el-button @click="clearFilter">Reset all filters</el-button>
-    <el-table ref="tableRef" row-key="date" :data="tableData" style="width: 99%" @row-click="tableRowClick">
+    <el-table ref="tableRef" row-key="date" :data="tableData" style="width: 99%" @row-click="tableRowClick" v-loading="applicationListLoading">
       <el-table-column
           prop="applicationID"
           label="ApplicationID"
@@ -51,19 +51,19 @@
 
       <el-table-column align="right">
         <template #default="scope">
-          <el-popconfirm title="Are you sure to delete?" @confirm.stop="handleAppDelete(scope.$index, scope.row)"
-                         v-show="scope.row.status === 'Unsubmit'"
-                          width="30">
-            <template #reference>
-              <el-button
-                  size="small"
-                  type="danger"
-                  @click.stop=""
-                  v-show="scope.row.status === 'Unsubmit'"
-              >Delete
-              </el-button>
-            </template>
-          </el-popconfirm>
+          <div v-show="scope.row.status === 'Unsubmit'">
+            <el-popconfirm title="Are you sure to delete?" @confirm.stop="handleAppDelete(scope.$index, scope.row)"
+                           width="30">
+              <template #reference>
+                <el-button
+                    size="small"
+                    type="danger"
+                    @click.stop=""
+                >Delete
+                </el-button>
+              </template>
+            </el-popconfirm>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -104,6 +104,7 @@ const termList = reactive([] as object[])
 
 interface ApplicationList {
   [key: string]: any;
+
   applicationID: number
   term: string
   createdDateTime: string
@@ -149,7 +150,6 @@ const handleAppDelete = (index: number, row: ApplicationList) => {
   })
 }
 
-
 onBeforeMount(() => {
   get('api/currentStudentApplicationList').then((res) => {
     applicationListLoading.value = true
@@ -176,7 +176,7 @@ onBeforeMount(() => {
 
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 
 .list-container {
   margin: 30px 30px;
