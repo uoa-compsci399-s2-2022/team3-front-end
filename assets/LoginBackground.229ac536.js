@@ -1,1 +1,0 @@
-import{_ as s,o as a,c as n,F as t,A as _,B as d,a as o}from"./index.594ced5a.js";const r={},c=e=>(_("data-v-2ded1943"),e=e(),d(),e),i=c(()=>o("div",{class:"bg-container"},null,-1)),l=c(()=>o("div",{class:"bg-container-mobile"},null,-1));function p(e,u){return a(),n(t,null,[i,l],64)}const m=s(r,[["render",p],["__scopeId","data-v-2ded1943"]]);export{m as L};
