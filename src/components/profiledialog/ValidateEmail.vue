@@ -16,7 +16,7 @@ const checkCode = () =>{
 }
 console.log(email.value)
 defineExpose({
-  getEmail(data : String){
+  getEmail(data : string){
     email.value = data
   },
   result(){

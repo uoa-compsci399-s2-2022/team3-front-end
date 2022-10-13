@@ -76,7 +76,7 @@
       <el-button @click="sendCourse" class="hidden-sm-and-down botton-fix-button" type="primary" size="large">Confirm
       </el-button>
 
-      <el-button @click="()=>{let result = sendCourse(); if (result) visible.visible = false}" class="hidden-md-and-up botton-fix-button"
+      <el-button @click="()=>{confirmEvent}" class="hidden-md-and-up botton-fix-button"
                  type="primary"
                  size="large">Confirm
       </el-button>
@@ -100,7 +100,7 @@ const router = useRouter()
 const route = useRoute()
 
 type Props = {
-  visible: object
+  visible: any
   termID: number
 }
 const props = defineProps<Props>()
@@ -125,6 +125,12 @@ const sendCourse = () => {
     return false
   }
 
+}
+
+
+const confirmEvent = () =>{
+  let result = sendCourse();
+  if (result) props.visible.visible = false
 }
 
 interface courseList {

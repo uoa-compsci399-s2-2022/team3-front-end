@@ -3,6 +3,9 @@ import {defineExpose, reactive, ref} from 'vue';
 import {get, post, put} from '@/utils/request'
 import {ElNotification, genFileId, UploadInstance, UploadProps, UploadRawFile, UploadUserFile} from "element-plus";
 import { warningNotification, errorNotification, normalNotification, successNotification } from '@/utils/notification';
+import {Upload } from '@element-plus/icons-vue'
+import {UploadFilled} from "@element-plus/icons-vue";
+import UpdateDialog from '@/components/profiledialog/UpdateDialog.vue'
 
 const id = ref<string>();
 const name = ref<string>();
@@ -134,9 +137,6 @@ getUserProfile()
 
 const dialogVisible = ref(false);
 const dialogUploadVisible = ref(false);
-import {Upload } from '@element-plus/icons-vue'
-import {UploadFilled} from "@element-plus/icons-vue";
-import UpdateDialog from '@/components/profiledialog/UpdateDialog.vue'
 
 const updateProfile = ref({} as usertype)
 
@@ -226,7 +226,7 @@ const submitUpdateForm = (form : usertype) => {
   }
 }
 
-async function check_email(email : string) {
+async function check_email(email? : string) {
   normalNotification('Sending an email to ' + email, 'Please wait for a few seconds')
   const respsone = await post('api/sendValidationEmail', {email: email})
   console.log(respsone)
@@ -235,7 +235,7 @@ async function check_email(email : string) {
 }
 
 
-async function validValidationCode(email: string , code : string){
+async function validValidationCode(email?: string , code? : string){
   const response = await post('/api/validateValidationCode/'+email+'/'+code)
   console.log(response)
   console.log(response['status'])
@@ -521,7 +521,7 @@ defineExpose({
         <el-button @click="dialog_update_enrolDetails=true" v-if="dialog_update_enrolDetails===false">update enrol details </el-button>
         <el-button @click="dialog_update_studentDegree=true" v-if="dialog_update_studentDegree===false">update student degree</el-button>
       </el-header>
-      <el-form :label-position="left" :model="updateProfile" >
+      <el-form label-position="left" :model="updateProfile" >
 
 
         <div class="dialog-update-name" v-if="dialog_update_name===true">

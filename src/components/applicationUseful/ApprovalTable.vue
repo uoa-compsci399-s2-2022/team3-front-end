@@ -168,7 +168,7 @@
     <vxe-column title="Operation" width="160" :fixed="operationFixed" v-if="tagIndexSync!=='3'">
       <template #default="{ row }">
         <div style="text-align: center">
-          <template v-if="$refs.xTable.isEditByRow(row)">
+          <template v-if="xTable.isEditByRow(row)">
             <el-button @click="saveRowEvent(row)" type="success" :icon="Select" circle plain/>
             <el-button @click="cancelRowEvent(row)" type="primary" :icon="SemiSelect" circle plain/>
           </template>
@@ -385,7 +385,7 @@ const reloadApplicationApprovalList = () => {
 // * Layout
 // *********************
 const coursedrawerSize = ref()
-const operationFixed = ref('right')
+const operationFixed = ref('right' as any)
 
 setInterval(() => {
   coursedrawerSize.value = getWidth() > 768 ? '40%' : '100%'
@@ -469,7 +469,7 @@ const singleEnrollForm = reactive<{
 })
 
 interface DomainItem {
-  courseID: number | null
+  courseID: number | undefined
   estimatedHours: number
 }
 
@@ -482,7 +482,7 @@ const removeDomain = (item: DomainItem) => {
 
 const addDomain = () => {
   singleEnrollForm.domains.push({
-    courseID: null,
+    courseID: undefined,
     estimatedHours: 0
   })
   console.log(singleEnrollForm.domains)

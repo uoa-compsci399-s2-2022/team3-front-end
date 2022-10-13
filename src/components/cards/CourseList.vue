@@ -29,9 +29,9 @@ const callCourse = (courseID : String) => {
 }
 
 const data = ref()
-const tableData_course = ref([])
+const tableData_course = ref([] as any)
 
-const test = (courseID : String, type :String) => {
+const test = (courseID : any, type :String) => {
   // callCourse(courseID)
 
   if (type === "1"){
@@ -77,7 +77,7 @@ defineExpose({
 
       <el-table-column fixed="right" width="120px">
         <template #default="scope">
-          <el-button type="primary" size="mini" @click="test(scope.row, '1')">Detail</el-button>
+          <el-button type="primary" @click="test(scope.row, '1')">Detail</el-button>
 
         </template>
       </el-table-column>

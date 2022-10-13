@@ -100,7 +100,7 @@ const statusType = {
   'Unsubmit': 'warning'
 }
 const tableData: ApplicationList[] = reactive([] as ApplicationList[])
-const termList = reactive([] as object[])
+const termList = reactive([] as any[])
 
 interface ApplicationList {
   [key: string]: any;

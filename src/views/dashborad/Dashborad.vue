@@ -39,7 +39,7 @@ const {
 )
 
 
-const courseList = ref([] as Object[])
+const courseList = ref([] as any[])
 
 async function GetCourse(termID: String) {
   get('/api/getCurrentUserEnrollByTerm/' + termID).then(res => {

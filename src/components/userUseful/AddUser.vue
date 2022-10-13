@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import {get, post} from "@/utils/request";
 import {ElMessage} from 'element-plus'
-
+import { reactive, ref } from 'vue'
 
 type Props = {
   visible: any
@@ -49,10 +49,6 @@ const refreshUserTable = () => {
   emit('refreshUserTable')
 }
 
-
-import { reactive, ref } from 'vue'
-import {stringify} from "querystring";
-import router from "@/router";
 const formLabelWidth = '140px'
 
 type User = {

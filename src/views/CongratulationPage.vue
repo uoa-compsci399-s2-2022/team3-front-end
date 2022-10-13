@@ -26,7 +26,7 @@ const showConfetti = ref(true)
 onMounted(()=>{
   setTimeout( async ()=>{
     showConfetti.value = false
-    await router.push({path: route.query.next})
+    await router.push({path: route.query.next as string})
     router.go(0)
   }, 3000)
 

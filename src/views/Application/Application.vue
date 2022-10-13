@@ -6,7 +6,7 @@ import {useThrottleFn} from '@vueuse/core'
 import {} from 'element-plus'
 import {get, post} from '@/utils/request'
 import {useRoute, useRouter} from 'vue-router'
-import * as dayjs from "dayjs";
+import dayjs from 'dayjs'
 import ApplicationPreferCourseList from '@/components/applicationUseful/ApplicationPreferCourseList.vue'
 import 'element-plus/theme-chalk/display.css';
 import type {UploadProps, UploadUserFile, UploadInstance, UploadRawFile} from "element-plus";

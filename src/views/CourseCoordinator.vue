@@ -281,7 +281,7 @@ const courseForm = reactive<courseFormCCType>({
   prerequisite: '',
 })
 
-const courseInformation = ref({})
+const courseInformation = ref({} as any)
 const editCourseLoading = ref(false)
 
 const handleCourseEdit = () => {

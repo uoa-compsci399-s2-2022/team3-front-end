@@ -55,12 +55,17 @@ import {useRouter} from 'vue-router';
 const router = useRouter()
 
 type Props = {
-  visible: object
+  visible: any
 }
 defineProps<Props>()
 
 const termValue = ref()
-const termList = reactive([] as object[])
+type LableValueType = {
+  label: string
+  value: number
+}
+
+const termList = reactive([] as LableValueType[])
 const typeValue = ref()
 const typeList = ref([{value:'tutor', label:'Tutor'}, {value: 'marker', label: 'Marker'}])
 onBeforeMount(() => {

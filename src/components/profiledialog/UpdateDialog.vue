@@ -13,7 +13,7 @@ import {
 import ValidateEmail from '@/components/profiledialog/ValidateEmail.vue'
 type usertype = {
   id: string;
-  name : string
+  name? : string
   upi: string;
   auid: number;
   email: string;

@@ -1,11 +1,11 @@
-import { createRouter, createWebHistory } from "vue-router";
+import {createRouter, createWebHistory, RouteRecordRaw} from "vue-router";
 import Home from '@/views/Home.vue'
 import { usePermissionStore } from "@/store";
 import { createVNode, render } from "vue";
 import LoadingBar from "@/components/LoadingBar.vue";
 import { get } from "@/utils/request";
 
-const routes = [
+const routes:RouteRecordRaw[] = [
     {
         path: "/",
         name: 'Home',
@@ -115,7 +115,7 @@ const routes = [
 
 const router = createRouter({
     history: createWebHistory(),
-    routes,
+    routes: routes
 });
 
 const Vnode = createVNode(LoadingBar)
