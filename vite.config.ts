@@ -57,6 +57,4 @@ export default defineConfig({
       },
     },
   },
-
-  base: '/team3-front-end/',
 })

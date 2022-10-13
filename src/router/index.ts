@@ -114,7 +114,7 @@ const routes:RouteRecordRaw[] = [
 
 
 const router = createRouter({
-    history: createWebHistory('/team3-front-end/'),
+    history: createWebHistory(),
     routes: routes
 });
 
