@@ -9,16 +9,14 @@
     </el-row>
 
     <el-row :gutter="22" class="table-wrapper">
-      <el-col :span="12" class="leftBox">
+      <el-col :span="8" class="leftBox">
         <el-row justify="center">
           <span class="tableTitle">Course List</span>
         </el-row>
-
         <el-table v-loading="isLoadingCourse" ref="singleTableRef" :data="stateCourse" highlight-current-row
-          style="width: 100%" @current-change="handleCurrentChange">
-          <el-table-column property="courseNum" label="Course Num" width="120" />
-          <el-table-column property="courseName" label="Course Name" width="250" />
-          <el-table-column property="canPreAssign" label="Can Pre Assign" />
+          style="width: 100%; height: calc(100vh - 255px)" @current-change="handleCurrentChange" :show-header="false">
+          <el-table-column property="courseNum" label="Course Num" width="140" />
+          <el-table-column property="courseName" label="Course Name" width="300" />
           <template #empty>
             <el-empty description="No Data" />
           </template>
@@ -26,7 +24,7 @@
 
       </el-col>
 
-      <el-col :span="12">
+      <el-col :span="16" style="margin-bottom: 20px">
         <el-row justify="center">
           <span class="tableTitle">Student List</span>
         </el-row>
@@ -56,8 +54,8 @@
             <el-empty description="No Data" />
           </template>
         </el-table>
-        <el-row justify="center" v-if="isReadyUser" style="margin-top: 10px">
-          <el-button @click="showUser" type="primary" :icon="Plus" style="margin-left: 16px ;">Appoint position
+        <el-row justify="center" v-if="isReadyUser" class="add-button-wrapper">
+          <el-button @click="showUser" type="primary" :icon="Plus" style="margin-left: 16px;">Appoint position
           </el-button>
         </el-row>
       </el-col>
@@ -65,7 +63,7 @@
 
   </div>
 
-  <AddUserDrawer :visible="UserVisible" direction="ltr" :currentCourse="currentCourse!" v-if="UserVisible.visible"
+  <AddUserDrawer :visible="UserVisible" direction="ltr" :currentCourse="currentCourse" v-if="UserVisible.visible"
     @refresh="freshtable" :user-role-arr="userRoleArr" />
 
   <!-- <el-dialog
@@ -86,12 +84,13 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch } from "vue";
+import {onBeforeMount, reactive, ref, watch} from "vue";
 import { useAsyncState } from '@vueuse/core'
 import { get } from "@/utils/request";
 import { ElTable } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import AddUserDrawer from '@/components/ManageUseful/AddUserDrawer.vue'
+import {usePermissionStore} from "@/store";
 
 interface User {
   id: string
@@ -99,7 +98,7 @@ interface User {
   name: string
   roleInCourse: string
 }
-const currentTerm = ref<Term>();
+const currentTerm = ref();
 const currentCourse = ref<Course>();
 const deleteConfirmVisible = ref(false)
 const wantToDeleteUser = ref({} as User)
@@ -171,6 +170,7 @@ const { isLoading: isLoadingUser, state: stateUser, isReady: isReadyUser, execut
 const handleTermChange = () => {
   if (currentTerm.value) {
     executeCourse(0, { termID: currentTerm.value })
+    localStorage.setItem('selectedTerm', currentTerm.value)
   }
 
 }
@@ -237,15 +237,33 @@ watch(stateUser, _ => {
 })
 
 
+onBeforeMount(() => {
+  executeTerm().then(
+      () => {
+        stateTerm.value.sort((a: Term, b: Term) => {
+          return b.termID! - a.termID!
+        })
+        const localTerm = localStorage.getItem('selectedTerm')
+        if (localTerm && stateTerm.value.filter((t: { termID: number; }) => t.termID === parseInt(localTerm!)).length > 0) {
+          currentTerm.value = stateTerm.value.filter((t: { termID: number; }) => t.termID === parseInt(localTerm!))[0].termID
+        } else {
+          currentTerm.value = stateTerm.value[0].termID
+        }
+        executeCourse(0,{ termID: currentTerm.value })
+      }
+  )
+})
+
+
 </script>
 
 <style scoped lang="scss">
 .page-container {
-  margin: 30px 30px;
+  margin: 30px 30px 0;
 }
 
 .leftBox {
-  border-right: 5px solid #c6c6c9;
+  border-right: 5px solid #f3f3f3;
 }
 
 
@@ -256,6 +274,8 @@ watch(stateUser, _ => {
 .tableTitle {
   font-weight: bold;
   font-size: larger;
+  color: #75787e;
+  margin-bottom: 10px;
 }
 
 .header-container {
@@ -266,7 +286,13 @@ watch(stateUser, _ => {
     margin-left: 20px;
     width: 260px;
   }
+}
 
-
+.add-button-wrapper{
+  margin-bottom: 20px;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  z-index: 1;
 }
 </style>

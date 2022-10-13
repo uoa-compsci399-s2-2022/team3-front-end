@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory, RouteRecordRaw} from "vue-router";
+import {createRouter, createWebHashHistory, RouteRecordRaw} from "vue-router";
 import Home from '@/views/Home.vue'
 import { usePermissionStore } from "@/store";
 import { createVNode, render } from "vue";
@@ -114,7 +114,7 @@ const routes:RouteRecordRaw[] = [
 
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes: routes
 });
 

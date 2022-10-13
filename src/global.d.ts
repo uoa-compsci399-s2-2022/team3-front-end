@@ -14,23 +14,23 @@ interface Course {
     courseNum: string;
     termName: string;
     termID: number;
-    courseName: string;
-    totalAvailableHours: number;
-    currentAvailableHours: number;
-    estimatedNumOfStudents: number;
-    currentlyNumOfStudents: number;
-    needTutors: boolean;
-    needMarkers: boolean;
-    numOfAssignments: number;
-    numOfLabsPerWeek: number;
-    numOfTutorialsPerWeek: number;
-    tutorResponsibility: string;
-    markerResponsibility: string;
-    canPreAssign: boolean;
-    markerDeadLine: string;
-    tutorDeadLine: string;
-    prerequisite: string;
-
+    courseName?: string;
+    totalAvailableHours?: number;
+    currentAvailableHours?: number;
+    estimatedNumOfStudents?: number;
+    currentlyNumOfStudents?: number;
+    needTutors?: boolean;
+    needMarkers?: boolean;
+    numOfAssignments?: number;
+    numOfLabsPerWeek?: number;
+    numOfTutorialsPerWeek?: number;
+    tutorResponsibility?: string;
+    markerResponsibility?: string;
+    canPreAssign?: boolean;
+    markerDeadLine?: string;
+    tutorDeadLine?: string;
+    prerequisite?: string;
+    courseCoordinators?: Array<any>;
 }
 
 
@@ -78,4 +78,5 @@ type applicationApprovalList = {
     PreferCourse: Array<any>;
     userID: string;
     PreferCourseGPA: number;
+    EnrolledCourse: Array<any>;
 }

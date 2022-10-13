@@ -2,7 +2,7 @@
   <el-dialog v-model="visibleSync" title="Import Course Template">
     <el-alert :closable="false" type="success" :title="'Import a course template into the semester: '+termName" class="termAlert" effect="dark"/>
     <el-upload
-        :action="'/api/api/uploadCourse/' + term"
+        :action="baseURL + '/api/uploadCourse/' + term"
         class="upload-demo"
         accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
         :headers="header"
@@ -48,6 +48,7 @@ import {
   genFileId,
   ElNotification
 } from "element-plus";
+import {baseURL} from '@/utils/request';
 const props = defineProps(['importVisible', 'term', 'termName'])
 const emit = defineEmits(['update:importVisible', 'update:term', 'update:termName'])
 const file = ref<UploadUserFile[]>([])

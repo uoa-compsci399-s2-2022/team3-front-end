@@ -7,7 +7,6 @@
   const semester = ref('')
 
   const showCourses = (termID : String) => {
-
     get('/api/getCourseByTerm/' + termID).then(async res => {
       tableData.value = []   // clear the table
       for (let i = 0; i < res.length; i++) {
@@ -17,9 +16,7 @@
           // alert(res1.courseCoordinator)
         })
       }
-
     })
-
   }
 
    async function showCoursesBy_courseID(termID : string) {

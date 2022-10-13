@@ -2,7 +2,7 @@
   <div class="page-container">
     <el-row style="align-items: center;">
       <el-col :md="12">
-        <el-select v-model="selectedTerm" class="m-2" placeholder="Term" style="margin-right: 10px"
+        <el-select v-model="selectedTerm" class="m-2" placeholder="Term" style="margin-right: 10px; margin-bottom: 5px"
                    v-loading="isLoadingTerm">
           <el-option
               v-for="item in stateTerm"
@@ -321,8 +321,9 @@ onBeforeMount(() => {
         stateTerm.value.sort((a: Term, b: Term) => {
           return b.termID! - a.termID!
         })
-        if (localStorage.getItem('selectedTerm')) {
-          selectedTerm.value = stateTerm.value.filter((t: { termID: number; }) => t.termID === parseInt(localStorage.getItem('selectedTerm')!))[0].termID
+        const localTerm = localStorage.getItem('selectedTerm')
+        if (localTerm && stateTerm.value.filter((t: { termID: number; }) => t.termID === parseInt(localTerm!)).length > 0) {
+          selectedTerm.value = stateTerm.value.filter((t: { termID: number; }) => t.termID === parseInt(localTerm!))[0].termID
         } else {
           selectedTerm.value = stateTerm.value[0].termID
         }

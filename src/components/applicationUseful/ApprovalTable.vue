@@ -65,6 +65,23 @@
             </el-descriptions-item>
           </el-descriptions>
           <br/>
+          <div v-if="['1', '3'].includes(tagIndexSync)">
+            <p class="emphasis">Enrolled Courses (Not Publish)</p>
+            <vxe-table
+                border
+                :row-config="{isHover: true}"
+                :data="row.EnrolledCourse">
+              <vxe-column field="courseNum" title="Course Num" width="110"></vxe-column>
+              <vxe-column field="courseName" title="Course Name" width="300"></vxe-column>
+              <vxe-column field="estimatedHours" title="The estimated work hours assigned to the student"></vxe-column>
+              <vxe-column field="totalAvailableHours" title="Total Available Hours" width="110"></vxe-column>
+              <vxe-column field="currentAvailableHours" title="Current Available Hours" width="110"></vxe-column>
+              <template #empty>
+                No Enroll's course
+              </template>
+            </vxe-table>
+          </div>
+          <br/>
           <p class="emphasis">Preference Course</p>
           <vxe-table
               border
@@ -87,6 +104,17 @@
       </template>
     </vxe-column>
     <vxe-column field="applicationID" title="AppID" width="65">
+    </vxe-column>
+    <vxe-column field="status" title="Result" width="85"
+                :filters="[{label: 'Accepted', value: 'Accepted'}, {label: 'Rejected', value: 'Rejected'}]"
+                :filter-multiple=false v-if="tagIndexSync==='3'">
+      <template #default="{ row, rowIndex }">
+        <el-tag
+            :type="row.status === 'Accepted' ? 'success' : 'danger'"
+        >
+          {{ row.status }}
+        </el-tag>
+      </template>
     </vxe-column>
     <vxe-column field="upi" title="UPI" :edit-render="{}" width="75">
       <template #edit="{ row }">
@@ -179,11 +207,12 @@
             <el-tooltip content="Accept" placement="bottom" :show-after="400" v-if="tagIndexSync!=='1'">
               <el-button type="success" :icon="Check" @click="acceptEvent(row)" circle/>
             </el-tooltip>
-            <el-popconfirm title="Are you sure to reject the application?" @confirm="rejectToServer(row)" width="50" v-if="tagIndexSync!=='2'">
+            <el-popconfirm title="Are you sure to reject the application?" @confirm="rejectToServer(row)" width="50"
+                           v-if="tagIndexSync!=='2'">
               <template #reference>
-<!--                <el-tooltip content="Reject" placement="bottom" :show-after="400" v-if="tagIndexSync!=='2'">-->
-                  <el-button type="danger" :icon="Close" circle/>
-<!--                </el-tooltip>-->
+                <!--                <el-tooltip content="Reject" placement="bottom" :show-after="400" v-if="tagIndexSync!=='2'">-->
+                <el-button type="danger" :icon="Close" circle/>
+                <!--                </el-tooltip>-->
               </template>
             </el-popconfirm>
 
@@ -402,9 +431,6 @@ const responsiveLayout = () => {
 }
 
 
-
-
-
 // *********************
 // * Prefer Course Drawer
 // *********************
@@ -449,7 +475,7 @@ const setClosedCourseAvailableHoursAlert = () => {
 
 const acceptEvent = (row: any) => {
   singleEnrollForm.domains = []
-  if (row.PreferCourse !== null && row.PreferCourse !== undefined){
+  if (row.PreferCourse !== null && row.PreferCourse !== undefined) {
     row.PreferCourse.forEach((item: any) => {
       singleEnrollForm.domains.push({
         courseID: item.courseID,
@@ -490,21 +516,21 @@ const addDomain = () => {
 
 const acceptToServer = () => {
   acceptToServerLoading.value = true
-  put(`api/applicationApproval/${currentApplicationID.value}/Accepted`, {data:singleEnrollForm.domains})
-    .then((res) => {
+  put(`api/applicationApproval/${currentApplicationID.value}/Accepted`, {data: singleEnrollForm.domains})
+      .then((res) => {
         reloadApplicationApprovalList()
         ElMessage.success('Accept successfully!')
         acceptToServerLoading.value = false
         enrollDialogVisible.value = false
-    })
-    .catch((err) => {
-      console.log(err)
-      ElMessage({
-        message: err.response.data.message,
-        type: 'error'
       })
-      acceptToServerLoading.value = false
-    })
+      .catch((err) => {
+        console.log(err)
+        ElMessage({
+          message: err.response.data.message,
+          type: 'error'
+        })
+        acceptToServerLoading.value = false
+      })
 }
 
 // *********************
@@ -528,8 +554,6 @@ const rejectToServer = (row: any) => {
         rejectToServerLoading.value = false
       })
 }
-
-
 
 
 // *********************
@@ -645,7 +669,7 @@ onBeforeMount(() => {
 
 .expand-wrapper {
   padding: 20px;
-  width: 70%;
+  width: 60%;
 }
 
 .emphasis {

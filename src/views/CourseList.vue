@@ -1,129 +1,109 @@
 <script setup lang="ts">
-import CourseCard from '@/components/cards/CourseCard.vue'
-import CourseCard_2 from '@/components/cards/CourseCard_2.vue'
-import {ref} from 'vue'
-import CourseList from '@/components/cards/CourseList.vue'
+import CourseList from '@/components/CourseList.vue'
+import {onBeforeMount, ref, watch} from 'vue'
 import {get} from "@/utils/request";
-const value = ref('1')
-const value_semester = ref('')
-const options =[
-  {
-    value : '1',
-    label : 'Course Card'
-  },
-  {
-    value: '2',
-    label: 'Course List'
-  },
-]
+import {useAsyncState} from "@vueuse/core";
+import {usePermissionStore} from "@/store";
+import {Search} from "@element-plus/icons-vue";
 
-const options_semester = ref([
-])
-get('/api/availableTerm').then(res => {
-  // var data = new Array()
-  for (let i = 0; i < res.length; i++) {
+const currentTerm = ref()
+const currentPosition = ref('All')
+const searchCourse = ref('')
+const position = ref(['All', 'Tutor', 'Marker'])
+const {isLoading: isLoadingTerm, state: stateTerm, isReady: isReadyTerm, execute: executeTerm} = useAsyncState(
+    (args) => {
+      return get('api/availableTerm')
+    },
+    {},
+    {
+      resetOnExecute: false,
+      immediate: false,
+    },
+)
 
-    let termName = res[i].termName.toString();
-    let termID = res[i].termID;
-    let startDate = res[i].startDate;
-    let endDate = res[i].endDate;
-    let Date = startDate + " to " + endDate;
-
-
-
-    options_semester.value.push({
-      value_semester : termID.toString(),
-      label_semester: termName.toString(),
-
-    })
-  }
-
+onBeforeMount(() => {
+  executeTerm().then(
+      () => {
+        stateTerm.value.sort((a: Term, b: Term) => {
+          return b.termID! - a.termID!
+        })
+        const localTerm = localStorage.getItem('selectedTerm')
+        if (localTerm && stateTerm.value.filter((t: { termID: number; }) => t.termID === parseInt(localTerm!)).length > 0) {
+          currentTerm.value = stateTerm.value.filter((t: { termID: number; }) => t.termID === parseInt(localTerm!))[0].termID
+        } else {
+          currentTerm.value = stateTerm.value[0].termID
+        }
+      }
+  )
 })
 
+const courseList = ref()
 
-
-const callCourseCardRef = ref()
-const callCourseListRef = ref()
-
-const callCourse = (termID : String, type: String) => {
-  // type === 1 CourseCard function
-  // type === 2 CourseList function
-  if (type === '1') {
-    callCourseCardRef.value.showCourses(termID)
-  } else {
-    callCourseListRef.value.showCourses(termID)
-  }
-
-}
-const resetSemesterStatus= () => {
-  value_semester.value = ''
-}
 </script>
 
 <template>
-
-
-
-  <div class="show-style">
-    <el-select  placeholder="Select" v-model="value">
-      <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-          @click="resetSemesterStatus"
-      />
-    </el-select>
-  </div>
-
-  <div class="course-semester" v-if="value != ''">
-    <el-divider content-position="center">Select a semester</el-divider>
-    <div class="course-list-semester">
-      <el-select  placeholder="Select a semester" v-model="value_semester" >
-
-        <el-option
-            v-for="item in options_semester"
-            :key="item.value_semester"
-            :label="item.label_semester"
-            :value="item.value_semester"
-            @click="callCourse(value_semester, value)"/>
+  <div class="page-container">
+    <el-row  class="header-container">
+      <el-select v-model="currentTerm" placeholder="Select Term" size="large"
+                 v-loading="isLoadingTerm" style="margin-right: 15px;" >
+        <el-option v-for="item in stateTerm" :key="item.termName" :label="item.termName" :value="item.termID" />
       </el-select>
-    </div>
+      <el-select v-model="currentPosition" placeholder="Available Position" size="large" style="margin-right: 30px;"
+                 v-loading="isLoadingTerm">
+        <el-option v-for="p in position" :key="p" :label="p" :value="p" />
+      </el-select>
+      <el-input
+          v-model="searchCourse"
+          placeholder="Search Courses by Course Num"
+          :prefix-icon="Search"
+          class="input"
+          maxlength="20"
+      />
+    </el-row>
+
+    <CourseList ref="courseList" v-model:termID="currentTerm" v-model:position="currentPosition" v-model:searchCourse="searchCourse"/>
+
+
+<!--    <div class="course-container" v-if="value === '1'">-->
+<!--      <course-card_2 ref="callCourseCardRef"/>-->
+<!--    </div>-->
+
+
+<!--    <div class="course-list" v-else-if="value === '2'">-->
+<!--      <course-list ref="callCourseListRef"/>-->
+<!--    </div>-->
+
   </div>
-  <div class="course-container"  v-if="value === '1'">
-    <course-card_2 ref="callCourseCardRef"/>
-  </div>
-
-
-  <div class="course-list" v-else-if="value === '2'">
-    <course-list ref="callCourseListRef"/>
-  </div>
-
-
 </template>
 
 <style lang="scss" scoped>
-//.course-container {
-//    margin: 20px 30px;
-//    display: grid;
-//    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-//    // grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-//    grid-auto-rows: inherit;
-//    gap: 20px;
-//}
-.show-style{
+.show-style {
   padding-top: 25px;
   /* padding-right: 20px; */
   padding-left: 30px;
   padding-bottom: 10px;
 }
 
-.course-list{
+.course-list {
   padding-left: 30px;
   padding-top: 15px;
 }
-.course-list-semester{
+
+.course-list-semester {
   text-align: center;
   padding: 10px;
+}
+
+.page-container {
+  margin: 30px 30px 0;
+}
+
+.header-container{
+  display: flex;
+  align-items: center;
+  row-gap: 10px;
+}
+.input{
+  max-width: 400px;
 }
 </style>

@@ -12,7 +12,6 @@ const options = ref([
 
 
 const showCourses = (termID : String) => {
-
   get('/api/getCourseByTerm/' + termID).then(res => {
     tableData.value = res;
   })

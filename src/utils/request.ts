@@ -2,12 +2,12 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { request } from 'http';
 import { config } from 'process'
 
-
+export const baseURL = 'http://127.0.0.1:5000'
 
 // create axios instance
 const instance = axios.create({
-    baseURL: '/api',
-    timeout: 10000,
+    baseURL: baseURL,
+    timeout: 200000,
     //withCredentials: true
 })
 
@@ -42,7 +42,7 @@ instance.interceptors.response.use((responce: AxiosResponse) => {
 
 export function get(url: string, params?: any, timeout?:number): Promise<any> {
     if (timeout === undefined){
-        timeout = 10000;
+        timeout = 200000;
     }
     const config: AxiosRequestConfig = {
         method: 'get',
