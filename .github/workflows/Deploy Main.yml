@@ -40,7 +40,33 @@ jobs:
         # your sftp server port, default to 22
         port: 22
         # you can copy private_key from your *.pem file, keep format
-        ssh_private_key: MIIEogIBAAKCAQEAlcci+KtZ4MqYlnlkofwqe3D+uu3zUrqX2UKFtaUTlQh1SYdMxl6C1lfybm1oZUg/hmlHYI6Hg0LG0iKq/SsjlA7us8iWHpv/wKyQgAKvgG+tkwXQecwqcBQWfL2gAGyTQT7EhrPsSTN4UhMR0OtgIetEh+BXffDybIdnMOX6l7VzLe3ol1azY3q/cqo+EeP52BlaulWqt0ws2MXSe/hGbG8VmYqkcamnKvwPMQXoinCp56r3G4QoGlQNxO4EKhX8pFgZpsCSrUOThfsOfLVAT8MXOOhiZx491kN2vT/xxmUtz/l6hXzewkYYSq5CcUIpbUcJIIQG8cPcUIsfeYGRQwIDAQABAoIBAFEGv9aC7EZ9k3qkBVrUTi8le8iofZ/drdQs9qTDvwo63yh993zBGErYnSA8M+PG6AbQ4XpM4OaTs3dupc38Dm1EfsHn276Hah5TvIBj84mp4N7OoG+jkbm8REYLV4mjMy5yxGKS51raa1cLVfINw53V5ucS6IILXTp1Lc/4Ok7jVT1wuy0IT7JviTQL2djZennLYiMeIfedBQFgepNR+DMyAB8LH12IACwyhPArsxxruVgw6aPBrKnmT8kPiPBkj2u4PcNom91oaI1D+9OI3q1cqSKkODUfdS/AKP8mHQxlK67n1WC0sklQ4f8qOWkflBFG5jU9PJ+o9iFuPG87bwECgYEA6jKuuGfLOJlBQ4vbBbu27Ms737kh9KpZHzN/vzztwS3aPt5SiqSDu4POcI4LBkEIlT1MqwT3L0zLGQz0RTbW/5gtFhQzMbEcNr3PH7xSxsKjUwXLvb2hGS7Eq3eLX+/3qdX7n2Ro6sCCcSRAqy0LRcTvfr3kHHiG2rZz1rJxpEECgYEAo7iWE6bKOLrzhMzon3xDLgoQh+H2sGQ19IPU3t6KbhnmMPeWygI9HYRpwl+t37rSdOcQJHTbYoQQuGqiFmgqf2gae4JylMVrYYkS7Uvh0PKxtMCnvDS/irOsidvBn4Y0gDxWlLlnWB0QcSdok1uLWPjb/9lv09okXvnn7rJphIMCgYBn4smMNUZ5Ocowe0ZRmb3/9fr+N7IvRK054O9G1nEkowFPp/D3XRiuQj59wRR01r5G7SUoK5C2Y5sn5o4ocbYXNNqzE4zN+yFnyvSowDH7xvUJ6+U/qnFeqVdGNEYX7Wtv4+K1BqZfk7uJEqq5A8cfUMdn8jXQx0oSlKJ31zn/wQKBgCz9NzhVN/KY5PwUNsREqE1JdLtyS5CzKOR1KZTIwG967Hd+QdBnBxZKYamJE0WMl/KJ4DS0a+jJc7LJkprnqu3x1H0mHohlK5nUyf+tP3NkjZKm8jDUqeHad8o2OiG1Bk5Kxlv+Crj6257Mfn8nw8YCNKo8vO8RXbc/ow1Dt50zAoGAVv2lhc+bjXaEgitG+9KvOGmWZzoW1vycwJHKjFmpTI4I/uf2JFEtP6EGyzeEWt9KJ6vwehr0HO1ktTdohp7YBfG0KMpICpJ0R8AHnGoHCECxUQ9rGST0O2g00biRjgsSJ3PzlcdblWiGZBBykFY8pJdbvqOBomd4mmnxrQpTK18=
+        ssh_private_key: -----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEAlcci+KtZ4MqYlnlkofwqe3D+uu3zUrqX2UKFtaUTlQh1SYdM
+xl6C1lfybm1oZUg/hmlHYI6Hg0LG0iKq/SsjlA7us8iWHpv/wKyQgAKvgG+tkwXQ
+ecwqcBQWfL2gAGyTQT7EhrPsSTN4UhMR0OtgIetEh+BXffDybIdnMOX6l7VzLe3o
+l1azY3q/cqo+EeP52BlaulWqt0ws2MXSe/hGbG8VmYqkcamnKvwPMQXoinCp56r3
+G4QoGlQNxO4EKhX8pFgZpsCSrUOThfsOfLVAT8MXOOhiZx491kN2vT/xxmUtz/l6
+hXzewkYYSq5CcUIpbUcJIIQG8cPcUIsfeYGRQwIDAQABAoIBAFEGv9aC7EZ9k3qk
+BVrUTi8le8iofZ/drdQs9qTDvwo63yh993zBGErYnSA8M+PG6AbQ4XpM4OaTs3du
+pc38Dm1EfsHn276Hah5TvIBj84mp4N7OoG+jkbm8REYLV4mjMy5yxGKS51raa1cL
+VfINw53V5ucS6IILXTp1Lc/4Ok7jVT1wuy0IT7JviTQL2djZennLYiMeIfedBQFg
+epNR+DMyAB8LH12IACwyhPArsxxruVgw6aPBrKnmT8kPiPBkj2u4PcNom91oaI1D
++9OI3q1cqSKkODUfdS/AKP8mHQxlK67n1WC0sklQ4f8qOWkflBFG5jU9PJ+o9iFu
+PG87bwECgYEA6jKuuGfLOJlBQ4vbBbu27Ms737kh9KpZHzN/vzztwS3aPt5SiqSD
+u4POcI4LBkEIlT1MqwT3L0zLGQz0RTbW/5gtFhQzMbEcNr3PH7xSxsKjUwXLvb2h
+GS7Eq3eLX+/3qdX7n2Ro6sCCcSRAqy0LRcTvfr3kHHiG2rZz1rJxpEECgYEAo7iW
+E6bKOLrzhMzon3xDLgoQh+H2sGQ19IPU3t6KbhnmMPeWygI9HYRpwl+t37rSdOcQ
+JHTbYoQQuGqiFmgqf2gae4JylMVrYYkS7Uvh0PKxtMCnvDS/irOsidvBn4Y0gDxW
+lLlnWB0QcSdok1uLWPjb/9lv09okXvnn7rJphIMCgYBn4smMNUZ5Ocowe0ZRmb3/
+9fr+N7IvRK054O9G1nEkowFPp/D3XRiuQj59wRR01r5G7SUoK5C2Y5sn5o4ocbYX
+NNqzE4zN+yFnyvSowDH7xvUJ6+U/qnFeqVdGNEYX7Wtv4+K1BqZfk7uJEqq5A8cf
+UMdn8jXQx0oSlKJ31zn/wQKBgCz9NzhVN/KY5PwUNsREqE1JdLtyS5CzKOR1KZTI
+wG967Hd+QdBnBxZKYamJE0WMl/KJ4DS0a+jJc7LJkprnqu3x1H0mHohlK5nUyf+t
+P3NkjZKm8jDUqeHad8o2OiG1Bk5Kxlv+Crj6257Mfn8nw8YCNKo8vO8RXbc/ow1D
+t50zAoGAVv2lhc+bjXaEgitG+9KvOGmWZzoW1vycwJHKjFmpTI4I/uf2JFEtP6EG
+yzeEWt9KJ6vwehr0HO1ktTdohp7YBfG0KMpICpJ0R8AHnGoHCECxUQ9rGST0O2g0
+0biRjgsSJ3PzlcdblWiGZBBykFY8pJdbvqOBomd4mmnxrQpTK18=
+-----END RSA PRIVATE KEY-----
         # will put all file under this path
         local_path: ./dist
         # files will copy to under remote_path
@@ -52,4 +78,4 @@ jobs:
         # This operation will delete all files in the remote path before upload. Please be careful set this to true
         delete_remote_files: # optional
         # SSH passsword，If a password is set, the secret key pair is ignored
-        password: # optional
+        password: mtms987654321
