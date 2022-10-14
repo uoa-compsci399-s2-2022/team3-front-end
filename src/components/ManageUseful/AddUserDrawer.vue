@@ -78,7 +78,7 @@ type roleInfo = {
 
 
 const props = defineProps<Props>()
-// const emit = defineEmits(['refresh'])
+const emit = defineEmits(['refresh'])
 
 const tableLoading = ref(true)
 
@@ -188,6 +188,7 @@ const appointPosition = async (role: string[], user: User, index: number) => {
           message: `${user.name}'s positions has been updated.'`,
           type: 'success'
         })
+        emit('refresh')
       }).catch(err => {
         ElMessage({
           message: err.response.data['message'],
@@ -212,6 +213,7 @@ const appointPosition = async (role: string[], user: User, index: number) => {
         message: `${user.name}'s positions has been updated.'`,
         type: 'success'
       })
+      emit('refresh')
     }).catch(err => {
       ElMessage({
         message: err.response.data['message'],
