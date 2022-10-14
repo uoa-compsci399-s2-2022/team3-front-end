@@ -28,36 +28,28 @@ jobs:
         cache: 'npm'
     - run: npm install
     - run: npm run build --if-present
-    - name: FTP Deploy
+    - name: SFTP Deploy
       # You may pin to the exact commit or the version.
-      # uses: SamKirkland/FTP-Deploy-Action@1b21034a8decff23858a1721ca2c25b949b4bc78
-      uses: SamKirkland/FTP-Deploy-Action@4.3.2
+      # uses: wlixcc/SFTP-Deploy-Action@da88a4dbe95286266bbac3c0b2b8284048d20c8f
+      uses: wlixcc/SFTP-Deploy-Action@v1.2.4
       with:
-        # ftp server
-        server: 3.27.10.240
-        # ftp username
+        # username
         username: mtms
-        # ftp password
-        password: mtms987654321
-        # Server port to connect to (read your web hosts docs)
-        port: # optional
-        # protocol to deploy with - ftp, ftps, or ftps-legacy
-        protocol: # optional
-        # Folder to upload from, must end with trailing slash /
-        local-dir: # optional
-        # Path to upload to on the server. Must end with trailing slash /
-        server-dir: # optional
-        # Path and name of the state file - this file is used to track which files have been deployed
-        state-name: # optional
-        # Prints which modifications will be made with current config options, but doesnt actually make any changes
-        dry-run: # optional
-        # Deletes ALL contents of server-dir, even items in excluded with exclude argument
-        dangerous-clean-slate: # optional
-        # An array of glob patterns, these files will not be included in the publish/delete process
-        exclude: # optional
-        # How verbose should the information be - minimal, standard, or verbose
-        log-level: # optional
-        # strict or loose
-        security: # optional
-        # Timeout in milliseconds for FTP operations
-        timeout: # optional
+        # your sftp server
+        server: 3.27.10.240
+        # your sftp server port, default to 22
+        port: 22
+        # you can copy private_key from your *.pem file, keep format
+        ssh_private_key: MIIEogIBAAKCAQEAlcci+KtZ4MqYlnlkofwqe3D+uu3zUrqX2UKFtaUTlQh1SYdMxl6C1lfybm1oZUg/hmlHYI6Hg0LG0iKq/SsjlA7us8iWHpv/wKyQgAKvgG+tkwXQecwqcBQWfL2gAGyTQT7EhrPsSTN4UhMR0OtgIetEh+BXffDybIdnMOX6l7VzLe3ol1azY3q/cqo+EeP52BlaulWqt0ws2MXSe/hGbG8VmYqkcamnKvwPMQXoinCp56r3G4QoGlQNxO4EKhX8pFgZpsCSrUOThfsOfLVAT8MXOOhiZx491kN2vT/xxmUtz/l6hXzewkYYSq5CcUIpbUcJIIQG8cPcUIsfeYGRQwIDAQABAoIBAFEGv9aC7EZ9k3qkBVrUTi8le8iofZ/drdQs9qTDvwo63yh993zBGErYnSA8M+PG6AbQ4XpM4OaTs3dupc38Dm1EfsHn276Hah5TvIBj84mp4N7OoG+jkbm8REYLV4mjMy5yxGKS51raa1cLVfINw53V5ucS6IILXTp1Lc/4Ok7jVT1wuy0IT7JviTQL2djZennLYiMeIfedBQFgepNR+DMyAB8LH12IACwyhPArsxxruVgw6aPBrKnmT8kPiPBkj2u4PcNom91oaI1D+9OI3q1cqSKkODUfdS/AKP8mHQxlK67n1WC0sklQ4f8qOWkflBFG5jU9PJ+o9iFuPG87bwECgYEA6jKuuGfLOJlBQ4vbBbu27Ms737kh9KpZHzN/vzztwS3aPt5SiqSDu4POcI4LBkEIlT1MqwT3L0zLGQz0RTbW/5gtFhQzMbEcNr3PH7xSxsKjUwXLvb2hGS7Eq3eLX+/3qdX7n2Ro6sCCcSRAqy0LRcTvfr3kHHiG2rZz1rJxpEECgYEAo7iWE6bKOLrzhMzon3xDLgoQh+H2sGQ19IPU3t6KbhnmMPeWygI9HYRpwl+t37rSdOcQJHTbYoQQuGqiFmgqf2gae4JylMVrYYkS7Uvh0PKxtMCnvDS/irOsidvBn4Y0gDxWlLlnWB0QcSdok1uLWPjb/9lv09okXvnn7rJphIMCgYBn4smMNUZ5Ocowe0ZRmb3/9fr+N7IvRK054O9G1nEkowFPp/D3XRiuQj59wRR01r5G7SUoK5C2Y5sn5o4ocbYXNNqzE4zN+yFnyvSowDH7xvUJ6+U/qnFeqVdGNEYX7Wtv4+K1BqZfk7uJEqq5A8cfUMdn8jXQx0oSlKJ31zn/wQKBgCz9NzhVN/KY5PwUNsREqE1JdLtyS5CzKOR1KZTIwG967Hd+QdBnBxZKYamJE0WMl/KJ4DS0a+jJc7LJkprnqu3x1H0mHohlK5nUyf+tP3NkjZKm8jDUqeHad8o2OiG1Bk5Kxlv+Crj6257Mfn8nw8YCNKo8vO8RXbc/ow1Dt50zAoGAVv2lhc+bjXaEgitG+9KvOGmWZzoW1vycwJHKjFmpTI4I/uf2JFEtP6EGyzeEWt9KJ6vwehr0HO1ktTdohp7YBfG0KMpICpJ0R8AHnGoHCECxUQ9rGST0O2g00biRjgsSJ3PzlcdblWiGZBBykFY8pJdbvqOBomd4mmnxrQpTK18=
+        # will put all file under this path
+        local_path: ./dist
+        # files will copy to under remote_path
+        remote_path: /home/mtms/team3-front-end/dist
+        # connection via sftp protocol only
+        sftp_only: # optional
+        # sftp args
+        sftpArgs: # optional
+        # This operation will delete all files in the remote path before upload. Please be careful set this to true
+        delete_remote_files: # optional
+        # SSH passsword，If a password is set, the secret key pair is ignored
+        password: # optional
