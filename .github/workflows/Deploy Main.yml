@@ -44,12 +44,12 @@ jobs:
         # will put all file under this path
         local_path: ./dist
         # files will copy to under remote_path
-        remote_path: /home/mtms/team3-front-end/dist
+        remote_path: /home/mtms/team3-front-end/
         # connection via sftp protocol only
         sftp_only: # optional
         # sftp args
         sftpArgs: # optional
         # This operation will delete all files in the remote path before upload. Please be careful set this to true
-        delete_remote_files: # optional
+        delete_remote_files: true
         # SSH passsword，If a password is set, the secret key pair is ignored
         password: mtms987654321
