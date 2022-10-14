@@ -25,6 +25,9 @@ const logout = () => {
   )
       .then(() => {
         get('/api/logout').then(() => {
+          localStorage.removeItem('mtms_token');
+          localStorage.removeItem('userID');
+          sessionStorage.removeItem('mtms_keys');
           ElMessage({
             type: 'success',
             message: 'Logout success',

@@ -4,7 +4,7 @@
       <el-card class="box-card">
         <p class="title">{{ course.courseNum }}</p>
         <p class="sub-title">{{course.courseName}}</p>
-        <el-tag effect="dark" type="primary" class="tag" v-show="course.needMarkers">
+        <el-tag effect="dark" class="tag" v-show="course.needMarkers">
           Marker
         </el-tag>
         <el-tag effect="dark" type="success" class="tag" v-show="course.needTutors">
@@ -29,7 +29,7 @@
   >
     <el-descriptions :column="2" border>
       <el-descriptions-item label="Available Position" label-align="center" align="center">
-        <el-tag type="primary" class="tag" v-show="currentCourse.needMarkers">
+        <el-tag class="tag" v-show="currentCourse.needMarkers">
           Marker
         </el-tag>
         <el-tag type="success" class="tag" v-show="currentCourse.needTutors">
@@ -196,6 +196,7 @@ onBeforeMount(() => {
   grid-template-columns: 1fr 1fr;
   grid-row-gap: 20px;
   grid-column-gap: 20px;
+  margin-bottom: 20px;
 }
 
 @media screen and (max-width: 768px) {
@@ -228,13 +229,13 @@ onBeforeMount(() => {
 }
 
 .title{
-  font-size: 25px;
+  font-size: 20px;
   font-weight: bold;
   margin-bottom: 5px;
   color: #0b416d;
 }
 .sub-title{
-  font-size: 17px;
+  font-size: 15px;
   margin-bottom: 10px;
   font-weight: 20;
   color: rgb(106, 107, 108);

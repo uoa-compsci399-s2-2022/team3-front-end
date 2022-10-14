@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { request } from 'http';
 import { config } from 'process'
 
-export const baseURL = 'http://127.0.0.1:5000'
+export const baseURL = 'https://api.uoamtms.com/'
 
 // create axios instance
 const instance = axios.create({

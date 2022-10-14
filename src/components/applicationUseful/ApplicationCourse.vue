@@ -75,12 +75,10 @@
     <el-row style="margin-top: 30px" justify="center">
       <el-button @click="sendCourse" class="hidden-sm-and-down botton-fix-button" type="primary" size="large">Confirm
       </el-button>
-
-      <el-button @click="()=>{confirmEvent}" class="hidden-md-and-up botton-fix-button"
+      <el-button @click="confirmEvent" class="hidden-md-and-up botton-fix-button"
                  type="primary"
                  size="large">Confirm
       </el-button>
-
     </el-row>
 
   </el-drawer>
@@ -119,12 +117,10 @@ const sendCourse = () => {
     ElMessage({
       message: 'Please select a course',
       type: 'warning',
-      grouping: true,
-      customClass: 'message-z-top'
+      grouping: true
     })
     return false
   }
-
 }
 
 

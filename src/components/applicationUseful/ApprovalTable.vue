@@ -66,7 +66,8 @@
           </el-descriptions>
           <br/>
           <div v-if="['1', '3'].includes(tagIndexSync)">
-            <p class="emphasis">Enrolled Courses (Not Publish)</p>
+            <p class="emphasis" v-if="tagIndexSync === '1'">Enrolled Courses (Not Published)</p>
+            <p class="emphasis" v-if="tagIndexSync === '3'">Enrolled Courses (Published)</p>
             <vxe-table
                 border
                 :row-config="{isHover: true}"
