@@ -106,18 +106,22 @@ defineExpose({validateStep})
 const switchstate = ref()
 
 const validatehasLearnedgrade = (rule: any, value: any, callback: any) => {
+  console.log(value)
   if ( switchstate.value === false) {
+    console.log(1)
     callback();
-  } else if ( value == null) {
+  } else if ( value == "") {
+    console.log(2)
     callback(new Error('Please select your grade in this course'));
   } else {
+    console.log(3)
     callback();
   }
 }
 const validatehasLearnedexplanation = (rule: any, value: any, callback: any) => {
   if ( switchstate.value === true) {
     callback();
-  } else if (value == null) {
+  } else if (value == "") {
     callback(new Error('Please explain why you think you are eligible to apply'));
   } else {
     callback();
