@@ -99,7 +99,7 @@ watch(courseList, (courseList)=> {
 
     <div class="course-container">
       <div v-for="item in courseList">
-        <router-link :to="item.path">
+        <router-link :to="{path:item.path, query:{role:item.roleName}}" >
           <CourseCard :course="item"/>
         </router-link>
       </div>

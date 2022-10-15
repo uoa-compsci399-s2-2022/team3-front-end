@@ -28,6 +28,20 @@ const getPath = () => {
         {
           path: "/course-coordinator/" + courseID,
           title: res.courseNum,
+        }
+      ]
+    }).catch((err) => {
+        router.push('/404')
+    })
+    return
+  }
+  if (route.name === "tutor-marker") {
+    let courseID = route.params.courseId;
+    get('api/getCourse/' + courseID).then((res) => {
+      matched.value = [
+        {
+          path: "/",
+          title: "DashBoard",
         },
         {
           path: "/tutor-marker/" + courseID,
@@ -35,7 +49,7 @@ const getPath = () => {
         }
       ]
     }).catch((err) => {
-        router.push('/404')
+      router.push('/404')
     })
     return
   }

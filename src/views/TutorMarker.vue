@@ -60,29 +60,7 @@
             <el-card class="box-card">
               <template #header>
                 <div class="card-header">
-                  <span>Pre Assign Markers & Tutors</span>
-                </div>
-              </template>
-              <p class="emphasis">If you wish to assign students who are not register in the system: </p>
-              <el-row justify="center">
-                <el-button size="large" type="warning" @click="$router.push('/manageuser/batch-invite-user')" round>
-                  Invite User
-                </el-button>
-              </el-row>
-              <br/>
-              <p class="emphasis">If they are already users of the system: </p>
-              <el-row justify="center">
-                <el-button size="large" type="primary" @click="enrollUserModalOpened = true" round>Enroll to the
-                  Course
-                </el-button>
-              </el-row>
-            </el-card>
-          </el-col>
-          <el-col :span="24">
-            <el-card class="box-card">
-              <template #header>
-                <div class="card-header">
-                  <span>Current Markers & Tutors</span>
+                  <span>Members in {{courseInformation.courseNum}}</span>
                 </div>
               </template>
 
@@ -108,6 +86,16 @@
                 <el-table-column label="Name" prop="name" width="150"/>
                 <el-table-column label="UPI" prop="upi" width="80"/>
                 <el-table-column label="AUID" prop="auid"/>
+              </el-table>
+
+              <p class="emphasis">Course Coordinator</p>
+              <el-table
+                  :data="currentCCList"
+                  style="width: 100%"
+                  v-loading="currentCCLoading">
+                <el-table-column label="ID" prop="id"/>
+                <el-table-column label="Email" prop="email"/>
+                <el-table-column label="Name" prop="name"/>
               </el-table>
 
 
@@ -373,6 +361,8 @@ const currentMarkerList = ref([])
 const currentMarkerLoading = ref(false)
 const currentTutorList = ref([])
 const currentTutorLoading = ref(false)
+const currentCCList = ref([])
+const currentCCLoading = ref(false)
 
 const {isLoading: isLoadingUser, state: stateUser, isReady: isReadyUser, execute: executeUser} = useAsyncState(
     (args) => {
@@ -387,20 +377,21 @@ const {isLoading: isLoadingUser, state: stateUser, isReady: isReadyUser, execute
 )
 
 
-const getCurrentMarkerTutorList = () => {
+const getCurrentMarkerTutorCCList = () => {
   currentMarkerLoading.value = true
   currentTutorLoading.value = true
+  currentCCLoading.value = true
   executeUser().then(() => {
     currentMarkerList.value = stateUser.value.filter((user: { roleInCourse: string; }) => user.roleInCourse === 'marker')
     currentTutorList.value = stateUser.value.filter((user: { roleInCourse: string; }) => user.roleInCourse === 'tutor')
+    currentCCList.value = stateUser.value.filter((user: { roleInCourse: string; }) => user.roleInCourse === 'courseCoordinator')
     currentMarkerLoading.value = false
     currentTutorLoading.value = false
-    console.log(currentMarkerList.value)
-    console.log(currentTutorList.value)
+    currentCCLoading.value = false
   })
 }
 
-getCurrentMarkerTutorList()
+getCurrentMarkerTutorCCList()
 
 
 </script>

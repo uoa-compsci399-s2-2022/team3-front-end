@@ -5,6 +5,7 @@ import {ref, watch} from 'vue';
 import {useRouter, useRoute} from 'vue-router';
 import 'element-plus/theme-chalk/display.css';
 import {useSidebarStore} from "@/store";
+
 const sidebar = useSidebarStore();
 
 const router = useRouter();
@@ -57,14 +58,22 @@ async function getUserProfile() {
 }
 
 
-
 const courseNum = ref<string>();
+const role = ref<string>();
 const getCourseNum = () => {
   if (route.name === "course-coordinator") {
     let courseID = route.params.courseId;
+    role.value = "Course Coordinator";
     get('api/getCourse/' + courseID).then((res) => {
       courseNum.value = res.courseNum;
     })
+  } else if (route.name === "tutor-marker") {
+    let courseID = route.params.courseId;
+    route.query.role as string === "tutor" ? role.value = "Tutor" : role.value = "Marker";
+    get('api/getCourse/' + courseID).then((res) => {
+      courseNum.value = res.courseNum;
+    })
+
   }
 }
 
@@ -79,11 +88,11 @@ getCourseNum()
 <template>
   <section>
 
-    <div class="title" v-if="$route.name==='course-coordinator'" @click="sidebar.handleCollase()">
+    <div class="title" v-if="$route.name==='course-coordinator' || $route.name==='tutor-marker'" @click="sidebar.handleCollase()">
       <el-icon class="expand-sidebar">
         <Expand/>
       </el-icon>
-      Course Coordinator - {{ courseNum }}
+      {{ role }} - {{ courseNum }}
     </div>
     <div class="title" v-else @click="sidebar.handleCollase()">
       <el-icon class="expand-sidebar">
@@ -117,7 +126,6 @@ getCourseNum()
 <style lang="scss">
 
 
-
 section {
   display: flex;
   margin-top: 30px;
@@ -126,7 +134,7 @@ section {
   padding: 0px 10px 10px 10px;
   border-bottom: 1px solid rgb(210, 210, 210);
 
-  .expand-sidebar{
+  .expand-sidebar {
     display: none;
   }
 
@@ -139,10 +147,10 @@ section {
   }
 
   @media (max-width: 540px) {
-    .expand-sidebar{
+    .expand-sidebar {
       display: inline;
     }
-    .title{
+    .title {
       font-size: 25px;
     }
   }
