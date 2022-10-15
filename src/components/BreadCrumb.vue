@@ -56,12 +56,12 @@ const getPath = () => {
 
 watch(route, () => {
   matched.value = []
-  if (route.name !== "application"){
+  if (route.matched[0].name === "Home"){
     getPath()
   }
 })
 
-
+console.log(route.matched)
 if (route.name !== "application"){
   getPath()
 }
