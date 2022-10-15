@@ -149,7 +149,6 @@ router.beforeEach((to, from, next) => {
 
     // if the user has token, but he don't have the permitted page list
     // then send a request to get the user's groups.
-    console.log("qwq", store.key)
     if (localStorage.getItem('mtms_token') && store.key.size === 0) {
         console.log('redirectBasedOnLoginStatus without key');
         restoreUserKey().then(

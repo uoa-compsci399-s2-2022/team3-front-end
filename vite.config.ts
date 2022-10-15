@@ -49,13 +49,13 @@ export default defineConfig({
 
   server: {
     host:true,
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://3.27.10.240:5000/',
-    //     changeOrigin: true,
-    //     rewrite: (path) => path.replace(/^\/api/, ""),
-    //   },
-    // },
+    proxy: {
+      '/api': {
+        target: ' http://127.0.0.1:5000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
   },
 
 })

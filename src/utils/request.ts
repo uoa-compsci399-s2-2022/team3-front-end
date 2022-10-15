@@ -1,8 +1,9 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { request } from 'http';
-import { config } from 'process'
 
-export const baseURL = 'https://api.uoamtms.com/'
+
+// export const baseURL = 'https://api.uoamtms.com/'
+export const baseURL = import.meta.env.VITE_API_URL as string
+
 
 // create axios instance
 const instance = axios.create({
@@ -61,7 +62,6 @@ export function post(url: string, data: any=null, header?:any): Promise<any>{
         data:data,
         headers: header
     }
-    console.log(config)
     return instance(config);
 }
 
