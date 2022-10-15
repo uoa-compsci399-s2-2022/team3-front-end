@@ -28,7 +28,12 @@ const getPath = () => {
         {
           path: "/course-coordinator/" + courseID,
           title: res.courseNum,
-        }]
+        },
+        {
+          path: "/tutor-marker/" + courseID,
+          title: res.courseNum,
+        }
+      ]
     }).catch((err) => {
         router.push('/404')
     })
