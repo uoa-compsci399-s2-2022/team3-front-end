@@ -49,7 +49,7 @@ async function GetCourse(termID: String) {
         item.path = `course-coordinator/${item.courseID}`
         courseList.value.push(item)
       } else {
-        item.path = `/`
+        item.path = `tutor-marker/${item.courseID}`
         courseList.value.push(item)
       }
     })
