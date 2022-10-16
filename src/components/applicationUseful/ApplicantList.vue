@@ -41,13 +41,13 @@ const handleSelect = (selection: any[], row: any) => {
         if (isCheck) {
             ElNotification({
                 title: 'Success',
-                message: `${row.name}'s application for ${row.type} position is starred!'`,
+                message: `${row.name}'s application for ${row.type} position is starred!`,
                 type: 'success',
             })
         } else {
             ElNotification({
                 title: 'Success',
-                message: `${row.name}'s application for ${row.type} position is removed from starred list!'`,
+                message: `${row.name}'s application for ${row.type} position is removed from starred list!`,
                 type: 'success',
             })
         }
@@ -55,7 +55,7 @@ const handleSelect = (selection: any[], row: any) => {
         if (err.response.status === 400) {
             ElNotification({
                 title: 'Notice',
-                message: `${row.name}'s application for ${row.type} position has been published!'`,
+                message: err.response.data.message,
                 type: 'error',
             })
             tableRef.value.toggleRowSelection(row, false)
@@ -80,13 +80,12 @@ const filterType = (value: string, row: any) => {
 </script>
 
 <template>
-    <el-table ref="tableRef" :data="tableData" style="width: 100%" @select="handleSelect">
+    <el-table ref="tableRef" :data="tableData" style="width: 100%;" @select="handleSelect" max-height="800">
 
         <el-table-column type="selection" width="55" />
         <el-table-column type="expand">
 
             <template #default="props">
-                {{props.row}}
                 <el-descriptions title="Applicant Information" direction="vertical" :column="4" border>
                     <el-descriptions-item label="Currently Overseas" align="center">
                         {{props.row.currentlyOverseas}}

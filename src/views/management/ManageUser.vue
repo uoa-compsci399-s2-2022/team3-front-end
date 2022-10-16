@@ -1,21 +1,27 @@
 <template>
 
   <div class="page-container">
-    <el-button-group>
-      <el-button type="primary" :icon="Plus" @click="showAddUser">Add User</el-button>
-      <el-button type="primary" :icon="Ticket" @click="router.push('/manageuser/batch-invite-user')">Batch Invite
-      </el-button>
-    </el-button-group>
-    <span style="color: #555a64; margin-left: 20px">Open for registration</span>
-    <el-switch
-        :loading="settingLoading"
-        v-model="allowRegister"
-        style="margin-left: 5px"
-        inline-prompt
-        :active-icon="Check"
-        :inactive-icon="Close"
-        @change="allowRegisterChange"
-    />
+    <div class="header-toolbar">
+      <div>
+        <el-button-group>
+          <el-button type="primary" :icon="Plus" @click="showAddUser">Add User</el-button>
+          <el-button type="primary" :icon="Ticket" @click="router.push('/manageuser/batch-invite-user')">Batch Invite
+          </el-button>
+        </el-button-group>
+      </div>
+      <div v-permission="4">
+        <span style="color: #555a64; margin-left: 20px">Open for registration</span>
+        <el-switch
+            :loading="settingLoading"
+            v-model="allowRegister"
+            style="margin-left: 5px"
+            inline-prompt
+            :active-icon="Check"
+            :inactive-icon="Close"
+            @change="allowRegisterChange"
+        />
+      </div>
+    </div>
 
 
     <el-table :data="filterTableData" style="width: 100%" v-loading="tableLoading">
@@ -188,11 +194,23 @@ const allowRegisterChange = () => {
         type: 'success'
       })
     }).catch((e) => {
+      refresh()
+      if (e.response.status === 401) {
+        router.push('/login')
+        return
+      }
+      if (e.response.status === 403) {
+        ElMessage({
+          message: 'Unauthorized Access',
+          type: 'error'
+        })
+        return;
+      }
       ElMessage({
         message: e.response.data['message'],
         type: 'error'
       })
-      settingLoading.value = false
+
     })
   }
 }
@@ -216,6 +234,11 @@ onBeforeMount(() => {
 
 .page-container {
   margin: 30px 30px;
+}
+.header-toolbar{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
 }
 
 </style>
