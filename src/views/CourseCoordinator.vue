@@ -1,5 +1,17 @@
 <template>
   <div class="page-container">
+    <el-row :gutter="15" style="margin-bottom: 20px;">
+      <el-col :span="24">
+        <el-card>
+          <template #header>
+            <div class="card-header">
+              <span>Endorse Applicants</span>
+            </div>
+          </template>
+          <applicant-list :course-id="($route.params.courseId as string)"/>
+        </el-card>
+      </el-col>
+    </el-row>
     <el-row :gutter="15">
       <el-col :md="12" :xs="24">
         <el-card class="box-card">
@@ -116,13 +128,7 @@
         </el-row>
       </el-col>
     </el-row>
-    <el-row :gutter="15">
-      <el-col :span="24">
-        <el-card>
-          <applicant-list :course-id="($route.params.courseId as string)"/>
-        </el-card>
-      </el-col>
-    </el-row>
+
   </div>
 
 
