@@ -1,12 +1,29 @@
 <script setup lang="ts">
 import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
-import {  reactive, ref } from 'vue';
-import { post } from '@/utils/request'
+import {onBeforeMount, reactive, ref} from 'vue';
+import {get, post} from '@/utils/request'
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import type { FormInstance } from 'element-plus'
 
 const registerFormRef = ref<FormInstance>()
+
+const getSetting = () => {
+  get('api/setting').then((res) => {
+    if (!res.allowRegister){
+      router.push('/login')
+    }
+  }).catch((e) => {
+    ElMessage({
+      message: e.response.data['message'],
+      type: 'error'
+    })
+  })
+}
+
+onBeforeMount(() => {
+  getSetting()
+})
 
 
 const validatePass = (rule: any, value: any, callback: any) => {

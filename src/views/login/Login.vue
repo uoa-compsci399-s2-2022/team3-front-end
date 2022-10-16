@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
-import { reactive, ref } from 'vue';
+import {onBeforeMount, reactive, ref} from 'vue';
 import { get, post } from '@/utils/request'
 import { useUserStore, usePermissionStore } from '@/store'
 import { useRouter } from 'vue-router';
+import {ElMessage} from "element-plus";
 
 
 const data = reactive({
@@ -37,6 +38,24 @@ const login = () => {
         err => console.error(err)
     )
 }
+
+const allowRegister = ref(false)
+const getSetting = () => {
+  get('api/setting').then((res) => {
+    allowRegister.value = res.allowRegister
+  }).catch((e) => {
+    ElMessage({
+      message: e.response.data['message'],
+      type: 'error'
+    })
+  })
+}
+
+onBeforeMount(() => {
+  getSetting()
+})
+
+
 </script>
 
 <template>
@@ -52,7 +71,7 @@ const login = () => {
                 <div class="keep-login"><input type="checkbox" class="login-options"><span>Keep me logged in</span>
                 </div>
                 <button type="submit" @click.prevent="login">Login</button>
-                <span class="register-prompt">Don't have an account? Click <router-link to="/register">here</router-link> to sign up.</span>
+                <span class="register-prompt" v-if="allowRegister">Don't have an account? Click <router-link to="/register">here</router-link> to sign up.</span>
             </form>
 
         </div>
