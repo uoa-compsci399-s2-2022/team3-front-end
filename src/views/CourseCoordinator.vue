@@ -116,6 +116,13 @@
         </el-row>
       </el-col>
     </el-row>
+    <el-row :gutter="15">
+      <el-col :span="24">
+        <el-card>
+          <applicant-list :course-id="($route.params.courseId as string)"/>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 
 
@@ -234,13 +241,13 @@
 </template>
 
 <script setup lang="ts">
-import {Check, Edit, Search} from '@element-plus/icons-vue';
+import {Edit, Search} from '@element-plus/icons-vue';
 import {reactive, ref} from 'vue';
 import {get, put} from "@/utils/request";
 import {useRoute} from "vue-router";
 import {ElMessage} from "element-plus";
-import dayjs from "dayjs";
 import {useAsyncState} from "@vueuse/core";
+import ApplicantList from '@/components/applicationUseful/ApplicantList.vue';
 
 const route = useRoute();
 
