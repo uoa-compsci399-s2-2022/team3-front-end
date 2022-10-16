@@ -1,28 +1,29 @@
 <script setup lang="ts">
 import LoginBackground from '@/components/backgrounds/LoginBackground.vue'
-import {onBeforeMount, reactive, ref} from 'vue';
-import {get, post} from '@/utils/request'
+import { onBeforeMount, reactive, ref } from 'vue';
+import { get, post } from '@/utils/request'
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import type { FormInstance } from 'element-plus'
 
+
 const registerFormRef = ref<FormInstance>()
 
 const getSetting = () => {
-  get('api/setting').then((res) => {
-    if (!res.allowRegister){
-      router.push('/login')
-    }
-  }).catch((e) => {
-    ElMessage({
-      message: e.response.data['message'],
-      type: 'error'
+    get('api/setting').then((res) => {
+        if (!res.allowRegister) {
+            router.push('/login')
+        }
+    }).catch((e) => {
+        ElMessage({
+            message: e.response.data['message'],
+            type: 'error'
+        })
     })
-  })
 }
 
 onBeforeMount(() => {
-  getSetting()
+    getSetting()
 })
 
 
@@ -67,50 +68,6 @@ const rules = reactive({
 })
 
 
-//------------------------
-
-// const data = reactive(
-//     {
-//         userID: "admin",
-//         password: "admin",
-//         repeatPassword: "admin",
-//         email: "lzhe450@aucklanduni.ac.nz",
-//         name: "Burkhard",
-//         code: ""
-//     }
-// )
-
-// const dataItem = reactive({
-//     button_text: "get code",
-//     button_loading: false,
-//     disable_code_button: true,
-//     sec: 60,
-//     timer: null
-// })
-
-// const router = useRouter()
-
-// const term = reactive({
-//     Notick: true
-// })
-// const tick = () => {
-//     term.Notick = !term.Notick
-// }
-
-// // check terms and conditions
-// const register = () => {
-
-//     if (!term.Notick) {
-//         Canregister()
-//     }
-//     else {
-//         console.log(appContext, ElMessage.error("Please read the Terms & Conditions"))
-
-//     }
-
-// }
-
-
 const router = useRouter()
 // register
 const register = () => {
@@ -127,9 +84,9 @@ const register = () => {
             err => {
 
                 ElMessage({
-                message: `${err.response.data.message}`,
-                type: 'error',
-            })
+                    message: `${err.response.data.message}`,
+                    type: 'error',
+                })
             }
         )
 }
@@ -138,32 +95,30 @@ const register = () => {
 let endTime: Date;
 let timeLeft = ref<number>(NaN)
 const waiting = ref(false);
-const sendCode = async () => {
+const sendCode = async (coolDownTime: number) => {
     if (!await registerFormRef!.value!.validateField('email', () => null)) {
         return;
     }
     endTime = new Date()
-    endTime.setSeconds(endTime.getSeconds() + 10)
-    localStorage.setItem('end_time', endTime.toISOString())
-    timeLeft.value = endTime.getSeconds() - new Date().getSeconds()
+    endTime.setTime(endTime.getTime() + coolDownTime * 1000)
+    localStorage.setItem('end_time', endTime.getTime().toString())
+    timeLeft.value = endTime.getTime() - new Date().getTime()
     waiting.value = true;
     let timer = setInterval(() => {
-        timeLeft.value = endTime.getSeconds() - new Date().getSeconds()
+        timeLeft.value = endTime.getTime() - new Date().getTime()
         if (timeLeft.value <= 0) {
             clearInterval(timer);
             waiting.value = false;
             localStorage.removeItem('end_time')
         }
     }, 1000)
-
     post("/api/sendValidationEmail", { email: registerForm.email })
         .then(res => {
             ElMessage({
                 message: `Validation code email has been sent to your email.`,
                 type: 'success',
             })
-        })
-        .catch(
+        }).catch(
             err => {
                 ElMessage({
                     message: `${err.response.data.message}`,
@@ -176,12 +131,12 @@ const sendCode = async () => {
 
 // 防止用户刷新后timer重置
 if (localStorage.getItem('end_time')) {
-    endTime = new Date(localStorage.getItem('end_time') as string)
-    timeLeft.value = endTime.getSeconds() - new Date().getSeconds()
+    endTime = new Date(Number(localStorage.getItem('end_time')))
+    timeLeft.value = endTime.getTime() - new Date().getTime()
     if (timeLeft.value > 0) {
         waiting.value = true;
         let timer = setInterval(() => {
-            timeLeft.value = endTime.getSeconds() - new Date().getSeconds()
+            timeLeft.value = endTime.getTime() - new Date().getTime()
             if (timeLeft.value <= 0) {
                 clearInterval(timer);
                 waiting.value = false;
@@ -235,9 +190,10 @@ const submitForm = (formEl: FormInstance | undefined) => {
                     <el-button type="info" @click="" plain disabled v-if="waiting" class="verification">
                         <el-icon>
                             <Timer />
-                        </el-icon>After {{timeLeft}}s to resend
+                        </el-icon>After {{(timeLeft / 1000).toFixed(0)}}s to resend
                     </el-button>
-                    <el-button type="primary" @click="sendCode" plain v-else class="verification">Send Code</el-button>
+                    <el-button type="primary" @click="sendCode(60)" plain v-else class="verification">Send Code
+                    </el-button>
                 </div>
                 <el-form-item label="Verification Code" prop="code">
                     <el-input v-model="registerForm.code" type="text" />
@@ -269,6 +225,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
     justify-self: center;
     align-items: center;
     width: 550px;
+
     h1 {
         transform: translateX(60px);
         font-size: 28.83px;
