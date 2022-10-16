@@ -1,5 +1,17 @@
 <template>
   <div class="page-container">
+    <el-row :gutter="15" style="margin-bottom: 20px;">
+      <el-col :span="24">
+        <el-card>
+          <template #header>
+            <div class="card-header">
+              <span>Endorse Applicants</span>
+            </div>
+          </template>
+          <applicant-list :course-id="($route.params.courseId as string)"/>
+        </el-card>
+      </el-col>
+    </el-row>
     <el-row :gutter="15">
       <el-col :md="12" :xs="24">
         <el-card class="box-card">
@@ -116,6 +128,7 @@
         </el-row>
       </el-col>
     </el-row>
+
   </div>
 
 
@@ -234,13 +247,13 @@
 </template>
 
 <script setup lang="ts">
-import {Check, Edit, Search} from '@element-plus/icons-vue';
+import {Edit, Search} from '@element-plus/icons-vue';
 import {reactive, ref} from 'vue';
 import {get, put} from "@/utils/request";
 import {useRoute} from "vue-router";
 import {ElMessage} from "element-plus";
-import dayjs from "dayjs";
 import {useAsyncState} from "@vueuse/core";
+import ApplicantList from '@/components/applicationUseful/ApplicantList.vue';
 
 const route = useRoute();
 

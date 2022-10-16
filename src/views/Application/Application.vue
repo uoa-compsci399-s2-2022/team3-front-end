@@ -69,6 +69,11 @@ const preferCourseList = ref([] as preferCourse[]);
 
 const data = reactive({} as applicationData);
 const currentUserProfile = reactive({} as applicationData);
+
+onBeforeMount(()=>{
+  getApplicationMetaInfo()
+})
+
 const getUserProfile = (currentUserProfile: any, saved: any) => {
   if (currentUserProfile === null) {
     return saved;
@@ -129,19 +134,34 @@ if (!isNaN(parseInt(route.params.applicationID as string))) {
   router.push('/404')
 }
 
-get('api/application/' + applicationID.value).then(res => {
-  termName.value = res.term;
-  applicationMetaInfo.value.term = res.term;
-  applicationMetaInfo.value.status = res.status;
-  applicationMetaInfo.value.createdDateTime = res.createdDateTime;
-  applicationMetaInfo.value.termID = res.termID;
-  applicationMetaInfo.value.type = res.type;
+const courseListByRole = ref([] as Course[]);
+const getApplicationMetaInfo = () =>{
+  get('api/application/' + applicationID.value).then(res => {
+    termName.value = res.term;
+    applicationMetaInfo.value.term = res.term;
+    applicationMetaInfo.value.status = res.status;
+    applicationMetaInfo.value.createdDateTime = res.createdDateTime;
+    applicationMetaInfo.value.termID = res.termID;
+    applicationMetaInfo.value.type = res.type;
+    metaLoading.value = true;
+    get('/api/getCurrentUserEnrollByTerm/' + applicationMetaInfo.value.termID).then(res => {
+      courseListByRole.value = []
+      res.forEach((item: any) => {
+        if (item.roleName.toLowerCase() === applicationMetaInfo.value.type.toLowerCase()) {
+          courseListByRole.value.push(item)
+        }
+      })
+    })
+  }).catch((err) => {
+    router.push('/applicationList')
+    ElMessage({
+      type: 'error',
+      message: err.response.data.message
+    })
+  })
+}
 
-  metaLoading.value = true;
 
-}).catch((err) => {
-  console.log(err)
-})
 
 
 get('api/currentUserProfile').then(res => {
@@ -205,10 +225,19 @@ const showCourseChooser = () => {
   courseVisible.visible = true
 }
 
+
+
 const add_course = (course: any) => {
   if (preferCourseList.value.map((item) => item.courseID).includes(course.courseID)) {
     ElMessage({
       message: 'You cannot add the same course',
+      type: 'warning',
+    });
+    return;
+  }
+  if (courseListByRole.value.map((item) => item.courseID).includes(course.courseID)) {
+    ElMessage({
+      message: 'You cannot add the course you have enrolled in',
       type: 'warning',
     });
     return;
@@ -793,7 +822,6 @@ const check =async ()=>{
         <el-button @click="next()" v-if="step < 3">Next Step</el-button>
       </div>
     </div>
-
   </div>
 
   <ApplicationCourse v-if="applicationMetaInfo.termID" :visible="courseVisible" :termID="applicationMetaInfo.termID"

@@ -9,6 +9,7 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     AddUser: typeof import('./src/components/userUseful/AddUser.vue')['default']
     AddUserDrawer: typeof import('./src/components/ManageUseful/AddUserDrawer.vue')['default']
+    ApplicantList: typeof import('./src/components/applicationUseful/ApplicantList.vue')['default']
     ApplicationCourse: typeof import('./src/components/applicationUseful/ApplicationCourse.vue')['default']
     ApplicationPreferCourseList: typeof import('./src/components/applicationUseful/ApplicationPreferCourseList.vue')['default']
     ApprovalTable: typeof import('./src/components/applicationUseful/ApprovalTable.vue')['default']
@@ -38,10 +39,8 @@ declare module '@vue/runtime-core' {
     ElDropdownItem: typeof import('element-plus/es')['ElDropdownItem']
     ElDropdownMenu: typeof import('element-plus/es')['ElDropdownMenu']
     ElEmpty: typeof import('element-plus/es')['ElEmpty']
-    ElFooter: typeof import('element-plus/es')['ElFooter']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
-    ElHeader: typeof import('element-plus/es')['ElHeader']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
