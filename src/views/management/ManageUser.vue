@@ -3,8 +3,20 @@
   <div class="page-container">
     <el-button-group>
       <el-button type="primary" :icon="Plus" @click="showAddUser">Add User</el-button>
-      <el-button type="primary" :icon="Ticket" @click="router.push('/manageuser/batch-invite-user')">Batch Invite</el-button>
+      <el-button type="primary" :icon="Ticket" @click="router.push('/manageuser/batch-invite-user')">Batch Invite
+      </el-button>
     </el-button-group>
+    <span style="color: #555a64; margin-left: 20px">Open for registration</span>
+    <el-switch
+        :loading="settingLoading"
+        v-model="allowRegister"
+        style="margin-left: 5px"
+        inline-prompt
+        :active-icon="Check"
+        :inactive-icon="Close"
+        @change="allowRegisterChange"
+    />
+
 
     <el-table :data="filterTableData" style="width: 100%" v-loading="tableLoading">
       <el-table-column label="ID" prop="id"/>
@@ -50,14 +62,15 @@
     </template>
   </el-dialog>
   <AddUser :visible="addUserVisible" @refreshUserTable="refresh"/>
-  <EditUser :visible="editUserVisible" @refreshUserTable="refresh" :currentUser='wantToEditUser' v-if="editUserVisible.visible"/>
+  <EditUser :visible="editUserVisible" @refreshUserTable="refresh" :currentUser='wantToEditUser'
+            v-if="editUserVisible.visible"/>
 </template>
 
 <script lang="ts" setup>
-import {computed, onBeforeMount, reactive, ref} from 'vue'
-import {get, Delete} from "@/utils/request";
+import {computed, onBeforeMount, reactive, ref, watch} from 'vue'
+import {get, Delete, put} from "@/utils/request";
 import dayjs from "dayjs";
-import {Plus, Ticket} from '@element-plus/icons-vue'
+import {Plus, Ticket, Check, Close} from '@element-plus/icons-vue'
 import AddUser from '@/components/userUseful/AddUser.vue'
 import EditUser from '@/components/userUseful/EditUser.vue'
 import {ElMessage} from 'element-plus'
@@ -76,6 +89,8 @@ const deleteConfirmVisible = ref(false)
 const wantToDeleteUser = ref({} as User)
 const wantToEditUser = ref({} as User)
 const tableLoading = ref(true)
+const allowRegister = ref(false)
+const settingLoading = ref(false)
 
 const showAddUser = () => {
   addUserVisible.visible = true
@@ -146,12 +161,53 @@ const getUser = () => {
   })
 }
 
+const getSetting = () => {
+  settingLoading.value = true;
+  get('api/setting').then((res) => {
+    allowRegister.value = res.allowRegister
+    settingLoading.value = false
+  }).catch((e) => {
+    ElMessage({
+      message: e.response.data['message'],
+      type: 'error'
+    })
+    settingLoading.value = false
+  })
+}
+
+const allowRegisterChange = () => {
+  const newVal = allowRegister.value
+  settingLoading.value = true;
+  if (typeof newVal === "boolean") {
+    put('api/setting', {
+      data: {allowRegister: newVal}
+    }).then((res) => {
+      refresh()
+      ElMessage({
+        message: 'Update setting success',
+        type: 'success'
+      })
+    }).catch((e) => {
+      ElMessage({
+        message: e.response.data['message'],
+        type: 'error'
+      })
+      settingLoading.value = false
+    })
+  }
+}
+
 
 const refresh = () => {
   getUser()
+  getSetting()
 }
 
-getUser()
+
+onBeforeMount(() => {
+  getUser()
+  getSetting()
+})
 
 </script>
 
