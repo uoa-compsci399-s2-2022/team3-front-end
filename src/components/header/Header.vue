@@ -33,7 +33,9 @@ const logout = () => {
             type: 'success',
             message: 'Logout success',
           })
-          router.push('/login');
+          router.push('/login').then(() => {
+            router.go(0)
+          });
         }).catch(() => {
           ElMessage({
             type: 'error',
