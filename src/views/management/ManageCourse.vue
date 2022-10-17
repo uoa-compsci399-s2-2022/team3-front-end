@@ -5,9 +5,11 @@ import {computed, reactive, Ref, ref, watch} from 'vue'
 import type {Column} from 'element-plus'
 import {watchDebounced} from '@vueuse/core';
 import ImportCourseTemplate from "@/components/ImportCourseTemplate.vue";
+import FullScreenManageCourse from "@/components/FullScreenManageCourse.vue";
+import {FullScreen} from '@element-plus/icons-vue'
+import {dateFormat, datetimeFormat} from "@/utils/datetimeFormat";
 
-
-
+const fullScreenCourseVisible = ref(false);
 const importVisible = ref(false);
 
 const importShowEvent = () => {
@@ -20,6 +22,20 @@ const importShowEvent = () => {
     })
   }
 }
+
+const fullScreenCourseShowEvent = () => {
+  if (onSelect.value) {
+    fullScreenCourseVisible.value = true;
+  } else {
+    ElMessage({
+      message: 'Please select a term first.',
+      type: 'warning',
+    })
+  }
+}
+
+
+
 
 //-----------------------------Term start----------------------------------
 
@@ -183,7 +199,9 @@ const setCurrent = (row?: term) => {
 async function getTermList() {
   let termList = await get('api/term');
   terms.length = 0;
-  (termList as term[]).forEach((term) => terms.push(term));
+  (termList as term[]).forEach((term) => {
+    terms.push(term)
+  });
   loading.value = false;
   terms.sort((a: term, b: term) => {
     return new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
@@ -386,12 +404,17 @@ const toCamel = (str: string): string => {
  */
 let columns: Column<any>[] = Array.from(titles, (v, i) => {
   let camelCaseV = toCamel(v);
-  return {
+  let result:any =  {
     key: camelCaseV,
     dataKey: camelCaseV,
     title: v,
     width: 150,
   }
+  if (camelCaseV === 'markerDeadLine' || camelCaseV === 'tutorDeadLine') {
+    result.cellRenderer = ({cellData: dateTime}) => (
+        <span>{datetimeFormat(dateTime)}</span>
+  )}
+  return result
 })
 
 /**
@@ -722,6 +745,14 @@ const handleCourseEdit = (row: number) => {
   }
 }
 
+
+const dateFormatter = (row: any, column: any, cellValue: any) => {
+  return dateFormat(cellValue);
+}
+const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
+  return datetimeFormat(cellValue);
+}
+
 </script>
 
 <template>
@@ -734,7 +765,7 @@ const handleCourseEdit = (row: number) => {
       </div>
       <article>
         <el-table v-loading="loading" :data="filterterms" ref="singleTableRef" highlight-current-row
-                  height="250">
+                  height="230">
           <el-table-column label="" width="100px">
 
             <template #default="scope">
@@ -743,11 +774,11 @@ const handleCourseEdit = (row: number) => {
           </el-table-column>
 
           <el-table-column label="Term name" prop="termName"/>
-          <el-table-column label="Start Date" prop="startDate"/>
-          <el-table-column label="End Date" prop="endDate"/>
+          <el-table-column label="Start Date" prop="startDate" :formatter="dateFormatter"/>
+          <el-table-column label="End Date" prop="endDate" :formatter="dateFormatter"/>
           <el-table-column label="Is available" prop="isAvailable"/>
-          <el-table-column label="Marker DeadLine" prop="defaultMarkerDeadLine"/>
-          <el-table-column label="Tutor deadline" prop="defaultTutorDeadLine"/>
+          <el-table-column label="Marker DeadLine" prop="defaultMarkerDeadLine" :formatter="dateTimeFormatter"/>
+          <el-table-column label="Tutor deadline" prop="defaultTutorDeadLine" :formatter="dateTimeFormatter"/>
           <el-table-column align="right">
             <template #header>
               <el-input v-model="searchTerm" size="small" placeholder="Type to search"/>
@@ -773,13 +804,20 @@ const handleCourseEdit = (row: number) => {
     <section>
       <div class="manage-course-subtitle">
         <h2>Courses</h2>
+        <el-alert v-if="onSelectName" :title="onSelectName" :center="true" type="warning" effect="dark" :closable="false"
+                  class="currentTermAlert"/>
         <el-input v-model="searchCourse" placeholder="Search by course number. e.g. COMPSCI235" size="small"
                   clearable/>
+        <el-button type="info" @click="fullScreenCourseShowEvent" plain>
+          <el-icon>
+            <FullScreen/>
+          </el-icon>
+        </el-button>
         <el-button type="info" plain @click="importShowEvent">Import</el-button>
         <el-button type="primary" plain @click="handleCourseAdd">Add Course</el-button>
       </div>
       <article>
-        <div style="height: 400px">
+        <div style="height: calc(100vh - 485px)">
           <el-auto-resizer>
             <template #default="{ height, width }">
               <el-table-v2 :columns="columns" :data="filterCourses" :width="width" :height="height" fixed>
@@ -1052,6 +1090,10 @@ const handleCourseEdit = (row: number) => {
   </teleport>
 
   <ImportCourseTemplate v-model:importVisible="importVisible" v-model:term="onSelect" v-model:termName="onSelectName"/>
+  <FullScreenManageCourse v-model:fullScreenCourseVisible="fullScreenCourseVisible" v-model:onSelectName="onSelectName"
+                          v-model:searchCourse="searchCourse" v-model:importShowEvent="importShowEvent"
+                          v-model:handleCourseAdd="handleCourseAdd" v-model:filter-courses="filterCourses"
+                          v-model:columns="columns"/>
 </template>
 
 <style scoped lang="scss">
@@ -1148,10 +1190,19 @@ const handleCourseEdit = (row: number) => {
 
   section {
     flex-shrink: 1;
+    margin-top: 15px;
 
     .manage-course-subtitle {
       display: flex;
       width: 100%;
+
+      .currentTermAlert {
+        margin-left: 5px;
+        padding: 0;
+        width: auto;
+        font-weight: bold;
+        height: 22px;
+      }
 
       h2 {
         font-size: 25px;

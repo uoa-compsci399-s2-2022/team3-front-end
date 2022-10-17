@@ -61,10 +61,10 @@
         {{ currentCourse.numOfTutorialsPerWeek }}
       </el-descriptions-item>
       <el-descriptions-item label="Marker Deadline" label-align="center" align="center">
-        {{ currentCourse.markerDeadLine }}
+        {{ datetimeFormat(currentCourse.markerDeadLine) }}
       </el-descriptions-item>
       <el-descriptions-item label="Tutor Deadline" label-align="center" align="center">
-        {{ currentCourse.tutorDeadLine }}
+        {{ datetimeFormat(currentCourse.tutorDeadLine) }}
       </el-descriptions-item>
       <el-descriptions-item label="Prerequisite" label-align="center" align="center" :span="2">
         {{ currentCourse.prerequisite }}
@@ -90,6 +90,7 @@ import {get} from "@/utils/request.js";
 import {computed, defineProps, onBeforeMount, ref, watch} from "vue";
 import {ArrowRightBold} from "@element-plus/icons-vue";
 import {isMobile, isMobile768} from "@/utils/isMoblie";
+import {datetimeFormat} from "@/utils/datetimeFormat";
 
 const currentCourse = ref<Course>();
 const drawer = ref(false);

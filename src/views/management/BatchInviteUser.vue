@@ -1,8 +1,19 @@
 <template>
 
   <div class="page-container">
+    <el-row class="hidden-md-and-up" justify="center" style="margin-bottom: 7px">
+        <el-button class="button_md_down" type="warning" @click="saveEvent">
+          <font-awesome-icon icon="fa-solid fa-cloud-arrow-up"/> &nbsp; Save
+        </el-button>
+        <el-button class="button_md_down" type="primary" :icon="Plus" @click="addRow(null)">Row</el-button>
+        <el-button class="button_md_down" :icon="DeleteFilled" type="danger" @click="removeButtonClickEvent">Delete
+        </el-button>
+        <el-button class="button_md_down" type="success" :icon="Promotion" @click="send">Send</el-button>
+    </el-row>
+
+
     <el-row>
-      <el-col :span="20">
+      <el-col :span="24" :md="20">
         <div class="table-wrapper">
           <vxe-table
               ref="tableRef"
@@ -15,11 +26,11 @@
               :mouse-config="{selected: true}"
               :data="tableData"
               :column-config="{resizable: true}"
-              :edit-config="{trigger: 'dblclick', mode: 'cell', showStatus: true}"
+              :edit-config="{trigger: 'click', mode: 'row', showStatus: true}"
               :sort-config="{trigger: 'cell', defaultSort: {field: 'age', order: 'desc'}, orders: ['desc', 'asc', null]}"
               @edit-closed="editClosedEvent">
-            <vxe-column type="checkbox" width="50"></vxe-column>
-            <vxe-column type="seq" width="60"></vxe-column>
+            <vxe-column type="checkbox" width="40"></vxe-column>
+            <vxe-column type="seq" width="40"></vxe-column>
             <vxe-column field="userID" title="UserID (UPI)" :edit-render="{autofocus: '.vxe-input--inner'}">
               <template #edit="{ row }">
                 <vxe-input v-model="row.userID"></vxe-input>
@@ -47,11 +58,8 @@
             </template>
           </vxe-table>
         </div>
-
       </el-col>
-
-
-      <el-col :span="4">
+      <el-col :span="0" :md="4" class="button-col">
         <el-row justify="center" class="button-wrapper">
           <el-button class="button" type="warning" @click="saveEvent">
             <font-awesome-icon icon="fa-solid fa-cloud-arrow-up"/> &nbsp; Save
@@ -84,12 +92,14 @@
       width="30%"
   >
     <p>Are you sure to delete the selected row?</p>
-    <p>If you choose <strong style="font-weight: bold">Confirm & Save</strong> will delete these selected columns on the server (that is, the operation is irreversible)!</p>
+    <p>If you choose <strong style="font-weight: bold">Confirm & Save</strong> will delete these selected columns on the
+      server (that is, the operation is irreversible)!</p>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="deleteDialogVisible = false">Cancel</el-button>
         <el-button type="warning" @click="() =>{removeEvent();deleteDialogVisible = false;}">Confirm</el-button>
-        <el-button type="danger" @click="() =>{removeEvent();saveEvent();deleteDialogVisible = false;}">Confirm & Save</el-button>
+        <el-button type="danger"
+                   @click="() =>{removeEvent();saveEvent();deleteDialogVisible = false;}">Confirm & Save</el-button>
       </span>
     </template>
   </el-dialog>
@@ -103,10 +113,10 @@ import {ref, reactive, toRefs, onBeforeMount} from 'vue'
 import {get, post} from "@/utils/request";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {useSendEmailStore} from "@/store/modules/sendEmail/sendEmail"
+import 'element-plus/theme-chalk/display.css';
 
 
 const sendEmail = useSendEmailStore()
-
 
 
 type InviteUser = {
@@ -140,9 +150,9 @@ const addRow = async (group: string | null) => {
   const $table = tableRef.value;
   const indexList = $table.data!.map(i => i.index)
   let indexNum: number = 0;
-  if (tableData.value.length == 0){
+  if (tableData.value.length == 0) {
     indexNum = 1
-  }else{
+  } else {
     indexNum = Math.max(...indexList) + 1
   }
   if (group === null) {
@@ -162,10 +172,29 @@ const addRow = async (group: string | null) => {
       groups: [group]
     }
   }
-  const {row: newRow} = await $table.insertAt(user, -1)
-  $table.data!.push(user)
-  await $table?.setEditCell(newRow, 'userID')
-  console.log($table.data)
+  await $table.insertAt(user, null)
+  const {insertRecords} = $table.getRecordset()
+  const errMap = await $table?.validate()
+  if (errMap) {
+    return
+  }
+  const body = {insertRecords: insertRecords, removeRecords: [], updateRecords: []}
+  await post('api/inviteUserSaved', body).then(
+      (res) => {
+        ElMessage({
+          message: 'Save success',
+          type: 'success',
+          grouping: true
+        })
+      }).catch((err) => {
+    ElMessage({
+      message: err.response.data['message'],
+      type: 'error',
+      grouping: true
+    })
+  })
+  await loadList()
+  await $table.setEditCell($table.data[0], 'userID')
 }
 
 
@@ -227,6 +256,7 @@ const autoSaveUpdateEvent = async () => {
         message: err.response.data['message'],
         type: 'error'
       })
+
     })
   } catch (e: any) {
     if (e && e.message) {
@@ -318,7 +348,7 @@ const loadList = async () => {
   tableData.value = []
   try {
     const res: InviteUser[] = await get('api/inviteUserSaved')
-    tableData.value = res.sort((a, b) => a.index - b.index)
+    tableData.value = res.sort((a, b) => b.index - a.index)
   } catch (e) {
     tableData.value = []
   }
@@ -326,7 +356,7 @@ const loadList = async () => {
 }
 
 
-onBeforeMount(() =>{
+onBeforeMount(() => {
   tableData.value = []
   get('api/inviteableGroups').then((res) => {
     tableLoading.value = true
@@ -336,28 +366,34 @@ onBeforeMount(() =>{
 })
 
 
-
-
-
 </script>
 
 <style scoped lang="scss">
 
 .page-container {
-  margin: 30px 0 0 35px;
+  margin: 20px 20px 0 20px;
 }
 
 .table-wrapper {
-  height: calc(100vh - 160px);
+  height: calc(100vh - 148px);
+}
+
+@media screen and (max-width: 992px) {
+  .table-wrapper {
+    height: calc(100vh - 188px);
+  }
 }
 
 .button-wrapper {
   margin-bottom: 20px;
 
   .button {
-    width: 150px;
+    width: 140px;
   }
+}
 
+.button_md_down{
+  width: 100px;
 }
 
 .SendButton-wrapper {
