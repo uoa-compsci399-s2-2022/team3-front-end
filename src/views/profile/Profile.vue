@@ -165,11 +165,7 @@ const dialog_upload_ad = ref(true);
 
 
 const showinfo = () => {
-  ElNotification({
-    title: 'Info',
-    message: 'This is an info message',
-    type: 'info',
-  })
+  console.log(updateProfile.value)
 }
 
 
@@ -182,11 +178,9 @@ const submitUpdateForm = (form : usertype) => {
   const submitStatus = ref(true)
   for (let key in form) {
     if (key === 'studentDegree') {
-      if (form[key].toLowerCase() != 'undergraduate' && form[key].toLowerCase() != 'postgraduate') {
+      if ( form[key].toLowerCase() != "undergraduate" && form[key].toLowerCase() != "postgraduate" ) {
         normalNotification('Student Degree form: Not a Valid degree !!!!!', 'We are only accepting Undergraduate and Postgraduate students. Please check your spelling .')
         submitStatus.value = false;
-      }else{
-        updateProfile.value.studentDegree = form[key].toLowerCase()    // 统一下大小写
       }
     }
     if (key === 'auid'){
@@ -210,6 +204,7 @@ const submitUpdateForm = (form : usertype) => {
     errorNotification('Update Failed')
   }
   else{
+    console.log(updateProfile.value)
     // const data = updateProfile.value
     put('api/currentUserProfile' , {
       data : updateProfile.value
@@ -613,7 +608,12 @@ defineExpose({
             message: 'Student degree can not be empty',
             trigger: 'blur',
           }" >
-            <el-input v-model="updateProfile.studentDegree" :placeholder="`origin:  ${detil.studentDegree}`" ></el-input>
+<!--            <el-input v-model="updateProfile.studentDegree" :placeholder="`origin:  ${detil.studentDegree}`" ></el-input>-->
+            <el-radio-group v-model="updateProfile.studentDegree ">
+              <el-radio label="Undergraduate" />
+              <el-radio label="Postgraduate" />
+            </el-radio-group>
+
             <el-button @click="dialog_update_studentDegree=false; delete updateProfile.studentDegree">cancel</el-button>
           </el-form-item>
         </div>

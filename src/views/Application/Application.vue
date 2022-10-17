@@ -11,6 +11,7 @@ import ApplicationPreferCourseList from '@/components/applicationUseful/Applicat
 import 'element-plus/theme-chalk/display.css';
 import type {UploadProps, UploadUserFile, UploadInstance, UploadRawFile} from "element-plus";
 import {genFileId} from 'element-plus';
+import {warningNotification} from "@/utils/notification";
 
 const ApplicationCourse = defineAsyncComponent(() => import('@/components/applicationUseful/ApplicationCourse.vue'))
 const route = useRoute();
@@ -44,7 +45,9 @@ type applicationData = {
   otherContracts: string;
   maximumWorkingHours: number;
   gpa: number;
-
+  savedTime : string;
+  cv :string;
+  ad : string;
 }
 
 type preferCourse = {
@@ -194,6 +197,11 @@ get('api/currentUserProfile').then(res => {
     data.otherContracts = personalDetail.otherContracts;
     data.maximumWorkingHours = personalDetail.maximumWorkingHours;
     data.gpa = personalDetail.gpa;
+    // data.savedTime = personalDetail.savedTime;
+
+
+    // fileList_cv.value = personalDetail.cv;
+    // fileList_ad.value.push(personalDetail.academicRecord);
 
     preferCourseList.value = courseList;
 
@@ -347,6 +355,9 @@ watch(step, async (newStep, oldStep) => {
 const showApplicationPreferCourseList = ref()
 const validateStep = async (step: number) => {
   let flag = true;
+  if (step >= 2){
+    await getFiles()
+  }
   if (step === 0) {
     await formRef.value?.validateField(
         ['name', 'upi', 'studentId', 'email'],
@@ -365,7 +376,10 @@ const validateStep = async (step: number) => {
     await check()
     flag = prefercourseisvalid.value
 
-  } else {
+  } else if (step === 3) {
+
+  }
+  else{
 
   }
   // change the status of status bar
@@ -376,9 +390,50 @@ const validateStep = async (step: number) => {
   }
   return flag;
 }
-//---------表单验证相关------end--------------------------------------
+// ----------------------预加载 CV AD------------------------
+function base64ToBlob(code: string | undefined) {
+  //Base64一行不能超过76字符，超过则添加回车换行符。因此需要把base64字段中的换行符，回车符给去掉，有时候因为存在需要把加号空格之类的换回来，取决于base64存取时的规则。
+  code = code.replace(/[\n\r]/g, '');
+  var raw = window.atob(code);
+  let rawLength = raw.length;
+  //转换成pdf.js能直接解析的Uint8Array类型
+  let uInt8Array = new Uint8Array(rawLength);
+  for (let i = 0; i < rawLength; ++i) {
+    uInt8Array[i] = raw.charCodeAt(i);
+  }
+  return new Blob([uInt8Array], {type: 'application/pdf'});//转成pdf类型
+}
+async function getFiles(){
+  get('api/saveApplication_Files/' + applicationID.value).then(res => {
+    let personalDetail = res.files;
+    // let courseList = res.course;
+    // console.log(personalDetail)
+    let cv = personalDetail['cv']
+    let ad = personalDetail['academicRecord']
+    let savedTime = personalDetail['savedTime']
+    if (cv != "" && fileList_cv.value.length == 0) {
+      let blob_cv = base64ToBlob(cv)
+      fileList_cv.value.push({
+        name:"Last_Time: " + savedTime + '_CV.pdf',
+        url: URL.createObjectURL(blob_cv),
+      })
+      fileBase_cv.value = cv
+    }
 
-// -----Work by laiyu -------
+    if (ad != "" && fileList_ad.value.length == 0) {
+      let blob_ad = base64ToBlob(ad)
+      fileList_ad.value.push({
+        name:savedTime + '_Transcript.pdf',
+        url: URL.createObjectURL(blob_ad),
+      })
+      fileBase_ad.value = ad
+    }
+  })
+}
+
+// ----------------------预加载 CV AD------------------------
+
+//---------表单验证相关------end--------------------------------------
 // -----Testing upload file ------ start
 
 // 上传文件后对文件的预览于删除
@@ -572,7 +627,7 @@ const check =async ()=>{
           <el-step :status="statusArr[0]" :icon="Key"></el-step>
           <el-step :status="statusArr[1]" :icon="Avatar"/>
           <el-step :status="statusArr[2]" :icon="Management"/>
-          <el-step :status="statusArr[3]" :icon="UploadFilled"/>
+          <el-step :status="statusArr[3]" :icon="UploadFilled" />
         </el-steps>
       </div>
 
@@ -706,7 +761,9 @@ const check =async ()=>{
         <Transition>
           <div v-show="stepArr[3]">
             <el-divider>Upload CV</el-divider>
+            <div v-if="true">
 
+            </div>
             <el-upload class="upload-cv" drag
                        ref="upload_cv"
                        accept="application/pdf"
