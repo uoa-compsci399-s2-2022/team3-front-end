@@ -1,12 +1,17 @@
 <template>
-  <h3>Prefer Courses List</h3>
+  <h3 style="margin-bottom: 8px">Prefer Courses List</h3>
   <SlickList axis="y" v-model:list="prefercourselist" class="list-container" @update:list="changePreference" :distance="distance" :pressDelay="pressDelay" :useWindowAsScrollContainer="true">
     <SlickItem v-for="(c, i) in prefercourselist" :key="c.courseID" :index="i" class="list-item">
       <el-icon><DCaret /></el-icon>
       {{ c.courseNum }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Preference: {{ c.preference}}
         <el-button @click="deleteCourse(i)" class="delete-button" type="danger" :icon="Delete" circle/>
       <el-collapse>
-        <el-collapse-item title="Fill in the application information for this course" name="1" class="course-collapse">
+        <el-collapse-item name="1" class="course-collapse">
+          <template #title>
+            <div class="collapse-title">
+            <el-icon style="margin-left: 10px; margin-right: 10px" color="red"><EditPen /></el-icon> Click to fill in the application information for this course
+            </div>
+          </template>
           <el-form ref="preferCourseRef" :rules="rules" :model="c" label-width="250px" label-position="top" class="course-form">
             <el-form-item label="Have you completed this course?" prop="hasLearned">
               <el-switch v-model="c.hasLearned" />
@@ -38,7 +43,7 @@
 <script setup lang="ts">
 import { SlickList, SlickItem } from 'vue-slicksort';
 import {computed, ref, toRef, watch, reactive, onBeforeMount} from "vue";
-import {DCaret, Delete} from "@element-plus/icons-vue";
+import {DCaret, Delete, EditPen} from "@element-plus/icons-vue";
 import {ElMessage, FormInstance, FormRules} from "element-plus";
 import {isMobile} from "@/utils/isMoblie";
 
@@ -201,9 +206,9 @@ h3{
   display: block;
   padding: 0.75rem 1.25rem;
   margin-bottom: 4px;
-  background-color: rgba(176, 201, 227, 0.22);
+  background-color: #f1f1f1;
   border: 1px solid rgba(0,0,0,.125);
-  border-radius: .25rem;
+  border-radius: 10px;
 }
 
 .delete-button{
@@ -214,11 +219,27 @@ h3{
 .course-collapse{
   margin-top: 15px;
   border-radius: 10px;
+  background: #0b416d;
 }
+
 
 
 .course-form{
   margin: 5px;
 }
 
+*{
+  -webkit-touch-callout:none;  /*系统默认菜单被禁用*/
+  -webkit-user-select:none; /*webkit浏览器*/
+  -khtml-user-select:none; /*早期浏览器*/
+  -moz-user-select:none;/*火狐*/
+  -ms-user-select:none; /*IE10*/
+  user-select:none;
+}
+input{
+  -webkit-user-select:auto; /*webkit浏览器*/
+}
+textarea{
+  -webkit-user-select:auto; /*webkit浏览器*/
+}
 </style>

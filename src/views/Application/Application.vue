@@ -594,7 +594,7 @@ const check =async ()=>{
 <template>
   <div class="application-header">
     <img src="@/assets/logo/uoa.svg" alt="">
-    <el-button style="position: absolute; right: 20px;top: 20px" type="danger" @click="backTohome">Back</el-button>
+    <el-button style="position: absolute; right: 20px;top: 20px" type="primary" @click="backTohome">Back</el-button>
     <el-card class="application-meta-box-card hidden-sm-and-down">
       <div v-loading="!(metaLoading && userProfileLoading && saveLoading)">
         <p>ApplicationID: {{ applicationID }}</p>

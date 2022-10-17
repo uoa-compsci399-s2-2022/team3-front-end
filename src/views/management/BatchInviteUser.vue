@@ -12,29 +12,30 @@
               :loading="tableLoading"
               :loading-config="{icon: 'vxe-icon-indicator roll', text: 'Loading...'}"
               :keyboard-config="{isArrow: true, isDel: true, isEnter: true, isTab: true, isEdit: true, isChecked: true}"
+              :mouse-config="{selected: true}"
               :data="tableData"
               :column-config="{resizable: true}"
-              :edit-config="{trigger: 'click', mode: 'row', showStatus: true}"
+              :edit-config="{trigger: 'dblclick', mode: 'cell', showStatus: true}"
               :sort-config="{trigger: 'cell', defaultSort: {field: 'age', order: 'desc'}, orders: ['desc', 'asc', null]}"
               @edit-closed="editClosedEvent">
             <vxe-column type="checkbox" width="50"></vxe-column>
             <vxe-column type="seq" width="60"></vxe-column>
-            <vxe-column field="userID" title="UserID (UPI)" :edit-render="{}">
+            <vxe-column field="userID" title="UserID (UPI)" :edit-render="{autofocus: '.vxe-input--inner'}">
               <template #edit="{ row }">
                 <vxe-input v-model="row.userID"></vxe-input>
               </template>
             </vxe-column>
-            <vxe-column field="email" title="Email" :edit-render="{}">
+            <vxe-column field="email" title="Email" :edit-render="{autofocus: '.vxe-input--inner'}">
               <template #edit="{ row }">
                 <vxe-input v-model="row.email"></vxe-input>
               </template>
             </vxe-column>
-            <vxe-column field="name" title="Name" :edit-render="{}">
+            <vxe-column field="name" title="Name" :edit-render="{autofocus: '.vxe-input--inner'}">
               <template #edit="{ row }">
                 <vxe-input v-model="row.name"></vxe-input>
               </template>
             </vxe-column>
-            <vxe-column field="groups" title="Groups" :edit-render="{}">
+            <vxe-column field="groups" title="Groups" :edit-render="{autofocus: '.vxe-input--inner'}">
               <template #edit="{ row }">
                 <vxe-select v-model="row.groups" placeholder="Select Groups" multiple>
                   <vxe-option :value="g.groupName" :label="g.groupName" v-for="g in groups"></vxe-option>
@@ -98,7 +99,7 @@
 <script setup lang="ts">
 import {Plus, Promotion, DocumentChecked, DeleteFilled} from "@element-plus/icons-vue";
 import {VXETable, VxeTableInstance, VxeTableEvents} from "vxe-table";
-import {ref, reactive, toRefs} from 'vue'
+import {ref, reactive, toRefs, onBeforeMount} from 'vue'
 import {get, post} from "@/utils/request";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {useSendEmailStore} from "@/store/modules/sendEmail/sendEmail"
@@ -314,6 +315,7 @@ const removeEvent = async () => {
 
 const loadList = async () => {
   tableLoading.value = true
+  tableData.value = []
   try {
     const res: InviteUser[] = await get('api/inviteUserSaved')
     tableData.value = res.sort((a, b) => a.index - b.index)
@@ -324,11 +326,18 @@ const loadList = async () => {
 }
 
 
-get('api/inviteableGroups').then((res) => {
-  groups.value = res;
+onBeforeMount(() =>{
+  tableData.value = []
+  get('api/inviteableGroups').then((res) => {
+    tableLoading.value = true
+    groups.value = res;
+    loadList()
+  })
 })
 
-loadList()
+
+
+
 
 </script>
 

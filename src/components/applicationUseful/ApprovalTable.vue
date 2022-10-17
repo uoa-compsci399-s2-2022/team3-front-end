@@ -127,9 +127,9 @@
         <vxe-input v-model="row.name" type="text"></vxe-input>
       </template>
     </vxe-column>
-    <vxe-column field="gpa" title="GPA" :edit-render="{}" width="70" sortable>
+    <vxe-column field="gpa" title="GPA" :edit-render="{}" width="85"  sortable>
       <template #edit="{ row }">
-        <vxe-input v-model="row.gpa" type="number"></vxe-input>
+        <vxe-input v-model="row.gpa" type="float" digits="3"></vxe-input>
       </template>
     </vxe-column>
     <vxe-column field="PreferCourseGPA" title="PreferCourse GPA" width="110" sortable>

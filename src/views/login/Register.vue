@@ -166,8 +166,8 @@ const submitForm = (formEl: FormInstance | undefined) => {
     <LoginBackground />
     <div class="container">
         <div class="register-window">
-            <h1>Register</h1>
             <img src="@/assets/logo/uoa.svg" alt="" class="logo">
+            <h1>Register</h1>
             <el-form ref="registerFormRef" :model="registerForm" status-icon :rules="rules" label-width="150px"
                 class="demo-registerForm" hide-required-asterisk>
                 <el-form-item label="UserID" prop="userID">
@@ -253,8 +253,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
         justify-content: center;
 
         .register-window {
-            margin-right: 0;
-            margin-top: 10vw;
+
 
             img {
                 position: static;
