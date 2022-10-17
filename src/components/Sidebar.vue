@@ -36,7 +36,7 @@ const items: sidebarMenu = [
     icon: 'DocumentChecked',
     index: '/applicationapproval',
     title: 'Application Approval',
-    permission: '4',
+    permission: '5',
   },
   {
     icon: "Collection",
@@ -53,7 +53,7 @@ const items: sidebarMenu = [
       {
         index: '/managecourse',
         title: 'Manage Course',
-        permission: '4',
+        permission: '5',
       },
       {
         index: 'manageuserFolder',
@@ -75,7 +75,7 @@ const items: sidebarMenu = [
       {
         index: '/manageEnrolment',
         title: 'Manage Enrolment',
-        permission: '4',
+        permission: '5',
       },
     ]
   }];

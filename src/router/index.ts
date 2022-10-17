@@ -32,14 +32,14 @@ const routes:RouteRecordRaw[] = [
             },
             {
                 path: 'applicationapproval',
-                meta: { title:'Application Approval', permission: '4' },
+                meta: { title:'Application Approval', permission: '5' },
                 component: () => import('@/views/Application/ApplicationApproval.vue')
             },
             //management
             {
                 path: "managecourse",
                 name: "managecourse",
-                meta: { title:'Manage Course', permission: '4' },
+                meta: { title:'Manage Course', permission: '5' },
                 component: () => import('@/views/management/ManageCourse.vue')
             },
             {
@@ -65,7 +65,7 @@ const routes:RouteRecordRaw[] = [
             {
                 path: "manageEnrolment",
                 name: "manageEnrolment",
-                meta: { title:'Manage Enrolment', permission: '4' },
+                meta: { title:'Manage Enrolment', permission: '5' },
                 component: () => import('@/views/management/ManageEnrolment.vue')
             },
             {
@@ -77,7 +77,7 @@ const routes:RouteRecordRaw[] = [
             {
                 path: "tutor-marker/:courseId",
                 name: "tutor-marker",
-                meta: { title:'Tutor Marker', permission: '3' },
+                meta: { title:'Tutor Marker', permission: '2' },
                 component: () => import('@/views/TutorMarker.vue')
             },
 

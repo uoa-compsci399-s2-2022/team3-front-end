@@ -324,7 +324,7 @@ const loadList = async () => {
 }
 
 
-get('api/groups').then((res) => {
+get('api/inviteableGroups').then((res) => {
   groups.value = res;
 })
 
