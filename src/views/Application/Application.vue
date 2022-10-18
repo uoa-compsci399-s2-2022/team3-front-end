@@ -525,7 +525,6 @@ const save = () => {
     "fileURLAD": fileBase_ad
   }).then(
       res => {
-        console.log(res)
         ElMessage({
           showClose: true,
           message: 'Save successfully',

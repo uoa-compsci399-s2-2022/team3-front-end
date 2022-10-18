@@ -36,7 +36,6 @@ const handleSelect = (selection: any[], row: any) => {
             break
         }
     }
-    console.log(isCheck)
     get(`api/endorsedApplicationByCC/${row.applicationID}/${route.params.courseId}`).then(res => {
         if (isCheck) {
             ElNotification({
@@ -81,7 +80,6 @@ const filterType = (value: string, row: any) => {
 
 <template>
     <el-table ref="tableRef" :data="tableData" style="width: 100%;" @select="handleSelect" max-height="800">
-
         <el-table-column type="selection" width="55" />
         <el-table-column type="expand">
 
@@ -183,4 +181,8 @@ const filterType = (value: string, row: any) => {
         border-color: rgb(255, 221, 0);
     }
 }
+:deep(.el-table__header-wrapper) .el-checkbox{
+  display: none !important;
+}
+
 </style>

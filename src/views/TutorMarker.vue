@@ -3,12 +3,6 @@
     <el-row :gutter="15">
       <el-col :md="12" :xs="24">
         <el-card class="box-card">
-          <template #header>
-            <div class="card-header">
-              <span>Course Information</span>
-              <el-button type="primary" :icon="Edit" @click="courseEditModalOpened = true" circle/>
-            </div>
-          </template>
           <el-descriptions
               title="Basic Information"
               direction="vertical"
@@ -312,7 +306,6 @@ const getCourseInfo = () => {
     courseForm.currentlyNumOfStudents = res.currentlyNumOfStudents
     courseForm.prerequisite = res.prerequisite
 
-    console.log(courseInformation.value)
   })
 }
 

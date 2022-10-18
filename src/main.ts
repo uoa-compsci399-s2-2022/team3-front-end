@@ -26,7 +26,14 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import {faTwitter} from '@fortawesome/free-brands-svg-icons'
 import dayjs from "dayjs";
+import { registerSW } from 'virtual:pwa-register'
 // import {  } from '@fortawesome/free-regular-svg-icons'
+
+
+const updateSW = registerSW({
+    onNeedRefresh() {},
+    onOfflineReady() {},
+})
 
 const app = createApp(App);
 app.use(router)

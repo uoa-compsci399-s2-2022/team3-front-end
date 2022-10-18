@@ -90,8 +90,6 @@ const uploadEvent = () => {
 
 const handleSuccess = (response: any, file: UploadUserFile) => {
     let Notimessage = '';
-
-    console.log(response)
     response['message'].forEach((e: String) => {
       Notimessage += `<p>${e}</p>`
     })
