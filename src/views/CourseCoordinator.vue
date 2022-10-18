@@ -337,7 +337,6 @@ const getCourseInfo = () => {
     courseForm.currentlyNumOfStudents = res.currentlyNumOfStudents
     courseForm.prerequisite = res.prerequisite
 
-    console.log(courseInformation.value)
   })
 }
 
@@ -408,8 +407,6 @@ const getCurrentMarkerTutorList = () => {
     currentTutorList.value = stateUser.value.filter((user: { roleInCourse: string; }) => user.roleInCourse === 'tutor')
     currentMarkerLoading.value = false
     currentTutorLoading.value = false
-    console.log(currentMarkerList.value)
-    console.log(currentTutorList.value)
   })
 }
 

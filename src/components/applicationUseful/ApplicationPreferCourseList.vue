@@ -92,13 +92,17 @@ const deleteCourse = (index: number) => {
 const validateStep =  async () => {
 
   let flag = true;
+  if (prefercourselist.value.length === 0) {
+    ElMessage.error('Please add at least one course');
+    flag = false;
+    return
+  }
   for (let i = 0; i < preferCourseRef.value!.length; i++) {
     switchstate.value = prefercourselist.value[i].hasLearned
     await preferCourseRef.value![i].validateField(
         ['hasLearned','grade','explanation','preExperience'],
         (valid)=>{
           flag = flag && valid
-
         }
     )
 
@@ -111,15 +115,11 @@ defineExpose({validateStep})
 const switchstate = ref()
 
 const validatehasLearnedgrade = (rule: any, value: any, callback: any) => {
-  console.log(value)
   if ( switchstate.value === false) {
-    console.log(1)
     callback();
   } else if ( value == "") {
-    console.log(2)
     callback(new Error('Please select your grade in this course'));
   } else {
-    console.log(3)
     callback();
   }
 }

@@ -80,7 +80,7 @@ watch(route, () => {
   }
 })
 
-console.log(route.matched)
+
 if (route.name !== "application"){
   getPath()
 }

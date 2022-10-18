@@ -65,8 +65,8 @@
             </el-descriptions-item>
           </el-descriptions>
           <div style="margin-top: 10px">
-          <el-button type="primary" :icon="Download" plain>CV</el-button>
-          <el-button type="primary" :icon="Download" plain>Transcript</el-button>
+          <el-button type="primary" :icon="Download" @click="getCV(row.applicationID)" v-loading="loadingCV" plain >CV</el-button>
+          <el-button type="primary" :icon="Download" @click="getTranscript(row.applicationID)"  v-loading="loadingTranscript" plain>Transcript</el-button>
           </div>
           <div v-if="['1', '3'].includes(tagIndexSync)">
             <p class="emphasis" v-if="tagIndexSync === '1'">Enrolled Courses (Not Published)</p>
@@ -391,7 +391,7 @@ import {get, post, put} from "@/utils/request";
 import {ElMessage} from "element-plus";
 import type {FormInstance} from 'element-plus'
 import {datetimeFormat} from "@/utils/datetimeFormat";
-
+import {base64ToBlob} from '@/utils/base64ToBlob';
 // *********************
 // * Sync Parameter
 // *********************
@@ -682,6 +682,31 @@ const formatBool = (row) => {
   }
 }
 
+const loadingCV = ref(false)
+const loadingTranscript = ref(false)
+
+
+async function getCV(applicationID : any ){
+  loadingCV.value = true
+  let CVBase64 = await get('api/ApplicationCV/' + applicationID);
+  // console.log(CVBase64)
+  let blob = base64ToBlob(CVBase64.applicationCV);
+  let bloburl = window.URL.createObjectURL(blob);
+  window.open(bloburl);
+  loadingCV.value = false
+}
+
+
+async function getTranscript (applicationID : any ){
+  loadingTranscript.value = true
+  let transcriptBase64 = await get('api/ApplicationTranscript/' + applicationID);
+  // let blob = base64ToBlob(transcriptBase64.application)
+  console.log(transcriptBase64)
+  let blob = base64ToBlob(transcriptBase64.applicationTranscript);
+  let bloburl = window.URL.createObjectURL(blob);
+  window.open(bloburl);
+  loadingTranscript.value = false
+}
 
 onBeforeMount(() => {
   responsiveLayout()
