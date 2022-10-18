@@ -52,6 +52,7 @@ type term = {
   isAvailable: boolean;
   defaultMarkerDeadLine: string;
   defaultTutorDeadLine: string;
+  payday: Array<any>;
 }
 
 /**
@@ -252,6 +253,7 @@ const termDTO = reactive<term>({
   isAvailable: false,
   defaultMarkerDeadLine: "",
   defaultTutorDeadLine: "",
+  payday: [],
 })
 
 
@@ -272,9 +274,9 @@ const handleTermAdd = () => {
           termModalOpened.value = false;
 
         })
-        .catch(() => {
+        .catch((err) => {
           ElMessage({
-            message: `Failed. Please check your internect connection.`,
+            message: err.response.data.message,
             type: 'error',
           })
         })
