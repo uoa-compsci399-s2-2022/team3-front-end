@@ -100,8 +100,9 @@ function base64ToBlob(code: string | undefined) {
 
 
 async function getAcademicRecord() {
+  loadingAD.value = true;
   let user = await get(`api/getAcademicTranscript/` + detil.value['id'] )
-  console.log(user.cv)
+  // console.log(user.cv)
   if (user.AcademicTranscript != null && user.AcademicTranscript != undefined && user.AcademicTranscript != "") {
     academicRecord.value = user.AcademicTranscript;
     // let blob = base64toBlob(academicRecord.value, 'application/pdf');
@@ -111,13 +112,14 @@ async function getAcademicRecord() {
   }else{
     warningNotification('Did not detect your academic transcript, please upload your academic transcript')
   }
-
+  loadingAD.value = false;
 }
 
 async function getCV() {
+  loadingCV.value = true;
   // console.log(id.value)
   let user = await get(`api/getCV/` + detil.value['id'])
-  console.log(user.cv)
+  // console.log(user.cv)
   if (user.cv != null && user.cv != undefined && user.cv != "") {
     academicRecord.value = user.cv;
     // let blob = base64toBlob(academicRecord.value, 'application/pdf');
@@ -129,7 +131,7 @@ async function getCV() {
   else{
     warningNotification('Did not detect your CV, please upload your CV')
   }
-
+  loadingCV.value = false;
 }
 
 getUserProfile()
@@ -163,9 +165,11 @@ const dialog_validated_email = ref(false);
 const dialog_upload_cv = ref(true);
 const dialog_upload_ad = ref(true);
 
+const loadingCV = ref(false);
+const loadingAD = ref(false);
 
 const showinfo = () => {
-  console.log(updateProfile.value)
+  // console.log(updateProfile.value)
 }
 
 
@@ -174,7 +178,7 @@ const validationCode = ref('')
 
 
 const submitUpdateForm = (form : usertype) => {
-  console.log(form)
+  // console.log(form)
   const submitStatus = ref(true)
   for (let key in form) {
     if (key === 'studentDegree') {
@@ -184,7 +188,7 @@ const submitUpdateForm = (form : usertype) => {
       }
     }
     if (key === 'auid'){
-      console.log(isNaN(Number(form[key])))
+      // console.log(isNaN(Number(form[key])))
       if ( isNaN(Number(form[key]))){
         normalNotification('AUID form: Not a Valid AUID !!!!!', 'Please check your AUID again.')
         submitStatus.value = false;
@@ -204,12 +208,12 @@ const submitUpdateForm = (form : usertype) => {
     errorNotification('Update Failed')
   }
   else{
-    console.log(updateProfile.value)
+    // console.log(updateProfile.value)
     // const data = updateProfile.value
     put('api/currentUserProfile' , {
       data : updateProfile.value
     }).then((res) => {
-      console.log(res.status)
+      // console.log(res.status)
       if (res.status == 1) {
         successNotification('Update Success')
         getUserProfile()
@@ -224,7 +228,7 @@ const submitUpdateForm = (form : usertype) => {
 async function check_email(email? : string) {
   normalNotification('Sending an email to ' + email, 'Please wait for a few seconds')
   const respsone = await post('api/sendValidationEmail', {email: email})
-  console.log(respsone)
+  // console.log(respsone)
   successNotification('Send email to '+ email +  'successfully. Please type the validation code, validation code will be expired in 5 minutes')
   // normalNotification('Sending email to '+ email, )
 }
@@ -232,8 +236,8 @@ async function check_email(email? : string) {
 
 async function validValidationCode(email?: string , code? : string){
   const response = await post('/api/validateValidationCode/'+email+'/'+code)
-  console.log(response)
-  console.log(response['status'])
+  // console.log(response)
+  // console.log(response['status'])
   if (response['status'] === 1){
     successNotification('Validation Code is correct')
     dialog_validated_email.value = true;
@@ -416,8 +420,8 @@ defineExpose({
         <div class="profile-download">
             <p>Personal documents</p>
 <!--            <div>visa.pdf</div>-->
-            <div @click="getCV">cv</div>
-            <div @click="getAcademicRecord">Academic Transcript</div>
+            <div @click="getCV" v-loading="loadingCV">cv</div>
+            <div @click="getAcademicRecord" v-loading="loadingAD">Academic Transcript</div>
           <el-button @click="showUploadDialog" >
             Upload<el-icon class="el-icon--right"><Upload/></el-icon>
           </el-button>
