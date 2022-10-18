@@ -73,13 +73,13 @@ declare module '@vue/runtime-core' {
     LoadingBar: typeof import('./src/components/LoadingBar.vue')['default']
     LoginBackground: typeof import('./src/components/backgrounds/LoginBackground.vue')['default']
     People: typeof import('./src/components/icons/People.vue')['default']
-    ReloadPrompt: typeof import('./src/components/ReloadPrompt.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
     StartApplicationDrawer: typeof import('./src/components/applicationUseful/StartApplicationDrawer.vue')['default']
     UpdateDialog: typeof import('./src/components/profiledialog/UpdateDialog.vue')['default']
     ValidateEmail: typeof import('./src/components/profiledialog/ValidateEmail.vue')['default']
+    WorkingHourCard: typeof import('./src/components/cards/WorkingHourCard.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

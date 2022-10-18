@@ -2,7 +2,7 @@
   <div class="page-container">
     <el-row class="header-container">
       <el-select v-model="currentTerm" @change="handleTermChange" class="m-2" placeholder="Select Term" size="large"
-        v-loading="isLoadingTerm">
+        v-loading="isLoadingTerm" no-data-text="No Term">
         <el-option v-for="item in stateTerm" :key="item.termName" :label="item.termName" :value="item.termID" />
       </el-select>
       <el-alert class="alert" title="Tips: Please Select Term First" type="warning" show-icon />
@@ -238,6 +238,9 @@ watch(stateUser, _ => {
 onBeforeMount(() => {
   executeTerm().then(
       () => {
+        if (stateTerm.value === null || stateTerm.value === undefined || stateTerm.value.length === 0) {
+          return
+        }
         stateTerm.value.sort((a: Term, b: Term) => {
           return b.termID! - a.termID!
         })

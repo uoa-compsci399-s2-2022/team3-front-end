@@ -24,6 +24,9 @@ const {isLoading: isLoadingTerm, state: stateTerm, isReady: isReadyTerm, execute
 onBeforeMount(() => {
   executeTerm().then(
       () => {
+        if (stateTerm.value === null || stateTerm.value === undefined || stateTerm.value.length === 0) {
+          return
+        }
         stateTerm.value.sort((a: Term, b: Term) => {
           return b.termID! - a.termID!
         })
@@ -45,7 +48,7 @@ const courseList = ref()
   <div class="page-container">
     <el-row  class="header-container">
       <el-select v-model="currentTerm" placeholder="Select Term" size="large"
-                 v-loading="isLoadingTerm" style="margin-right: 15px;" >
+                 v-loading="isLoadingTerm" style="margin-right: 15px;" no-data-text="No Term">
         <el-option v-for="item in stateTerm" :key="item.termName" :label="item.termName" :value="item.termID" />
       </el-select>
       <el-select v-model="currentPosition" placeholder="Available Position" size="large" style="margin-right: 30px;"

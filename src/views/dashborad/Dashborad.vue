@@ -10,8 +10,6 @@ const value = ref('1')
 const value_semester = ref('')
 
 
-
-
 const {isLoading: isLoadingTerm, state: stateTerm, isReady: isReadyTerm, execute: executeTerm} = useAsyncState(
     (args) => {
       return get('api/getCurrentUserTerm')
@@ -58,6 +56,10 @@ async function GetCourse(termID: String) {
 
 onBeforeMount(() => {
   executeCurrentTerm().then(() => {
+    if (stateCurrentTerm.value === null || stateCurrentTerm.value === undefined || stateCurrentTerm.value.length === 0) {
+      noCourse.value = true
+      return
+    }
     value_semester.value = stateCurrentTerm.value[0].termID
     GetCourse(value_semester.value)
   })
@@ -66,7 +68,7 @@ onBeforeMount(() => {
 
 const noCourse = ref(false)
 
-watch(courseList, (courseList)=> {
+watch(courseList, (courseList) => {
   noCourse.value = courseList.length == 0;
 })
 
@@ -75,7 +77,7 @@ watch(courseList, (courseList)=> {
 <template>
   <div class="page-container">
     <div>
-      <el-select placeholder="Select Term" v-model="value_semester" v-loading="isLoadingTerm">
+      <el-select placeholder="Select Term" v-model="value_semester" v-loading="isLoadingTerm" no-data-text="No Term">
         <el-option-group label="Current Terms">
           <el-option
               v-for="item in stateCurrentTerm"
@@ -93,13 +95,12 @@ watch(courseList, (courseList)=> {
               :value="item.termID"
               @click="GetCourse(value_semester)"/>
         </el-option-group>
-
       </el-select>
     </div>
 
     <div class="course-container">
       <div v-for="item in courseList">
-        <router-link :to="{path:item.path, query:{role:item.roleName}}" >
+        <router-link :to="{path:item.path, query:{role:item.roleName}}">
           <CourseCard :course="item"/>
         </router-link>
       </div>
@@ -152,7 +153,7 @@ watch(courseList, (courseList)=> {
         </el-button>
       </div>
       <div class="button-wrapper" v-permission="5">
-        <el-button @click="$router.push('manageEnrolment')" class="big-button" type="primary" plain>
+        <el-button @click="$router.push('applicationapproval')" class="big-button" type="primary" plain>
           <el-icon :size="90">
             <DocumentChecked/>
           </el-icon>
@@ -198,7 +199,7 @@ a {
   text-align: center;
 }
 
-.center-button-group{
+.center-button-group {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;

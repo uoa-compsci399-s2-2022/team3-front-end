@@ -65,8 +65,8 @@
             </el-descriptions-item>
           </el-descriptions>
           <div style="margin-top: 10px">
-          <el-button type="primary" :icon="Download" @click="getCV(row.applicationID)" v-loading="loadingCV" plain >CV</el-button>
-          <el-button type="primary" :icon="Download" @click="getTranscript(row.applicationID)"  v-loading="loadingTranscript" plain>Transcript</el-button>
+          <el-button type="primary" :icon="Download" @click="getCV(row.applicationID)" :loading="loadingCV" plain >CV</el-button>
+          <el-button type="primary" :icon="Download" @click="getTranscript(row.applicationID)"  :loading="loadingTranscript" plain>Transcript</el-button>
           </div>
           <div v-if="['1', '3'].includes(tagIndexSync)">
             <p class="emphasis" v-if="tagIndexSync === '1'">Enrolled Courses (Not Published)</p>
