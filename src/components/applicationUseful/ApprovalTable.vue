@@ -391,7 +391,7 @@ import {get, post, put} from "@/utils/request";
 import {ElMessage} from "element-plus";
 import type {FormInstance} from 'element-plus'
 import {datetimeFormat} from "@/utils/datetimeFormat";
-
+import {base64ToBlob} from '@/utils/base64ToBlob';
 // *********************
 // * Sync Parameter
 // *********************
@@ -681,7 +681,7 @@ const formatBool = (row) => {
     return 'No'
   }
 }
-import {base64ToBlob} from '@/utils/base64ToBlob'
+
 const loadingCV = ref(false)
 const loadingTranscript = ref(false)
 
