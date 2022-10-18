@@ -9,14 +9,14 @@
     </el-row>
 
     <el-row :gutter="22" class="table-wrapper">
-      <el-col :span="8" class="leftBox">
+      <el-col :span="9" class="leftBox">
         <el-row justify="center">
           <span class="tableTitle">Course List</span>
         </el-row>
         <el-table v-loading="isLoadingCourse" ref="singleTableRef" :data="stateCourse" highlight-current-row
           style="width: 100%; height: calc(100vh - 255px)" @current-change="handleCurrentChange" :show-header="false">
-          <el-table-column property="courseNum" label="Course Num" width="140" />
-          <el-table-column property="courseName" label="Course Name" width="300" />
+          <el-table-column property="courseNum" label="Course Num" width="135" />
+          <el-table-column property="courseName" label="Course Name"  show-overflow-tooltip/>
           <template #empty>
             <el-empty description="No Data" />
           </template>
@@ -24,7 +24,7 @@
 
       </el-col>
 
-      <el-col :span="16" style="margin-bottom: 20px">
+      <el-col :span="15" style="margin-bottom: 70px">
         <el-row justify="center">
           <span class="tableTitle">Student List</span>
         </el-row>
@@ -42,14 +42,11 @@
             </template>
 
           </el-table-column>
-          <!-- <el-table-column>
+          <el-table-column>
             <template #default="scope">
-              <el-button size="small" @click="handleremove(scope.row)" type="danger">
-                Remove
-              </el-button>
+              <el-button @click="handleremove(scope.row)" type="danger" :icon="Delete" circle />
             </template>
-
-          </el-table-column> -->
+          </el-table-column>
           <template #empty>
             <el-empty description="No Data" />
           </template>
@@ -66,12 +63,12 @@
   <AddUserDrawer :visible="UserVisible" direction="ltr" :currentCourse="currentCourse" v-if="UserVisible.visible"
     @refresh="freshtable" :user-role-arr="userRoleArr" />
 
-  <!-- <el-dialog
+  <el-dialog
       v-model="deleteConfirmVisible"
       title="Delete Confirm"
       width="30%"
   >
-    <span>Please confirm to delete the user: {{ wantToDeleteUser.id }}</span>
+    <span>Please confirm to delete the user '{{ wantToDeleteUser.id }}' from the course</span>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="deleteConfirmVisible = false">Cancel</el-button>
@@ -80,15 +77,15 @@
         >
       </span>
     </template>
-  </el-dialog> -->
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
-import {onBeforeMount, reactive, ref, watch} from "vue";
+import { onBeforeMount, reactive, ref, watch } from "vue";
 import { useAsyncState } from '@vueuse/core'
-import { get } from "@/utils/request";
-import { ElTable } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { get, Delete as delete_request } from "@/utils/request";
+import { ElTable, ElMessage } from 'element-plus'
+import { Plus, Delete } from '@element-plus/icons-vue'
 import AddUserDrawer from '@/components/ManageUseful/AddUserDrawer.vue'
 import {usePermissionStore} from "@/store";
 
@@ -102,36 +99,36 @@ const currentTerm = ref();
 const currentCourse = ref<Course>();
 const deleteConfirmVisible = ref(false)
 const wantToDeleteUser = ref({} as User)
-// const handleremove = (row: User) => {
-//   deleteConfirmVisible.value = true;
-//   wantToDeleteUser.value = row;
+const handleremove = (row: User) => {
+  deleteConfirmVisible.value = true;
+  wantToDeleteUser.value = row;
+}
+type deleteform = {
+  courseID: number
+  userID: string
+  role:string
+}
+const  form = reactive({} as deleteform)
+const deleteUser = () => {
+  form.courseID = currentCourse.value.courseID
+  form.userID = wantToDeleteUser.value.id
+  form.role = wantToDeleteUser.value.roleInCourse
 
-// }
-// type deleteform = {
-//   courseID: number
-//   userID: string
-//   role:string
-// }
-// const  form = reactive({} as deleteform)
-// const deleteUser = () => {
-//   form.courseID = currentCourse.value.courseID
-//   form.userID = wantToDeleteUser.value.id
-//   form.role = wantToDeleteUser.value.roleInCourse
+  delete_request('/api/enrolment',{data:form}).then(r => {
+    ElMessage({
+      message: 'Remove user success',
+      type: 'success'
+    })
+    deleteConfirmVisible.value = false;
+    freshtable()
+  }).catch(err => {
+    ElMessage({
+      message: err.response.data['message'],
+      type: 'error'
+    })
+  })
+}
 
-//   Delete('/api/enrolment',{data:form}).then(r => {
-//     ElMessage({
-//       message: 'Remove user success',
-//       type: 'success'
-//     })
-//     deleteConfirmVisible.value = false;
-//     freshtable()
-//   }).catch(err => {
-//     ElMessage({
-//       message: err.response.data['message'],
-//       type: 'error'
-//     })
-//   })
-// }
 const { isLoading: isLoadingTerm, state: stateTerm, isReady: isReadyTerm, execute: executeTerm } = useAsyncState(
   (args) => {
     return get('api/term')
@@ -193,6 +190,7 @@ const UserVisible = reactive({
 const showUser = () => {
   UserVisible.visible = true
 }
+
 const freshtable = () => {
   executeUser(0, { courseID: currentCourse.value!.courseID })
 }

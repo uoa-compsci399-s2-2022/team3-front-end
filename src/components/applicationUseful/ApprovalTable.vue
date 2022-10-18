@@ -53,7 +53,7 @@
                   Submitted DateTime
                 </div>
               </template>
-              {{ row.submittedDateTime }}
+              {{ datetimeFormat(row.submittedDateTime) }}
             </el-descriptions-item>
             <el-descriptions-item>
               <template #label>
@@ -64,7 +64,10 @@
               {{ row.otherContracts }}
             </el-descriptions-item>
           </el-descriptions>
-          <br/>
+          <div style="margin-top: 10px">
+          <el-button type="primary" :icon="Download" plain>CV</el-button>
+          <el-button type="primary" :icon="Download" plain>Transcript</el-button>
+          </div>
           <div v-if="['1', '3'].includes(tagIndexSync)">
             <p class="emphasis" v-if="tagIndexSync === '1'">Enrolled Courses (Not Published)</p>
             <p class="emphasis" v-if="tagIndexSync === '3'">Enrolled Courses (Published)</p>
@@ -127,43 +130,55 @@
         <vxe-input v-model="row.name" type="text"></vxe-input>
       </template>
     </vxe-column>
-    <vxe-column field="gpa" title="GPA" :edit-render="{}" width="70" sortable>
+    <vxe-column field="gpa" title="GPA" :edit-render="{}" width="85"  sortable>
       <template #edit="{ row }">
-        <vxe-input v-model="row.gpa" type="number"></vxe-input>
+        <vxe-input v-model="row.gpa" type="float" digits="3"></vxe-input>
       </template>
     </vxe-column>
     <vxe-column field="PreferCourseGPA" title="PreferCourse GPA" width="110" sortable>
     </vxe-column>
     <vxe-column field="currentlyOverseas" title="Currently Overseas" width="95" :edit-render="{}"
-                :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
+                :filters="[{label: 'Yes', value: true}, {label: 'No', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.currentlyOverseas" clearable transfer>
-          <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
+          <vxe-option v-for="item in boolean" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
         </vxe-select>
+      </template>
+      <template #default="{ row }">
+        <span>{{ formatBool(row.currentlyOverseas) }}</span>
       </template>
     </vxe-column>
     <vxe-column field="willBackToNZ" title="Will back to NZ" width="88" :edit-render="{}"
-                :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
+                :filters="[{label: 'Yes', value: true}, {label: 'No', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.willBackToNZ" clearable transfer>
-          <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
+          <vxe-option v-for="item in boolean" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
         </vxe-select>
+      </template>
+      <template #default="{ row }">
+        <span>{{ formatBool(row.willBackToNZ) }}</span>
       </template>
     </vxe-column>
     <vxe-column field="isCitizenOrPR" title="is Citizen or PR" width="79" :edit-render="{}"
-                :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
+                :filters="[{label: 'Yes', value: true}, {label: 'No', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.isCitizenOrPR" clearable transfer>
-          <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
+          <vxe-option v-for="item in boolean" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
         </vxe-select>
+      </template>
+      <template #default="{ row }">
+        <span>{{ formatBool(row.isCitizenOrPR) }}</span>
       </template>
     </vxe-column>
     <vxe-column field="haveValidVisa" title="have Valid Visa" width="100" :edit-render="{}"
-                :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
+                :filters="[{label: 'Yes', value: true}, {label: 'No', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.haveValidVisa" clearable transfer>
-          <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
+          <vxe-option v-for="item in boolean" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
         </vxe-select>
+      </template>
+      <template #default="{ row }">
+        <span>{{ formatBool(row.haveValidVisa) }}</span>
       </template>
     </vxe-column>
     <vxe-column field="enrolDetails" title="Enrol Details" width="110" :edit-render="{}" show-overflow>
@@ -181,11 +196,14 @@
       </template>
     </vxe-column>
     <vxe-column field="haveOtherContracts" width="100" title="Have other contracts" :edit-render="{}"
-                :filters="[{label: 'true', value: true}, {label: 'false', value: false}]" :filter-multiple=false>
+                :filters="[{label: 'Yes', value: true}, {label: 'No', value: false}]" :filter-multiple=false>
       <template #edit="{ row }">
         <vxe-select v-model="row.haveOtherContracts" clearable transfer>
-          <vxe-option v-for="item in boolean" :key="item" :value="item" :label="item"></vxe-option>
+          <vxe-option v-for="item in boolean" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
         </vxe-select>
+      </template>
+      <template #default="{ row }">
+        <span>{{ formatBool(row.haveOtherContracts) }}</span>
       </template>
     </vxe-column>
     <vxe-column field="maximumWorkingHours" title="Max working hours" width="108" :edit-render="{}" sortable>
@@ -324,11 +342,11 @@
               />
               <p class="emphasis">Prerequisite</p>
               <p>{{ item.prerequisite }}</p>
-              <div v-if="tutorOrMarker === 'Tutor'">
+              <div v-if="tutorOrMarker === 'tutor'">
                 <p class="emphasis">Tutor Responsibility</p>
                 <p>{{ item.tutorResponsibility }}</p>
               </div>
-              <div v-else-if="tutorOrMarker === 'Marker'">
+              <div v-else-if="tutorOrMarker === 'marker'">
                 <p class="emphasis">Marker Responsibility</p>
                 <p>{{ item.markerResponsibility }}</p>
               </div>
@@ -367,11 +385,12 @@
 <script setup lang="ts">
 import {VXETable, VxeTableEvents, VxeTableInstance} from 'vxe-table'
 import {ref, reactive, computed, watch, toRef, onBeforeMount, onUpdated} from 'vue'
-import {Edit, Check, Close, Select, SemiSelect, Delete} from '@element-plus/icons-vue'
+import {Edit, Check, Close, Select, SemiSelect, Delete, Download} from '@element-plus/icons-vue'
 import 'element-plus/theme-chalk/display.css';
 import {get, post, put} from "@/utils/request";
 import {ElMessage} from "element-plus";
 import type {FormInstance} from 'element-plus'
+import {datetimeFormat} from "@/utils/datetimeFormat";
 
 // *********************
 // * Sync Parameter
@@ -452,7 +471,6 @@ const coursedrawerData = ref({} as CourseDrawer)
 
 const showCourseDrawer = ({row}: eventProps) => {
   coursedrawerData.value = row
-  console.log(coursedrawerData.value)
   coursedrawer.value = true
 }
 
@@ -512,7 +530,6 @@ const addDomain = () => {
     courseID: undefined,
     estimatedHours: 0
   })
-  console.log(singleEnrollForm.domains)
 }
 
 const acceptToServer = () => {
@@ -561,7 +578,7 @@ const rejectToServer = (row: any) => {
 // * Table
 // *********************
 const xTable = ref<VxeTableInstance>({} as VxeTableInstance)
-const boolean = ref(['true', 'false'])
+const boolean = ref([{label:'Yes', value:'true'}, {label:'No', value:'false'}])
 const studentDegree = ref(['Undergraduate', "Postgraduate"])
 
 onUpdated(() => {
@@ -587,7 +604,6 @@ type saveApplicationApprovalList = {
 
 const autoSaveUpdateEvent = async (row: any, applicationID: number) => {
   const $table = xTable.value
-  console.log($table.getRecordset())
   const {updateRecords} = $table.getRecordset()
   const errMap = await $table?.validate()
   if (errMap) {
@@ -656,6 +672,14 @@ const cancelRowEvent = (row: any) => {
 const toggleExpandChangeEvent = ({row}: eventProps) => {
   const $table = xTable.value
   $table.refreshColumn()
+}
+
+const formatBool = (row) => {
+  if (row === true) {
+    return 'Yes'
+  } else if (row === false) {
+    return 'No'
+  }
 }
 
 

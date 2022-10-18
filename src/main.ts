@@ -25,12 +25,15 @@ import {
     faBookOpen
 } from '@fortawesome/free-solid-svg-icons'
 import {faTwitter} from '@fortawesome/free-brands-svg-icons'
+import dayjs from "dayjs";
 // import {  } from '@fortawesome/free-regular-svg-icons'
 
 const app = createApp(App);
 app.use(router)
 app.use(pinia)
 app.use(ElementPlus)
+
+app.config.globalProperties.$dayjs = dayjs;
 
 VXETable.setup({
     // @ts-ignore

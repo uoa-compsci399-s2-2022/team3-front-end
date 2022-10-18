@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import CourseCard from '@/components/cards/CourseCard.vue'
-import {Collection, Document} from '@element-plus/icons-vue'
+import {Collection, Document, User, Guide, DocumentChecked} from '@element-plus/icons-vue'
 import {onBeforeMount, ref, watch} from "vue";
 import {get} from "@/utils/request";
 import {useAsyncState} from "@vueuse/core";
@@ -108,23 +108,55 @@ watch(courseList, (courseList)=> {
 
   <div v-show="noCourse">
     <br/>
-    <el-row justify="center" style="color: #acb9c6">There are no courses in current term.</el-row>
+    <el-row justify="center" style="color: #acb9c6">There are no courses enrolled in the term</el-row>
     <br/>
     <div class="center-button-group">
-      <div class="button-wrapper">
+      <div class="button-wrapper" v-permission="1">
         <el-button @click="$router.push('courseList')" class="big-button" type="primary" plain>
           <el-icon :size="90">
             <Collection/>
           </el-icon>
-          <p>Browse available courses</p>
+          Browse Courses
         </el-button>
       </div>
-      <div class="button-wrapper">
+      <div class="button-wrapper" v-permission="2">
         <el-button @click="$router.push('applicationlist')" class="big-button" type="primary" plain>
           <el-icon :size="90">
             <Document/>
           </el-icon>
           Start Applications
+        </el-button>
+      </div>
+      <div class="button-wrapper" v-permission="3">
+        <el-button @click="$router.push('manageuser')" class="big-button" type="primary" plain>
+          <el-icon :size="90">
+            <User/>
+          </el-icon>
+          Manage Users
+        </el-button>
+      </div>
+      <div class="button-wrapper" v-permission="5">
+        <el-button @click="$router.push('managecourse')" class="big-button" type="primary" plain>
+          <el-icon :size="90">
+            <Collection/>
+          </el-icon>
+          Manage Courses
+        </el-button>
+      </div>
+      <div class="button-wrapper" v-permission="5">
+        <el-button @click="$router.push('manageEnrolment')" class="big-button" type="primary" plain>
+          <el-icon :size="90">
+            <Guide/>
+          </el-icon>
+          Manage Enrolment
+        </el-button>
+      </div>
+      <div class="button-wrapper" v-permission="5">
+        <el-button @click="$router.push('manageEnrolment')" class="big-button" type="primary" plain>
+          <el-icon :size="90">
+            <DocumentChecked/>
+          </el-icon>
+          Application Approval
         </el-button>
       </div>
     </div>
@@ -157,8 +189,8 @@ a {
 }
 
 .big-button {
-  height: 140px;
-  width: 275px;
+  height: 130px;
+  width: 245px;
 }
 
 .button-wrapper {

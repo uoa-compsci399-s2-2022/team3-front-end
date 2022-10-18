@@ -36,7 +36,7 @@ const items: sidebarMenu = [
     icon: 'DocumentChecked',
     index: '/applicationapproval',
     title: 'Application Approval',
-    permission: '4',
+    permission: '5',
   },
   {
     icon: "Collection",
@@ -53,7 +53,7 @@ const items: sidebarMenu = [
       {
         index: '/managecourse',
         title: 'Manage Course',
-        permission: '4',
+        permission: '5',
       },
       {
         index: 'manageuserFolder',
@@ -75,7 +75,7 @@ const items: sidebarMenu = [
       {
         index: '/manageEnrolment',
         title: 'Manage Enrolment',
-        permission: '4',
+        permission: '5',
       },
     ]
   }];
@@ -102,7 +102,7 @@ setInterval(() => {
   if (sidebar.collapse){
     sidebar.display = !isMobile();
   }
-}, 3000)
+}, 1000)
 
 onBeforeMount(() => {
   sidebar.display = !isMobile();
@@ -182,7 +182,7 @@ onBeforeMount(() => {
 @media (max-width: 730px) {
   .sidebar {
     position: fixed !important;
-    z-index: 99999;
+    z-index: 999;
   }
 }
 
@@ -200,7 +200,7 @@ onBeforeMount(() => {
   height: 100%;
   width: 100vw;
   backdrop-filter: blur(4px);
-  z-index: 9999;
+  z-index: 998;
   background-color: rgba($color: #000000, $alpha: 0.1);
 }
 

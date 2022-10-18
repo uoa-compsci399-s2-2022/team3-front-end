@@ -79,6 +79,7 @@ import {get, post, Delete} from '@/utils/request'
 import StartApplicationDrawer from '@/components/applicationUseful/StartApplicationDrawer.vue'
 import {useRouter, useRoute} from 'vue-router';
 import dayjs from "dayjs";
+import {datetimeFormat} from "@/utils/datetimeFormat";
 
 const router = useRouter();
 const route = useRoute();
@@ -155,12 +156,8 @@ onBeforeMount(() => {
     applicationListLoading.value = true
     tableData.splice(0, tableData.length)
     res.forEach((item: ApplicationList) => {
-      if (dayjs(item.createdDateTime).isValid()) {
-        item.createdDateTime = dayjs(item.createdDateTime).format('DD-MM-YYYY HH:mm:ss')
-      }
-      if (dayjs(item.submittedDateTime).isValid()) {
-        item.submittedDateTime = dayjs(item.submittedDateTime).format('DD-MM-YYYY HH:mm:ss')
-      }
+      item.createdDateTime = datetimeFormat(item.createdDateTime)
+      item.submittedDateTime = datetimeFormat(item.submittedDateTime)
     })
     tableData.push(...res)
     applicationListLoading.value = false

@@ -9,7 +9,7 @@
           </el-button>
         </el-button-group>
       </div>
-      <div v-permission="4">
+      <div v-permission="5">
         <span style="color: #555a64; margin-left: 20px">Open for registration</span>
         <el-switch
             :loading="settingLoading"
@@ -34,6 +34,7 @@
           <el-input v-model="search" size="small" placeholder="Type to search"/>
         </template>
         <template #default="scope">
+          <div v-permission="5">
           <el-button size="small" @click="handleEdit(scope.$index, scope.row)"
           >Edit
           </el-button
@@ -45,6 +46,7 @@
           >Delete
           </el-button
           >
+          </div>
         </template>
       </el-table-column>
     </el-table>
