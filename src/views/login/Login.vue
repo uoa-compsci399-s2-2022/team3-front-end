@@ -153,7 +153,6 @@ onBeforeMount(() => {
     input:focus {
       outline: none;
       border: 1px solid #000000;
-      caret-color: transparent;
     }
 
     .keep-login {

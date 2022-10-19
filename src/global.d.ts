@@ -19,6 +19,7 @@ interface Course {
     courseName?: string;
     totalAvailableHours?: number;
     currentAvailableHours?: number;
+    currentPublishedAvailableHours?: number;
     estimatedNumOfStudents?: number;
     currentlyNumOfStudents?: number;
     needTutors?: boolean;

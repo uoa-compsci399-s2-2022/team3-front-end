@@ -168,24 +168,24 @@ const submitForm = (formEl: FormInstance | undefined) => {
         <div class="register-window">
             <img src="@/assets/logo/uoa.svg" alt="" class="logo">
             <h1>Register</h1>
-            <el-form ref="registerFormRef" :model="registerForm" status-icon :rules="rules" label-width="150px"
-                class="demo-registerForm" hide-required-asterisk>
-                <el-form-item label="UserID" prop="userID">
-                    <el-input v-model="registerForm.userID" type="text" />
+            <el-form ref="registerFormRef" :model="registerForm" status-icon :rules="rules"
+                class="demo-registerForm" size="large" hide-required-asterisk >
+                <el-form-item prop="userID">
+                    <el-input v-model="registerForm.userID" type="text" placeholder="User ID" />
                 </el-form-item>
-                <el-form-item label="Password" prop="password">
-                    <el-input v-model="registerForm.password" type="password" />
+                <el-form-item prop="password">
+                    <el-input v-model="registerForm.password" type="password" placeholder="Password" />
                 </el-form-item>
-                <el-form-item label="Confirm" prop="repeatPassword">
-                    <el-input v-model="registerForm.repeatPassword" type="password" />
+                <el-form-item  prop="repeatPassword">
+                    <el-input v-model="registerForm.repeatPassword" type="password" placeholder="Confirm Password" />
                 </el-form-item>
 
-                <el-form-item label="Name" prop="name">
-                    <el-input v-model="registerForm.name" type="text" />
+                <el-form-item prop="name">
+                    <el-input v-model="registerForm.name" type="text" placeholder="Name"  />
                 </el-form-item>
                 <div style="display:flex; column-gap: 20px;">
-                    <el-form-item label="Email" prop="email">
-                        <el-input v-model="registerForm.email" type="text" />
+                    <el-form-item prop="email">
+                        <el-input v-model="registerForm.email" type="text" placeholder="Email" />
                     </el-form-item>
                     <el-button type="info" @click="" plain disabled v-if="waiting" class="verification">
                         <el-icon>
@@ -195,12 +195,12 @@ const submitForm = (formEl: FormInstance | undefined) => {
                     <el-button type="primary" @click="sendCode(60)" plain v-else class="verification">Send Code
                     </el-button>
                 </div>
-                <el-form-item label="Verification Code" prop="code">
-                    <el-input v-model="registerForm.code" type="text" />
+                <el-form-item  prop="code">
+                    <el-input v-model="registerForm.code" type="text" placeholder="Verification Code" />
                 </el-form-item>
 
                 <el-form-item>
-                    <el-button type="primary" @click="submitForm(registerFormRef)" style="width:100%;">Submit
+                    <el-button size="large" type="primary" @click="submitForm(registerFormRef)" style="width:120px">Register
                     </el-button>
                 </el-form-item>
             </el-form>
@@ -218,7 +218,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
 }
 
 .register-window {
-    margin-right: 20vw;
+    margin-right: 10vw;
     margin-top: 100px;
     display: flex;
     flex-direction: column;
@@ -227,10 +227,9 @@ const submitForm = (formEl: FormInstance | undefined) => {
     width: 550px;
 
     h1 {
-        transform: translateX(60px);
         font-size: 28.83px;
         font-weight: 600;
-        letter-spacing: 0px;
+        letter-spacing: 0;
         margin: 20px 0;
         /* Primary */
         color: #003867;
@@ -244,25 +243,41 @@ const submitForm = (formEl: FormInstance | undefined) => {
         top: 0;
     }
 
+    :deep(.el-form-item__content){
+      justify-content: center;
+    }
+
 }
 
 @media only screen and (max-width: 770px) {
-
     // ipad mini 768 * 1024
     .container {
         justify-content: center;
 
         .register-window {
+            width: 100%;
+            margin: 40px 0 0;
 
+          h1 {
+              font-size: 28.83px;
+              font-weight: 600;
+              letter-spacing: 0;
+              /* Primary */
+              color: #003867;
+            }
 
             img {
-                position: static;
-                width: 40vw;
-                height: 40vw;
-            }
+                  position: static;
+                  width: 36vw;
+                  height: 36vw;
+                  margin-bottom: 10px;
+
+              }
         }
     }
 }
+
+
 
 .verification {
     width: 150px;

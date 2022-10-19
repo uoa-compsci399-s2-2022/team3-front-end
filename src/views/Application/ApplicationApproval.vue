@@ -297,6 +297,7 @@ const getCourseByTermFromServer = (termID: number) => {
         termName: item.termName,
         totalAvailableHours: item.totalAvailableHours,
         currentAvailableHours: item.currentAvailableHours,
+        currentPublishedAvailableHours: item.currentPublishedAvailableHours,
         needTutors: item.needTutors,
         needMarkers: item.needMarkers,
         canPreAssign: item.canPreAssign,

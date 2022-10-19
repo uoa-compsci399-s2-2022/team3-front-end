@@ -43,9 +43,6 @@
           label="Estimated Number of Students"
           label-align="center"
           align="center"
-          label-class-name="my-label"
-          class-name="my-content"
-          width="150px"
       >{{ currentCourse.estimatedNumOfStudents }}
       </el-descriptions-item>
       <el-descriptions-item label="Currently Number Of Students" label-align="center" align="center">

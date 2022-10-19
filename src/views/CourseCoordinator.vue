@@ -206,19 +206,19 @@
     </div>
   </el-dialog>
 
-  <el-drawer v-model="enrollUserModalOpened" title="Enroll to the Course" size="50%" direction="rtl">
+  <el-drawer v-model="enrollUserModalOpened" title="Enroll to the Course" size="50%" direction="rtl" @close="enrolDrawerCloseEvent">
 
     <p class="emphasis">Find Users</p>
     <el-input
         v-model="userIDSearch"
         class="w-50 m-2"
-        placeholder="Please Input User ID"
+        placeholder="Search Users by ID, Email, Name, UPI or AUID"
         style="margin-bottom: 10px"
         :prefix-icon="Search"
         @input="handleUserSearch"
     />
 
-    <el-table :data="tableData" style="width: 100%" v-loading="tableLoading">
+    <el-table :data="userTableData" style="width: 100%" v-loading="tableLoading" empty-text="Please Search User First !">
       <el-table-column label="ID" prop="id"/>
       <el-table-column label="Email" prop="email"/>
       <el-table-column label="Name" prop="name"/>
@@ -226,21 +226,44 @@
       <el-table-column label="AUID" prop="auid"/>
       <el-table-column align="right">
         <template #default="scope">
-          <el-button size="small"
-          >Enroll
-          </el-button
-          >
+          <el-popover placement="left" :width="255" :visible="enrollPopoverVisible[scope.$index]" trigger="click">
+            <OnClickOutside @trigger="enrollPopoverVisible[scope.$index] = false">
+              <p style="font-weight: bold">Enroll {{ scope.row.id }}</p>
+              <div style="display: flex; justify-content: center; flex-direction: column">
+                <el-select v-model="currentRole" class="m-2" placeholder="Select Role"
+                           style="margin-top: 7px; margin-bottom: 7px" :teleported="false">
+                  <el-option
+                      key="marker"
+                      label="Marker"
+                      value="marker"
+                  />
+                  <el-option
+                      key="tutor"
+                      label="Tutor"
+                      value="tutor"
+                  />
+                </el-select>
+                <el-input-number placeholder="Estimated Working Hours" v-model="currentEstimatedHours" :min="0"
+                                 :step="1"
+                                 style="margin-top: 3px; margin-bottom: 7px; width: 100%" controls-position="right"/>
+              </div>
+              <div style="text-align: right; margin: 0">
+                <el-button size="small" type="primary" @click="handleEnrollUser(scope.row)" :loading="enrolmentLoading">confirm</el-button>
+              </div>
+            </OnClickOutside>
+            <template #reference>
+              <el-button size="small" @click="enrollPopoverVisible[scope.$index] = true">Enroll</el-button>
+            </template>
+          </el-popover>
         </template>
       </el-table-column>
+
     </el-table>
 
 
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="enrollUserModalOpened = false">Cancel</el-button>
-        <el-button type="primary" @click="enrollUserModalOpened = false"
-        >Confirm</el-button
-        >
+        <el-button type="primary" @click="enrollUserModalOpened = false">Close</el-button>
       </span>
     </template>
   </el-drawer>
@@ -248,17 +271,30 @@
 
 <script setup lang="ts">
 import {Edit, Search} from '@element-plus/icons-vue';
-import {reactive, ref} from 'vue';
-import {get, put} from "@/utils/request";
+import {onMounted, reactive, ref} from 'vue';
+import {get, post, put} from "@/utils/request";
 import {useRoute} from "vue-router";
 import {ElMessage} from "element-plus";
 import {useAsyncState} from "@vueuse/core";
+import {OnClickOutside} from '@vueuse/components'
 import ApplicantList from '@/components/applicationUseful/ApplicantList.vue';
 
+
+const enrolDrawerCloseEvent = () => {
+  userTableData.value = [];
+  userIDSearch.value = '';
+  enrollPopoverVisible.value = [];
+  currentRole.value = '';
+  currentEstimatedHours.value = null;
+}
+
+const enrollPopoverVisible = ref([]);
+const popoverRef = ref(null);
+const selectRoleRef = ref(null);
 const route = useRoute();
-
-
 const courseEditModalOpened = ref(false);
+
+
 
 
 type courseFormCCType = {
@@ -309,11 +345,17 @@ const handleCourseEdit = () => {
     })
     editCourseLoading.value = false;
   }).catch(err => {
-    ElMessage({
-      message: 'Oops. An error has occurred!',
-      type: 'error',
-    })
-    editCourseLoading.value = false;
+    if (err.response.data) {
+      ElMessage({
+        message: err.response.data.message,
+        type: 'error',
+      })
+    } else {
+      ElMessage({
+        message: 'Oops, something went wrong.',
+        type: 'error',
+      })
+    }
     console.error(err)
   })
 }
@@ -352,21 +394,23 @@ interface User {
 }
 
 const enrollUserModalOpened = ref(false);
-const tableData = ref<Array<User>>([])
+const userTableData = ref<Array<User>>([])
 const tableLoading = ref(false)
 const userIDSearch = ref('');
 
 
 const getUser = () => {
   tableLoading.value = true
-  get('api/UserProfile/' + userIDSearch.value).then((res) => {
-    tableData.value = []
-    tableData.value.push({
-      id: res.id,
-      email: res.email,
-      name: res.name,
-      upi: res.upi,
-      auid: res.auid
+  get('api/searchUser/' + userIDSearch.value).then((res) => {
+    userTableData.value = []
+    res.forEach((item: User) => {
+      userTableData.value.push({
+        id: item.id,
+        email: item.email,
+        name: item.name,
+        upi: item.upi,
+        auid: item.auid
+      })
     })
     tableLoading.value = false
   }).catch((e) => {
@@ -377,7 +421,12 @@ const getUser = () => {
 
 
 const handleUserSearch = () => {
-  getUser()
+  enrollPopoverVisible.value = []
+  if (userIDSearch.value !== '') {
+    getUser()
+  }else {
+    userTableData.value = []
+  }
 }
 
 
@@ -410,7 +459,57 @@ const getCurrentMarkerTutorList = () => {
   })
 }
 
+
 getCurrentMarkerTutorList()
+
+
+const currentRole = ref()
+const currentEstimatedHours = ref()
+const enrolmentLoading = ref(false)
+
+const handleEnrollUser = (row: User) => {
+  enrolmentLoading.value = true
+  if (!currentRole.value || !currentEstimatedHours.value) {
+    ElMessage({
+      message: 'Please select a role and input estimated hours.',
+      type: 'error',
+    })
+    enrolmentLoading.value = false
+    return
+  }
+  post(`api/enrolment`, {
+    courseID: route.params.courseId,
+    userID: row.id,
+    role: currentRole.value,
+    estimatedHours: currentEstimatedHours.value
+  }).then(() => {
+    ElMessage({
+      message: `Enroll success.`,
+      type: 'success',
+    })
+    getCurrentMarkerTutorList()
+    currentRole.value = ''
+    currentEstimatedHours.value = null
+    enrolmentLoading.value = false
+    enrollPopoverVisible.value = []
+  }).catch(err => {
+    if (err.response.data) {
+      ElMessage({
+        message: err.response.data.message,
+        type: 'error',
+      })} else {
+      ElMessage({
+        message: 'Oops, something went wrong.',
+        type: 'error',
+      })}
+    console.error(err)
+    enrolmentLoading.value = false
+  })
+}
+
+onMounted(() => {
+  enrollPopoverVisible.value = []
+})
 
 
 </script>

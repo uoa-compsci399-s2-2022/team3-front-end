@@ -45,9 +45,9 @@ type applicationData = {
   otherContracts: string;
   maximumWorkingHours: number;
   gpa: number;
-  savedTime : string;
-  cv :string;
-  ad : string;
+  savedTime: string;
+  cv: string;
+  ad: string;
 }
 
 type preferCourse = {
@@ -70,7 +70,7 @@ const preferCourseList = ref([] as preferCourse[]);
 const data = reactive({} as applicationData);
 const currentUserProfile = reactive({} as applicationData);
 
-onBeforeMount(()=>{
+onBeforeMount(() => {
   getApplicationMetaInfo()
 })
 
@@ -135,7 +135,7 @@ if (!isNaN(parseInt(route.params.applicationID as string))) {
 }
 
 const courseListByRole = ref([] as Course[]);
-const getApplicationMetaInfo = () =>{
+const getApplicationMetaInfo = () => {
   get('api/application/' + applicationID.value).then(res => {
     termName.value = res.term;
     applicationMetaInfo.value.term = res.term;
@@ -160,8 +160,6 @@ const getApplicationMetaInfo = () =>{
     })
   })
 }
-
-
 
 
 get('api/currentUserProfile').then(res => {
@@ -224,7 +222,6 @@ const courseVisible = reactive({
 const showCourseChooser = () => {
   courseVisible.visible = true
 }
-
 
 
 const add_course = (course: any) => {
@@ -355,7 +352,7 @@ watch(step, async (newStep, oldStep) => {
 const showApplicationPreferCourseList = ref()
 const validateStep = async (step: number) => {
   let flag = true;
-  if (step >= 2){
+  if (step >= 2) {
     await getFiles()
   }
   if (step === 0) {
@@ -378,8 +375,7 @@ const validateStep = async (step: number) => {
 
   } else if (step === 3) {
 
-  }
-  else{
+  } else {
 
   }
   // change the status of status bar
@@ -390,6 +386,7 @@ const validateStep = async (step: number) => {
   }
   return flag;
 }
+
 // ----------------------预加载 CV AD------------------------
 function base64ToBlob(code: string | undefined) {
   //Base64一行不能超过76字符，超过则添加回车换行符。因此需要把base64字段中的换行符，回车符给去掉，有时候因为存在需要把加号空格之类的换回来，取决于base64存取时的规则。
@@ -403,7 +400,8 @@ function base64ToBlob(code: string | undefined) {
   }
   return new Blob([uInt8Array], {type: 'application/pdf'});//转成pdf类型
 }
-async function getFiles(){
+
+async function getFiles() {
   get('api/saveApplication_Files/' + applicationID.value).then(res => {
     let personalDetail = res.files;
     // let courseList = res.course;
@@ -414,7 +412,7 @@ async function getFiles(){
     if (cv != "" && fileList_cv.value.length == 0) {
       let blob_cv = base64ToBlob(cv)
       fileList_cv.value.push({
-        name:"Last_Time: " + savedTime + '_CV.pdf',
+        name: "Last_Time: " + savedTime + '_CV.pdf',
         url: URL.createObjectURL(blob_cv),
       })
       fileBase_cv.value = cv
@@ -423,7 +421,7 @@ async function getFiles(){
     if (ad != "" && fileList_ad.value.length == 0) {
       let blob_ad = base64ToBlob(ad)
       fileList_ad.value.push({
-        name:savedTime + '_Transcript.pdf',
+        name: savedTime + '_Transcript.pdf',
         url: URL.createObjectURL(blob_ad),
       })
       fileBase_ad.value = ad
@@ -572,20 +570,20 @@ const submitEvent = () => {
   })
 }
 // ---------back button------end
-const backTohome =()=>{
+const backTohome = () => {
   router.push('/applicationList')
 }
 
 const prefercourseisvalid = ref(false)
 
-const changevaild =()=>{
-  prefercourseisvalid.value=true
+const changevaild = () => {
+  prefercourseisvalid.value = true
   // console.log(prefercourseisvalid.value)
 }
-const check =async ()=>{
+const check = async () => {
   let isvaild = await showApplicationPreferCourseList!.value!.validateStep()
   // console.log(isvaild)
-  prefercourseisvalid.value = await  isvaild
+  prefercourseisvalid.value = await isvaild
 }
 
 </script>
@@ -626,7 +624,7 @@ const check =async ()=>{
           <el-step :status="statusArr[0]" :icon="Key"></el-step>
           <el-step :status="statusArr[1]" :icon="Avatar"/>
           <el-step :status="statusArr[2]" :icon="Management"/>
-          <el-step :status="statusArr[3]" :icon="UploadFilled" />
+          <el-step :status="statusArr[3]" :icon="UploadFilled"/>
         </el-steps>
       </div>
 
@@ -748,7 +746,8 @@ const check =async ()=>{
 
         <Transition>
           <div v-show="stepArr[2]" class="step3">
-            <ApplicationPreferCourseList v-model:preferCourseList="preferCourseList" @isvaild="changevaild" ref="showApplicationPreferCourseList"/>
+            <ApplicationPreferCourseList v-model:preferCourseList="preferCourseList" @isvaild="changevaild"
+                                         ref="showApplicationPreferCourseList"/>
             <el-row justify="center">
               <el-button type="primary" :icon="Plus" size="large" @click="showCourseChooser">Add Prefer Courses
               </el-button>
@@ -824,7 +823,7 @@ const check =async ()=>{
   </div>
 
   <ApplicationCourse v-if="applicationMetaInfo.termID" :visible="courseVisible" :termID="applicationMetaInfo.termID"
-                     @added_course="add_course"/>
+                     @added_course="add_course"  v-model:role="applicationMetaInfo.type"/>
 
 
 </template>
@@ -927,6 +926,7 @@ const check =async ()=>{
     .application-form-container {
       width: 90%;
     }
+
     .progress-bar {
       width: 95%;
       font-size: large;

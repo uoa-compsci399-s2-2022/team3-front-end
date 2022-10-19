@@ -82,7 +82,10 @@
               <vxe-column field="courseName" title="Course Name" width="300"></vxe-column>
               <vxe-column field="estimatedHours" title="The estimated work hours assigned to the student"></vxe-column>
               <vxe-column field="totalAvailableHours" title="Total Available Hours" width="110"></vxe-column>
-              <vxe-column field="currentAvailableHours" title="Current Available Hours" width="110"></vxe-column>
+              <vxe-column field="currentAvailableHours" title="Available Hours (include no published)"
+                          width="110"></vxe-column>
+              <vxe-column field="currentPublishedAvailableHours" title="Published Available Hours"
+                          width="110"></vxe-column>
               <template #empty>
                 No Enroll's course
               </template>
@@ -304,9 +307,9 @@
   </el-drawer>
 
 
-  <el-dialog v-model="enrollDialogVisible" title="Accept" v-loading="acceptToServerLoading">
+  <el-dialog v-model="enrollDialogVisible" title="Accept" v-loading="acceptToServerLoading" draggable>
     <el-alert
-        type="warning"
+        type="info"
         effect="dark"
         title="Note: After Accept, there are not direct enrolled. It will be enrolled after clicking Publish."
         style="margin-bottom: 11px; margin-top: 0"
@@ -336,7 +339,7 @@
             <el-popover
                 placement="right"
                 :title="item.courseNum + ' - ' + item.courseName"
-                :width="520"
+                :width="550"
                 trigger="hover"
                 :hide-after="0"
             >
@@ -348,7 +351,7 @@
                 >
                   <span style="float: left">{{ item.courseNum }}</span>
                   <span class="course-select-option"
-                        style="float: right">Available Hour: {{ item.currentAvailableHours }}</span>
+                        style="float: right">Available Hour: {{item.currentAvailableHours}}</span>
                 </el-option>
               </template>
               <el-alert
@@ -356,19 +359,47 @@
                   title="Available Hours"
                   type="info"
                   effect="dark"
+                  style="margin-bottom: 7px"
                   description="This number of Available Hours means(for this course): Total Available Hours - Pre assigned Tutor & Marker Hours - the total estimated hours that have been accepted and enrolled(include: No Published & Published)"
                   show-icon
                   @close="setClosedCourseAvailableHoursAlert"
               />
-              <p class="emphasis">Prerequisite</p>
-              <p>{{ item.prerequisite }}</p>
+              <el-descriptions border :column="2" style="margin-bottom: 5px">
+                <el-descriptions-item label="Published Available Hours" label-align="center"
+                                      align="center">
+                  <span style="color: #0b416d; font-weight: bold">{{ item.currentPublishedAvailableHours }}</span>
+                </el-descriptions-item>
+                <el-descriptions-item
+                    label="Estimated Number of Students"
+                    label-align="center"
+                    align="center"
+                >{{ item.estimatedNumOfStudents }}
+                </el-descriptions-item>
+                <el-descriptions-item label="Currently Number Of Students" label-align="center" align="center">
+                  {{ item.currentlyNumOfStudents }}
+                </el-descriptions-item>
+                <el-descriptions-item label="Number of Assignments" label-align="center" align="center">
+                  {{ item.numOfAssignments }}
+                </el-descriptions-item>
+                <el-descriptions-item label="Number of Labs per Week" label-align="center" align="center">
+                  {{ item.numOfLabsPerWeek }}
+                </el-descriptions-item>
+                <el-descriptions-item label="Number of Tutorials per Week" label-align="center" align="center">
+                  {{ item.numOfTutorialsPerWeek }}
+                </el-descriptions-item>
+                <el-descriptions-item label="Prerequisite" label-align="center" :span="2"
+                                      align="center">{{ item.prerequisite }}
+                </el-descriptions-item>
+              </el-descriptions>
               <div v-if="tutorOrMarker === 'tutor'">
                 <p class="emphasis">Tutor Responsibility</p>
                 <p>{{ item.tutorResponsibility }}</p>
+                <p v-if="!item.tutorResponsibility" style="text-align: center">No Information</p>
               </div>
               <div v-else-if="tutorOrMarker === 'marker'">
                 <p class="emphasis">Marker Responsibility</p>
                 <p>{{ item.markerResponsibility }}</p>
+                <p v-if="!item.markerResponsibility" style="text-align: center">No Information</p>
               </div>
             </el-popover>
           </div>
@@ -514,16 +545,29 @@ const setClosedCourseAvailableHoursAlert = () => {
 
 const acceptEvent = (row: any) => {
   singleEnrollForm.domains = []
+  let warningMessage = []
   if (row.PreferCourse !== null && row.PreferCourse !== undefined) {
     row.PreferCourse.forEach((item: any) => {
-      singleEnrollForm.domains.push({
-        courseID: item.courseID,
-        estimatedHours: 0
-      })
+      if (props.course.find((course: any) => course.courseID === item.courseID)) {
+        singleEnrollForm.domains.push({
+          courseID: item.courseID,
+          estimatedHours: null
+        })
+      } else {
+        warningMessage.push(`This user's preference course with courseID: ${item.courseID} has not been found in the term`)
+      }
     })
   }
   currentApplicationID.value = row.applicationID
   enrollDialogVisible.value = true
+  setTimeout(() => {
+    warningMessage.forEach((item: any) => {
+      ElMessage({
+        message: item,
+        type: 'warning'
+      })
+    })
+  }, 100)
 }
 
 const formRef = ref<FormInstance>()

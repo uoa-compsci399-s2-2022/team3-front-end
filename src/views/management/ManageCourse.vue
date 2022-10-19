@@ -35,8 +35,6 @@ const fullScreenCourseShowEvent = () => {
 }
 
 
-
-
 //-----------------------------Term start----------------------------------
 
 // dom element of add term table
@@ -272,7 +270,16 @@ const handleTermAdd = () => {
             type: 'success',
           })
           termModalOpened.value = false;
-
+          termDTO.startDate = ""
+          termDTO.endDate = ""
+          termDTO.termName = ""
+          termDTO.isAvailable = false
+          termDTO.defaultMarkerDeadLine = ""
+          termDTO.defaultTutorDeadLine = ""
+          termDTO.payday = []
+          dateRange.value = null
+          defaultMarkerDeadLine.value = null
+          defaultTutorDeadLine.value = null
         })
         .catch((err) => {
           ElMessage({
@@ -406,7 +413,7 @@ const toCamel = (str: string): string => {
  */
 let columns: Column<any>[] = Array.from(titles, (v, i) => {
   let camelCaseV = toCamel(v);
-  let result:any =  {
+  let result: any = {
     key: camelCaseV,
     dataKey: camelCaseV,
     title: v,
@@ -415,7 +422,8 @@ let columns: Column<any>[] = Array.from(titles, (v, i) => {
   if (camelCaseV === 'markerDeadLine' || camelCaseV === 'tutorDeadLine') {
     result.cellRenderer = ({cellData: dateTime}) => (
         <span>{datetimeFormat(dateTime)}</span>
-  )}
+    )
+  }
   return result
 })
 
@@ -621,10 +629,17 @@ const addCourse = async () => {
       type: 'success',
     })
   } catch (err) {
-    ElMessage({
-      message: 'Oops. You seems offline.',
-      type: 'error',
-    })
+    if (err.response.data.message) {
+      ElMessage({
+        message: err.response.data.message,
+        type: 'error',
+      })
+    } else {
+      ElMessage({
+        message: 'Failed to add a new course.',
+        type: 'error',
+      })
+    }
     console.error(err)
   }
 }
@@ -641,10 +656,17 @@ const handleCourseDelete = (courseID: number) => {
       type: 'success',
     })
   }).catch((err) => {
-    ElMessage({
-      message: 'Oops. You seems offline.',
-      type: 'error',
-    })
+    if (err.response.data.message) {
+      ElMessage({
+        message: err.response.data.message,
+        type: 'error',
+      })
+    } else {
+      ElMessage({
+        message: 'Failed to delete a new course.',
+        type: 'error',
+      })
+    }
   })
 }
 
@@ -806,7 +828,8 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
     <section>
       <div class="manage-course-subtitle">
         <h2>Courses</h2>
-        <el-alert v-if="onSelectName" :title="onSelectName" :center="true" type="warning" effect="dark" :closable="false"
+        <el-alert v-if="onSelectName" :title="onSelectName" :center="true" type="warning" effect="dark"
+                  :closable="false"
                   class="currentTermAlert"/>
         <el-input v-model="searchCourse" placeholder="Search by course number. e.g. COMPSCI235" size="small"
                   clearable/>
