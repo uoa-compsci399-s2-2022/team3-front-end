@@ -661,7 +661,7 @@ $primary: #64bee8;
 
         .content {
             background-color: rgb(255, 255, 255);
-            position: absolute;
+            position: relative;
             width: 600px;
             min-height: 350px;
             left: -30px;
