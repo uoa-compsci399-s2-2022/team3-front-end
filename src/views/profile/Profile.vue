@@ -661,7 +661,7 @@ $primary: #64bee8;
 
         .content {
             background-color: rgb(255, 255, 255);
-            position: relative;
+            position: absolute;
             width: 600px;
             min-height: 350px;
             left: -30px;
@@ -673,7 +673,7 @@ $primary: #64bee8;
                 font-family: $heading;
                 font-size: 20px;
                 color: $primary;
-                margin-top: 20px;
+                padding-top: 20px;
                 margin-bottom: 20px;
             }
 
