@@ -1,13 +1,14 @@
 <script setup lang="ts">
 
 import CourseCard from '@/components/cards/CourseCard.vue'
+import WorkingHourCard from '@/components/cards/WorkingHourCard.vue'
 import {Collection, Document, User, Guide, DocumentChecked} from '@element-plus/icons-vue'
 import {onBeforeMount, ref, watch} from "vue";
 import {get} from "@/utils/request";
 import {useAsyncState} from "@vueuse/core";
 
 const value = ref('1')
-const value_semester = ref('')
+const value_semester = ref<number>()
 
 
 const {isLoading: isLoadingTerm, state: stateTerm, isReady: isReadyTerm, execute: executeTerm} = useAsyncState(
@@ -39,7 +40,7 @@ const {
 
 const courseList = ref([] as any[])
 
-async function GetCourse(termID: String) {
+async function GetCourse(termID: Number) {
   get('/api/getCurrentUserEnrollByTerm/' + termID).then(res => {
     courseList.value = []
     res.forEach((item: any) => {
@@ -97,12 +98,21 @@ watch(courseList, (courseList) => {
         </el-option-group>
       </el-select>
     </div>
+    <div>
+      <div>
+        <div class="course-container">
+          <div v-for="item in courseList">
+            <router-link :to="{path:item.path, query:{role:item.roleName}}">
+              <CourseCard :course="item"/>
+            </router-link>
+          </div>
+        </div>
+      </div>
 
-    <div class="course-container">
-      <div v-for="item in courseList">
-        <router-link :to="{path:item.path, query:{role:item.roleName}}">
-          <CourseCard :course="item"/>
-        </router-link>
+      <div>
+        <div class="working-hour-card-wrapper">
+          <WorkingHourCard v-model:termID="value_semester" v-show="!noCourse"/>
+        </div>
       </div>
     </div>
   </div>
@@ -167,7 +177,7 @@ watch(courseList, (courseList) => {
 <style scoped lang="scss">
 
 .page-container {
-  margin: 30px 30px 30px 30px;
+  margin: 30px 10px 30px 30px;
 }
 
 
@@ -178,6 +188,7 @@ watch(courseList, (courseList) => {
   // grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   grid-auto-rows: 210px;
   gap: 10px;
+  margin-right: 330px;
 
 }
 
@@ -204,6 +215,25 @@ a {
   justify-content: center;
   flex-wrap: wrap;
 }
+
+.working-hour-card-wrapper {
+  width: 300px;
+  position: fixed;
+  right: 15px;
+  top: 140px;
+
+}
+
+@media screen and (max-width: 768px) {
+  .course-container {
+    margin-right: 20px;
+  }
+
+  .working-hour-card-wrapper {
+    display: none;
+  }
+}
+
 
 
 </style>

@@ -43,7 +43,7 @@ const props = defineProps<Props>()
 <style scoped lang="scss">
 .card-container {
   border-radius: 10px;
-  height: 200px;
+  height: 190px;
   background-color: rgb(11, 65, 109);
   box-shadow: 0 2px 5px rgb(0 0 0 / 30%);
   position: relative;

@@ -26,13 +26,13 @@
 
       <el-col :span="15" style="margin-bottom: 70px">
         <el-row justify="center">
-          <span class="tableTitle">Student List</span>
+          <span class="tableTitle">User List</span>
         </el-row>
 
         <el-table v-loading="isLoadingUser" ref="singleTableRef" :data="stateUser" highlight-current-row
           style="width: 100%">
           <el-table-column property="id" label="ID" width="100" />
-          <el-table-column property="email" label="Email" width="250" />
+          <el-table-column property="email" label="Email" width="230" />
           <el-table-column property="name" label="Name" />
           <el-table-column label="Position">
             <template #default="scope">
@@ -40,8 +40,8 @@
                 {{scope.row.roleInCourse}}
               </el-tag>
             </template>
-
           </el-table-column>
+          <el-table-column property="estimatedHours" label="Estimated Hours" width="145" />
           <el-table-column>
             <template #default="scope">
               <el-button @click="handleremove(scope.row)" type="danger" :icon="Delete" circle />
@@ -94,6 +94,7 @@ interface User {
   email: string
   name: string
   roleInCourse: string
+  estimatedHours: number
 }
 const currentTerm = ref();
 const currentCourse = ref<Course>();
@@ -151,6 +152,7 @@ const { isLoading: isLoadingCourse, state: stateCourse, isReady: isReadyCourse, 
   },
 )
 
+
 const { isLoading: isLoadingUser, state: stateUser, isReady: isReadyUser, execute: executeUser } = useAsyncState(
   (args) => {
     const courseID = args.courseID
@@ -163,6 +165,7 @@ const { isLoading: isLoadingUser, state: stateUser, isReady: isReadyUser, execut
     immediate: false
   },
 )
+
 
 const handleTermChange = () => {
   if (currentTerm.value) {
