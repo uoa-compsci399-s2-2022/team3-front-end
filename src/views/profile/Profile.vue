@@ -564,7 +564,7 @@ async function getAcademicRecord() {
 <style>
 .el-tabs__content {
     height: 100%;
-    overflow: visible;
+    overflow: visible !important;
 }
 </style>
 <style scoped lang="scss">
