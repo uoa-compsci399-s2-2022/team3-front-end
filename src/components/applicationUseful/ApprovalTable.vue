@@ -65,8 +65,11 @@
             </el-descriptions-item>
           </el-descriptions>
           <div style="margin-top: 10px">
-          <el-button type="primary" :icon="Download" @click="getCV(row.applicationID)" :loading="loadingCV" plain >CV</el-button>
-          <el-button type="primary" :icon="Download" @click="getTranscript(row.applicationID)"  :loading="loadingTranscript" plain>Transcript</el-button>
+            <el-button type="primary" :icon="Download" @click="getCV(row.applicationID)" :loading="loadingCV" plain>CV
+            </el-button>
+            <el-button type="primary" :icon="Download" @click="getTranscript(row.applicationID)"
+                       :loading="loadingTranscript" plain>Transcript
+            </el-button>
           </div>
           <div v-if="['1', '3'].includes(tagIndexSync)">
             <p class="emphasis" v-if="tagIndexSync === '1'">Enrolled Courses (Not Published)</p>
@@ -96,6 +99,14 @@
             <vxe-column field="preference" title="#" width="40"></vxe-column>
             <vxe-column field="courseNum" title="Course Num" width="110"></vxe-column>
             <vxe-column field="courseName" title="Course Name"></vxe-column>
+            <vxe-column field="courseCoordinatorEndorsed" title="CC Endorsed" :edit-render="{}" width="70"
+                        align="center">
+              <template #default="{ row }">
+                <el-icon class="star" v-show="row.courseCoordinatorEndorsed">
+                  <StarFilled/>
+                </el-icon>
+              </template>
+            </vxe-column>
             <vxe-column field="hasLearned" title="has Learned" width="100"></vxe-column>
             <vxe-column field="grade" title="Grade" width="60"></vxe-column>
             <vxe-column field="explanation" title="Explanation(No Learned)"></vxe-column>
@@ -130,9 +141,18 @@
         <vxe-input v-model="row.name" type="text"></vxe-input>
       </template>
     </vxe-column>
-    <vxe-column field="gpa" title="GPA" :edit-render="{}" width="85"  sortable>
+    <vxe-column field="gpa" title="GPA" :edit-render="{}" width="85" sortable>
       <template #edit="{ row }">
         <vxe-input v-model="row.gpa" type="float" digits="3"></vxe-input>
+      </template>
+    </vxe-column>
+    <vxe-column field="haveCourseCoordinatorEndorsed" title="Have CC Endorsed" :edit-render="{}" width="85"
+                align="center" :filters="[{label: 'Yes', value: true}, {label: 'No', value: false}]"
+                :filter-multiple=false>
+      <template #default="{ row }">
+        <el-icon class="star" v-show="row.haveCourseCoordinatorEndorsed">
+          <StarFilled/>
+        </el-icon>
       </template>
     </vxe-column>
     <vxe-column field="PreferCourseGPA" title="PreferCourse GPA" width="110" sortable>
@@ -385,7 +405,7 @@
 <script setup lang="ts">
 import {VXETable, VxeTableEvents, VxeTableInstance} from 'vxe-table'
 import {ref, reactive, computed, watch, toRef, onBeforeMount, onUpdated} from 'vue'
-import {Edit, Check, Close, Select, SemiSelect, Delete, Download} from '@element-plus/icons-vue'
+import {Edit, Check, Close, Select, SemiSelect, Delete, Download, StarFilled} from '@element-plus/icons-vue'
 import 'element-plus/theme-chalk/display.css';
 import {get, post, put} from "@/utils/request";
 import {ElMessage} from "element-plus";
@@ -578,7 +598,7 @@ const rejectToServer = (row: any) => {
 // * Table
 // *********************
 const xTable = ref<VxeTableInstance>({} as VxeTableInstance)
-const boolean = ref([{label:'Yes', value:'true'}, {label:'No', value:'false'}])
+const boolean = ref([{label: 'Yes', value: 'true'}, {label: 'No', value: 'false'}])
 const studentDegree = ref(['Undergraduate', "Postgraduate"])
 
 onUpdated(() => {
@@ -686,7 +706,7 @@ const loadingCV = ref(false)
 const loadingTranscript = ref(false)
 
 
-async function getCV(applicationID : any ){
+async function getCV(applicationID: any) {
   loadingCV.value = true
   let CVBase64 = await get('api/ApplicationCV/' + applicationID);
   // console.log(CVBase64)
@@ -697,7 +717,7 @@ async function getCV(applicationID : any ){
 }
 
 
-async function getTranscript (applicationID : any ){
+async function getTranscript(applicationID: any) {
   loadingTranscript.value = true
   let transcriptBase64 = await get('api/ApplicationTranscript/' + applicationID);
   // let blob = base64ToBlob(transcriptBase64.application)
@@ -738,6 +758,11 @@ onBeforeMount(() => {
   margin-left: 20px;
   color: var(--el-text-color-secondary);
   font-size: 13px;
+}
+
+.star {
+  color: rgb(255, 221, 0);
+  font-size: 25px;
 }
 
 </style>

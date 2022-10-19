@@ -1,5 +1,5 @@
 <template>
-  <el-card class="box-card">
+  <el-card class="box-card" v-loading="chartLoading">
     <div id="chart">
     </div>
   </el-card>
@@ -25,15 +25,16 @@ const drawChart = () => {
       left: 'left',
       top: 4,
       textStyle: {
-        color: '#000'
+        color: '#183153'
       }
     },
     tooltip: {
       trigger: 'item',
+      confine: true
     },
     legend: {
       left: 'center',
-      top: 40,
+      top: 'bottom',
     },
     toolbox: {
       show: true,
@@ -46,15 +47,17 @@ const drawChart = () => {
       {
         type: 'pie',
         roseType: 'radius',
-        radius: [45, 140],
-        center: ['48%', '55%'],
+        radius: [45, 130],
+        center: ['50%', '38%'],
         itemStyle: {
           borderRadius: 5
         },
         label: {
           show: false
         },
-        data: estimateHours.value
+        data: estimateHours.value.sort(function (a, b) {
+          return b.value - a.value;
+        }),
       }
     ]
   };
@@ -80,7 +83,7 @@ function getData() {
       if (item.roleName !== "courseCoordinator") {
         estimateHours.value.push({
           name: item.courseNum + " - " + item.roleName,
-          value: item.estimateHours ? item.estimateHours : 0
+          value: item.estimatedHours ? item.estimatedHours : 0
         })
       }
     })

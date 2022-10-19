@@ -186,8 +186,8 @@ watch(courseList, (courseList) => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   // grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  grid-auto-rows: 210px;
-  gap: 10px;
+  grid-auto-rows: 190px;
+  gap: 20px;
   margin-right: 330px;
 
 }
