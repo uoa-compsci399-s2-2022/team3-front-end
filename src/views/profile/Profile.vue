@@ -263,8 +263,8 @@ const handleRemove_cv: UploadProps['onRemove'] = (file, uploadFiles) => {
 }
 
 const currentStep = ref(0)
-const status1 = ref("")
-const status2 = ref("")
+const status1 = ref<"" | "success" | "error" | "wait" | "process" | "finish">("")
+const status2 = ref<"" | "success" | "error" | "wait" | "process" | "finish">("")
 
 const submitUpload = () => {
     if (fileBase_ad.value == '' && fileBase_cv.value == '') {
