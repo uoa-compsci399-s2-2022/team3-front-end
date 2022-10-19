@@ -2,10 +2,10 @@
   <div class="page-container">
     <el-row class="header-container">
       <el-select v-model="currentTerm" @change="handleTermChange" class="m-2" placeholder="Select Term" size="large"
-        v-loading="isLoadingTerm">
-        <el-option v-for="item in stateTerm" :key="item.termName" :label="item.termName" :value="item.termID" />
+                 v-loading="isLoadingTerm" no-data-text="No Term">
+        <el-option v-for="item in stateTerm" :key="item.termName" :label="item.termName" :value="item.termID"/>
       </el-select>
-      <el-alert class="alert" title="Tips: Please Select Term First" type="warning" show-icon />
+      <el-alert class="alert" title="Tips: Please Select Term First" type="warning" show-icon/>
     </el-row>
 
     <el-row :gutter="22" class="table-wrapper">
@@ -14,11 +14,12 @@
           <span class="tableTitle">Course List</span>
         </el-row>
         <el-table v-loading="isLoadingCourse" ref="singleTableRef" :data="stateCourse" highlight-current-row
-          style="width: 100%; height: calc(100vh - 255px)" @current-change="handleCurrentChange" :show-header="false">
-          <el-table-column property="courseNum" label="Course Num" width="135" />
-          <el-table-column property="courseName" label="Course Name"  show-overflow-tooltip/>
+                  style="width: 100%; height: calc(100vh - 255px)" @current-change="handleCurrentChange"
+                  :show-header="false">
+          <el-table-column property="courseNum" label="Course Num" width="135"/>
+          <el-table-column property="courseName" label="Course Name" show-overflow-tooltip/>
           <template #empty>
-            <el-empty description="No Data" />
+            <el-empty description="No Data"/>
           </template>
         </el-table>
 
@@ -26,29 +27,35 @@
 
       <el-col :span="15" style="margin-bottom: 70px">
         <el-row justify="center">
-          <span class="tableTitle">Student List</span>
+          <span class="tableTitle">User List</span>
         </el-row>
 
         <el-table v-loading="isLoadingUser" ref="singleTableRef" :data="stateUser" highlight-current-row
-          style="width: 100%">
-          <el-table-column property="id" label="ID" width="100" />
-          <el-table-column property="email" label="Email" width="250" />
-          <el-table-column property="name" label="Name" />
-          <el-table-column label="Position">
+                  style="width: 100%">
+          <el-table-column property="id" label="ID" width="100"/>
+          <el-table-column property="email" label="Email" width="230"/>
+          <el-table-column property="name" label="Name"/>
+          <el-table-column label="Position" width="150">
             <template #default="scope">
               <el-tag>
-                {{scope.row.roleInCourse}}
+                {{ scope.row.roleInCourse }}
               </el-tag>
             </template>
-
+          </el-table-column>
+          <el-table-column label="Estimated Hours" width="140">
+            <template #default="scope">
+              <el-input-number style="width: 100px" v-model="scope.row.estimatedHours" :min="0"
+                               @change="modifyEstimatedHour(scope.row.estimatedHours, scope.row)"
+                               v-if="scope.row.roleInCourse !== 'courseCoordinator'" controls-position="right"/>
+            </template>
           </el-table-column>
           <el-table-column>
             <template #default="scope">
-              <el-button @click="handleremove(scope.row)" type="danger" :icon="Delete" circle />
+              <el-button @click="handleremove(scope.row)" type="danger" :icon="Delete" circle/>
             </template>
           </el-table-column>
           <template #empty>
-            <el-empty description="No Data" />
+            <el-empty description="No Data"/>
           </template>
         </el-table>
         <el-row justify="center" v-if="isReadyUser" class="add-button-wrapper">
@@ -61,7 +68,7 @@
   </div>
 
   <AddUserDrawer :visible="UserVisible" direction="ltr" :currentCourse="currentCourse" v-if="UserVisible.visible"
-    @refresh="freshtable" :user-role-arr="userRoleArr" />
+                 @refresh="freshtable" :user-role-arr="userRoleArr"/>
 
   <el-dialog
       v-model="deleteConfirmVisible"
@@ -81,20 +88,23 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, reactive, ref, watch } from "vue";
-import { useAsyncState } from '@vueuse/core'
-import { get, Delete as delete_request } from "@/utils/request";
-import { ElTable, ElMessage } from 'element-plus'
-import { Plus, Delete } from '@element-plus/icons-vue'
+import {onBeforeMount, reactive, ref, watch} from "vue";
+import {useAsyncState} from '@vueuse/core'
+import {get, Delete as delete_request, put} from "@/utils/request";
+import {ElTable, ElMessage} from 'element-plus'
+import {Plus, Delete} from '@element-plus/icons-vue'
 import AddUserDrawer from '@/components/ManageUseful/AddUserDrawer.vue'
 import {usePermissionStore} from "@/store";
+import {floor} from "xe-utils";
 
 interface User {
   id: string
   email: string
   name: string
   roleInCourse: string
+  estimatedHours: number
 }
+
 const currentTerm = ref();
 const currentCourse = ref<Course>();
 const deleteConfirmVisible = ref(false)
@@ -106,15 +116,15 @@ const handleremove = (row: User) => {
 type deleteform = {
   courseID: number
   userID: string
-  role:string
+  role: string
 }
-const  form = reactive({} as deleteform)
+const form = reactive({} as deleteform)
 const deleteUser = () => {
   form.courseID = currentCourse.value.courseID
   form.userID = wantToDeleteUser.value.id
   form.role = wantToDeleteUser.value.roleInCourse
 
-  delete_request('/api/enrolment',{data:form}).then(r => {
+  delete_request('/api/enrolment', {data: form}).then(r => {
     ElMessage({
       message: 'Remove user success',
       type: 'success'
@@ -129,44 +139,46 @@ const deleteUser = () => {
   })
 }
 
-const { isLoading: isLoadingTerm, state: stateTerm, isReady: isReadyTerm, execute: executeTerm } = useAsyncState(
-  (args) => {
-    return get('api/term')
-  },
-  {},
-  {
-    resetOnExecute: false,
-  },
+const {isLoading: isLoadingTerm, state: stateTerm, isReady: isReadyTerm, execute: executeTerm} = useAsyncState(
+    (args) => {
+      return get('api/term')
+    },
+    {},
+    {
+      resetOnExecute: false,
+    },
 )
 
-const { isLoading: isLoadingCourse, state: stateCourse, isReady: isReadyCourse, execute: executeCourse } = useAsyncState(
-  (args) => {
-    const termID = args.termID
-    return get('api/getCourseByTerm/' + termID);
-  },
-  [],
-  {
-    resetOnExecute: false,
-    immediate: false
-  },
+const {isLoading: isLoadingCourse, state: stateCourse, isReady: isReadyCourse, execute: executeCourse} = useAsyncState(
+    (args) => {
+      const termID = args.termID
+      return get('api/getCourseByTerm/' + termID);
+    },
+    [],
+    {
+      resetOnExecute: false,
+      immediate: false
+    },
 )
 
-const { isLoading: isLoadingUser, state: stateUser, isReady: isReadyUser, execute: executeUser } = useAsyncState(
-  (args) => {
-    const courseID = args.courseID
-    // return get(`api/getCourseUser/${courseID}/true`);
-    return get(`api/getCourseUserWithPublishInformation/${courseID}`)
-  },
-  [],
-  {
-    resetOnExecute: false,
-    immediate: false
-  },
+
+const {isLoading: isLoadingUser, state: stateUser, isReady: isReadyUser, execute: executeUser} = useAsyncState(
+    (args) => {
+      const courseID = args.courseID
+      // return get(`api/getCourseUser/${courseID}/true`);
+      return get(`api/getCourseUserWithPublishInformation/${courseID}`)
+    },
+    [],
+    {
+      resetOnExecute: false,
+      immediate: false
+    },
 )
+
 
 const handleTermChange = () => {
   if (currentTerm.value) {
-    executeCourse(0, { termID: currentTerm.value })
+    executeCourse(0, {termID: currentTerm.value})
     localStorage.setItem('selectedTerm', currentTerm.value)
   }
 
@@ -181,7 +193,7 @@ const setCurrent = (row?: any) => {
 const handleCurrentChange = (val: Course | undefined) => {
   currentCourse.value = val
   if (currentCourse.value) {
-    executeUser(0, { courseID: currentCourse.value.courseID })
+    executeUser(0, {courseID: currentCourse.value.courseID})
   }
 }
 const UserVisible = reactive({
@@ -192,7 +204,7 @@ const showUser = () => {
 }
 
 const freshtable = () => {
-  executeUser(0, { courseID: currentCourse.value!.courseID })
+  executeUser(0, {courseID: currentCourse.value!.courseID})
 }
 
 type role = {
@@ -235,9 +247,29 @@ watch(stateUser, _ => {
 })
 
 
+const modifyEstimatedHour = (currentValue, row:User) => {
+  put(`api/modifyEstimatedHours/${currentCourse.value.courseID}/${row.id}/${row.roleInCourse}/${currentValue}`, {}).then(r => {
+    ElMessage({
+      message: 'Modify estimated hour success',
+      type: 'success'
+    })
+    freshtable()
+  }).catch(err => {
+    ElMessage({
+      message: err.response.data['message'],
+      type: 'error'
+    })
+  })
+
+
+}
+
 onBeforeMount(() => {
   executeTerm().then(
       () => {
+        if (stateTerm.value === null || stateTerm.value === undefined || stateTerm.value.length === 0) {
+          return
+        }
         stateTerm.value.sort((a: Term, b: Term) => {
           return b.termID! - a.termID!
         })
@@ -247,7 +279,7 @@ onBeforeMount(() => {
         } else {
           currentTerm.value = stateTerm.value[0].termID
         }
-        executeCourse(0,{ termID: currentTerm.value })
+        executeCourse(0, {termID: currentTerm.value})
       }
   )
 })
@@ -286,7 +318,7 @@ onBeforeMount(() => {
   }
 }
 
-.add-button-wrapper{
+.add-button-wrapper {
   margin-bottom: 20px;
   position: fixed;
   bottom: 10px;

@@ -1,3 +1,5 @@
+
+
 type Term = {
     termID?: number;
     termName: string;
@@ -80,3 +82,6 @@ type applicationApprovalList = {
     PreferCourseGPA: number;
     EnrolledCourse: Array<any>;
 }
+
+
+type EChartsOption = echarts.EChartsOption

@@ -27,6 +27,7 @@ import {
 import {faTwitter} from '@fortawesome/free-brands-svg-icons'
 import dayjs from "dayjs";
 import { registerSW } from 'virtual:pwa-register'
+import * as echarts from 'echarts';
 // import {  } from '@fortawesome/free-regular-svg-icons'
 
 
@@ -41,6 +42,7 @@ app.use(pinia)
 app.use(ElementPlus)
 
 app.config.globalProperties.$dayjs = dayjs;
+app.config.globalProperties.$echarts = echarts;
 
 VXETable.setup({
     // @ts-ignore

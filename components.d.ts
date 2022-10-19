@@ -76,6 +76,7 @@ declare module '@vue/runtime-core' {
     StartApplicationDrawer: typeof import('./src/components/applicationUseful/StartApplicationDrawer.vue')['default']
     UpdateDialog: typeof import('./src/components/profiledialog/UpdateDialog.vue')['default']
     ValidateEmail: typeof import('./src/components/profiledialog/ValidateEmail.vue')['default']
+    WorkingHourCard: typeof import('./src/components/cards/WorkingHourCard.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

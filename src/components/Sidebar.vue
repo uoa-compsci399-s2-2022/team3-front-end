@@ -170,6 +170,12 @@ onBeforeMount(() => {
         </template>
       </template>
 
+      <div class="sidebar-logo" v-show="!sidebar.collapse">
+          <a href="https://www.auckland.ac.nz">
+              <img src="/uoa-white.webp" alt="UoA logo" />
+          </a>
+      </div>
+
     </el-menu>
   </div>
 
@@ -300,12 +306,14 @@ onBeforeMount(() => {
   }
 
   &-logo {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
 
     img {
-      width: 150px;
+      width: 90px;
       cursor: pointer;
     }
   }

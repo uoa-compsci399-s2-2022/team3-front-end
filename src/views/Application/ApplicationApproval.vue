@@ -3,7 +3,7 @@
     <el-row style="align-items: center;">
       <el-col :md="12">
         <el-select v-model="selectedTerm" class="m-2" placeholder="Term" style="margin-right: 10px; margin-bottom: 5px"
-                   v-loading="isLoadingTerm">
+                   v-loading="isLoadingTerm" no-data-text="No Term">
           <el-option
               v-for="item in stateTerm"
               :key="item.termID"
@@ -318,6 +318,9 @@ onBeforeMount(() => {
   }
   executeTerm().then(
       () => {
+        if (stateTerm.value === null || stateTerm.value === undefined || stateTerm.value.length === 0) {
+          return
+        }
         stateTerm.value.sort((a: Term, b: Term) => {
           return b.termID! - a.termID!
         })

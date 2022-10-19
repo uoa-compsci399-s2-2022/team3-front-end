@@ -27,7 +27,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="visibleSync = false">Cancel</el-button>
-        <el-button type="primary" @click="uploadEvent"
+        <el-button type="primary" @click="uploadEvent" :loading="uploadLoading"
         >Import</el-button
         >
       </span>
@@ -80,12 +80,18 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
   upload.value!.handleStart(file)
 }
 
+
+const uploadLoading = ref(false)
+
 const uploadEvent = () => {
+  uploadLoading.value = true
   if (file.value.length === 0) {
     ElMessage.warning('Please select a file.')
+    uploadLoading.value = false
     return
   }
   upload.value!.submit()
+
 }
 
 const handleSuccess = (response: any, file: UploadUserFile) => {
@@ -102,6 +108,7 @@ const handleSuccess = (response: any, file: UploadUserFile) => {
     })
     upload.value!.clearFiles()
     visibleSync.value = false
+    uploadLoading.value = false
 }
 
 

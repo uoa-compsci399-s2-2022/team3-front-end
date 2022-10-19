@@ -1,15 +1,14 @@
 <script setup lang="ts">
 
 import CourseCard from '@/components/cards/CourseCard.vue'
+import WorkingHourCard from '@/components/cards/WorkingHourCard.vue'
 import {Collection, Document, User, Guide, DocumentChecked} from '@element-plus/icons-vue'
 import {onBeforeMount, ref, watch} from "vue";
 import {get} from "@/utils/request";
 import {useAsyncState} from "@vueuse/core";
 
 const value = ref('1')
-const value_semester = ref('')
-
-
+const value_semester = ref<number>()
 
 
 const {isLoading: isLoadingTerm, state: stateTerm, isReady: isReadyTerm, execute: executeTerm} = useAsyncState(
@@ -41,7 +40,7 @@ const {
 
 const courseList = ref([] as any[])
 
-async function GetCourse(termID: String) {
+async function GetCourse(termID: Number) {
   get('/api/getCurrentUserEnrollByTerm/' + termID).then(res => {
     courseList.value = []
     res.forEach((item: any) => {
@@ -58,6 +57,10 @@ async function GetCourse(termID: String) {
 
 onBeforeMount(() => {
   executeCurrentTerm().then(() => {
+    if (stateCurrentTerm.value === null || stateCurrentTerm.value === undefined || stateCurrentTerm.value.length === 0) {
+      noCourse.value = true
+      return
+    }
     value_semester.value = stateCurrentTerm.value[0].termID
     GetCourse(value_semester.value)
   })
@@ -66,7 +69,7 @@ onBeforeMount(() => {
 
 const noCourse = ref(false)
 
-watch(courseList, (courseList)=> {
+watch(courseList, (courseList) => {
   noCourse.value = courseList.length == 0;
 })
 
@@ -75,7 +78,7 @@ watch(courseList, (courseList)=> {
 <template>
   <div class="page-container">
     <div>
-      <el-select placeholder="Select Term" v-model="value_semester" v-loading="isLoadingTerm">
+      <el-select placeholder="Select Term" v-model="value_semester" v-loading="isLoadingTerm" no-data-text="No Term">
         <el-option-group label="Current Terms">
           <el-option
               v-for="item in stateCurrentTerm"
@@ -93,15 +96,23 @@ watch(courseList, (courseList)=> {
               :value="item.termID"
               @click="GetCourse(value_semester)"/>
         </el-option-group>
-
       </el-select>
     </div>
+    <div>
+      <div>
+        <div class="course-container">
+          <div v-for="item in courseList">
+            <router-link :to="{path:item.path, query:{role:item.roleName}}">
+              <CourseCard :course="item"/>
+            </router-link>
+          </div>
+        </div>
+      </div>
 
-    <div class="course-container">
-      <div v-for="item in courseList">
-        <router-link :to="{path:item.path, query:{role:item.roleName}}" >
-          <CourseCard :course="item"/>
-        </router-link>
+      <div>
+        <div class="working-hour-card-wrapper">
+          <WorkingHourCard v-model:termID="value_semester" v-show="!noCourse"/>
+        </div>
       </div>
     </div>
   </div>
@@ -152,7 +163,7 @@ watch(courseList, (courseList)=> {
         </el-button>
       </div>
       <div class="button-wrapper" v-permission="5">
-        <el-button @click="$router.push('manageEnrolment')" class="big-button" type="primary" plain>
+        <el-button @click="$router.push('applicationapproval')" class="big-button" type="primary" plain>
           <el-icon :size="90">
             <DocumentChecked/>
           </el-icon>
@@ -166,7 +177,7 @@ watch(courseList, (courseList)=> {
 <style scoped lang="scss">
 
 .page-container {
-  margin: 30px 30px 30px 30px;
+  margin: 30px 10px 30px 30px;
 }
 
 
@@ -175,8 +186,9 @@ watch(courseList, (courseList)=> {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   // grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  grid-auto-rows: 210px;
-  gap: 10px;
+  grid-auto-rows: 190px;
+  gap: 20px;
+  margin-right: 330px;
 
 }
 
@@ -198,11 +210,30 @@ a {
   text-align: center;
 }
 
-.center-button-group{
+.center-button-group {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
 }
+
+.working-hour-card-wrapper {
+  width: 300px;
+  position: fixed;
+  right: 15px;
+  top: 140px;
+
+}
+
+@media screen and (max-width: 768px) {
+  .course-container {
+    margin-right: 20px;
+  }
+
+  .working-hour-card-wrapper {
+    display: none;
+  }
+}
+
 
 
 </style>
