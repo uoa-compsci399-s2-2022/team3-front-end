@@ -1,5 +1,5 @@
 <template>
-  <el-card class="box-card" v-loading="chartLoading">
+  <el-card class="working-hour-card" v-loading="chartLoading">
     <div id="chart">
     </div>
   </el-card>
@@ -8,16 +8,17 @@
 
 <script setup lang="ts">
 import * as echarts from 'echarts';
-import {onBeforeMount, onMounted, ref, toRef, toRefs, watch} from "vue";
+import {onBeforeMount, onMounted, onUnmounted, ref, toRef, toRefs, watch} from "vue";
 import {get} from "@/utils/request";
 
 const props = defineProps <{termID: number}>()
 
 const {termID} = toRefs(props)
 
+let myChart;
 
 const drawChart = () => {
-  let myChart = echarts.init(document.getElementById('chart'));
+  myChart = echarts.init(document.getElementById('chart'));
   let option: EChartsOption;
   option = {
     title: {
@@ -100,20 +101,28 @@ onMounted(() => {
     getData()
   }
 })
+onUnmounted(() => {
+  if (myChart) {
+    myChart.dispose()
+  }
 
+})
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
 
-.box-card {
+.working-hour-card {
   width: 100%;
   border-radius: 20px;
-  -moz-box-shadow: #0b416d 0 0 12px;
-  -webkit-box-shadow: #0b416d 0 0 12px;
   box-shadow: #0b416d 0 0 12px;
   height: calc(100vh - 170px);
+}
+
+
+:deep(.el-card) .is-always-shadow {
+  box-shadow: #0b416d 0 0 12px;
 }
 
 :deep(.el-card__body) {
