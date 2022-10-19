@@ -1,113 +1,307 @@
-<script setup lang="ts">
-import {defineExpose, reactive, ref} from 'vue';
-import {get, post, put} from '@/utils/request'
-import {ElNotification, genFileId, UploadInstance, UploadProps, UploadRawFile, UploadUserFile} from "element-plus";
-import { warningNotification, errorNotification, normalNotification, successNotification } from '@/utils/notification';
-import {Upload } from '@element-plus/icons-vue'
-import {UploadFilled} from "@element-plus/icons-vue";
-import UpdateDialog from '@/components/profiledialog/UpdateDialog.vue'
-import {base64ToBlob} from "@/utils/base64ToBlob";
+<script lang="ts" setup>
+import { get, post, put } from '@/utils/request';
+import { ElMessage, ElNotification, FormInstance, genFileId, UploadInstance, UploadProps, UploadRawFile, UploadUserFile } from 'element-plus';
+import { reactive, ref, watch } from 'vue'
+import { useElementSize } from '@vueuse/core'
+import { errorNotification, successNotification, warningNotification } from '@/utils/notification';
+import { base64ToBlob } from '@/utils/base64ToBlob';
 
-const id = ref<string>();
-const name = ref<string>();
-const email = ref<string>();
-// const upi = ref<string>();
-// const auid = ref<string>();
-// const currentlyOverseas = ref<string>();
-// const willBackToNZ = ref<string>();
-// const isCitizenOrPR = ref<string>();
-// const haveValidVisa = ref<string>();
-// const enrolDetails = ref<string>();
-// const studentDegree = ref<string>();
-// const otherContracts = ref<string>();
-// const maximunWorking = ref<string>();
+const currentTab = ref("0")
+
+type personalInfoType = {
+    id: string;
+    name: string;
+    email: string;
+    upi: string;
+    auid: string;
+    groups: string[];
+    degree: string;
+    enrolDetails: string;
+}
+const personalInfo = ref<personalInfoType>({} as personalInfoType)
+const getUserProfile = () => {
+    get(`api/currentUserProfile`).then(res => {
+        personalInfo.value.id = res.id
+        personalInfo.value.name = res.name;
+        personalInfo.value.email = res.email;
+        personalInfo.value.upi = res.upi;
+        personalInfo.value.auid = res.auid;
+        personalInfo.value.groups = res.groups;
+        personalInfo.value.degree = res.degree;
+        personalInfo.value.enrolDetails = res.enrolDetails;
+        console.log(res)
+    })
+}
+getUserProfile()
+
+
+// --------------change your personal details------------------------
+const fieldsToChange = ref<Array<keyof profileType>>([])
+
+type profileType = {
+    name: string;
+    email: string;
+    upi: string;
+    auid: string;
+    degree: string;
+    enrolDetails: string;
+    code: string;
+}
+const varificationCode = ref<string>("")
+const changeProfileDTO = ref<profileType>({} as profileType);
+const removeEmptyFields = () => {
+    let removeArr = []
+    for (let [key, value] of Object.entries(changeProfileDTO.value)) {
+        if (value === '') {
+            removeArr.push(key)
+        }
+    }
+    removeArr.forEach(v => delete (changeProfileDTO.value as any)[v])
+}
+
+watch(changeProfileDTO.value, () => {
+    removeEmptyFields()
+})
+
+const onSubmit = (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    if (fieldsToChange.value.find(v => v === 'email')) {
+        formEl.validate(async (valid) => {
+            if (valid) {
+                try {
+                    let res = await post(`/api/validateValidationCode/${changeProfileDTO.value.email}/${changeProfileDTO.value.code}`)
+                    updateProfile()
+                } catch (e: any) {
+                    console.log(e);
+                    ElNotification({
+                        title: 'Error :(',
+                        type: 'error',
+                        message: `${e.response.data.message}`,
+                    })
+                }
+            } else {
+                console.log('error submit!')
+                return false
+            }
+        })
+    } else {
+        updateProfile()
+    }
+
+}
+const updateProfile = async () => {
+
+    put('/api/currentUserProfile', { data: changeProfileDTO.value }).then(_ => {
+        ElNotification({
+            title: 'Success',
+            message: 'Your profile has been updated.',
+            type: 'success',
+        })
+        getUserProfile()
+        setTimeout(() => { currentTab.value = "0" });
+        fieldsToChange.value.length = 0;
+    }).catch(err => {
+        ElNotification({
+            title: 'Oops. Something went wrong :(',
+            message: `${err.response.data.message}`,
+            type: 'error',
+            duration: 0,
+        })
+    })
+
+}
+
+const rules = reactive({
+    email: [{ required: true, message: 'Please input email address', trigger: 'blur', }],
+    code: [{ required: true, message: 'Please input verification code', trigger: 'blur', }]
+})
+
+const UpdateProfileRef = ref<FormInstance>()
+// send validation code with a 60s timer
+let endTime: Date;
+let timeLeft = ref<number>(NaN)
+const waiting = ref(false);
+const sendCode = async (coolDownTime: number) => {
+    if (!await UpdateProfileRef!.value!.validateField('email', () => null)) {
+        return;
+    }
+    endTime = new Date()
+    endTime.setTime(endTime.getTime() + coolDownTime * 1000)
+    localStorage.setItem('end-time-profile', endTime.getTime().toString())
+    timeLeft.value = endTime.getTime() - new Date().getTime()
+    waiting.value = true;
+    let timer = setInterval(() => {
+        timeLeft.value = endTime.getTime() - new Date().getTime()
+        if (timeLeft.value <= 0) {
+            clearInterval(timer);
+            waiting.value = false;
+            localStorage.removeItem('end-time-profile')
+        }
+    }, 1000)
+    post("/api/sendValidationEmail", { email: changeProfileDTO.value.email })
+        .then(res => {
+            ElMessage({
+                message: `Validation code email has been sent to your email.`,
+                type: 'success',
+            })
+        }).catch(
+            err => {
+                ElMessage({
+                    message: `${err.response.data.message}`,
+                    type: 'error',
+                })
+            }
+        )
+}
+
+
+// 防止用户刷新后timer重置
+if (localStorage.getItem('end-time-profile')) {
+    endTime = new Date(Number(localStorage.getItem('end-time-profile')))
+    timeLeft.value = endTime.getTime() - new Date().getTime()
+    if (timeLeft.value > 0) {
+        waiting.value = true;
+        let timer = setInterval(() => {
+            timeLeft.value = endTime.getTime() - new Date().getTime()
+            if (timeLeft.value <= 0) {
+                clearInterval(timer);
+                waiting.value = false;
+                localStorage.removeItem('end-time-profile')
+            }
+        }, 1000)
+    }
+}
+
+const contentRef = ref<any>(null);
+const { height } = useElementSize(contentRef)
+watch(height, () => {
+    if (height.value === 0) {
+        return;
+    }
+    const el = document.getElementById("my-tab") as HTMLElement;
+    el.style.height = `${height.value + 100}px`
+})
+
+
+// ---------------upload file -----------------------
+
+const fileList_ad = ref<UploadUserFile[]>([])
+const fileBase_ad = ref<string>('')    // 上传的文件的base64
+const upload_ad = ref<UploadInstance>()
+const handleChange_ad: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
+    if (fileList_ad.value.length == 0) {
+        fileList_ad.value.push(uploadFile)
+        const reader = new FileReader()
+        reader.readAsDataURL(uploadFile.raw as Blob)
+        reader.onload = () => {
+            const base64data = reader.result
+            const img = base64data as string;
+            fileBase_ad.value = img.split('data:application/pdf;base64,')[1]
+        }
+    } else {
+        fileList_ad.value[0] = uploadFile
+        const reader = new FileReader()
+        reader.readAsDataURL(uploadFile.raw as Blob)
+        reader.onload = () => {
+            const base64data = reader.result
+            const img = base64data as string;
+            fileBase_ad.value = img.split('data:application/pdf;base64,')[1]
+        }
+    }
+    currentStep.value = 1;
+}
+
+// 当上传的文件超过1 个时， 则替换之前的那一个
+const handleExceed_ad: UploadProps['onExceed'] = (files, fileList) => {
+    upload_ad.value!.clearFiles()
+    const file = files[0] as UploadRawFile
+    file.uid = genFileId()
+    upload_ad.value!.handleStart(file)
+}
+
+const handleRemove_ad: UploadProps['onRemove'] = (file, uploadFiles) => {
+    fileBase_ad.value = ''
+}
+
+
+const fileList_cv = ref<UploadUserFile[]>([]);
+const fileBase_cv = ref<string>('')    // 上传的文件的base64
+const upload_cv = ref<UploadInstance>()
+const handleChange_cv: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
+    if (fileList_cv.value.length == 0) {
+        fileList_cv.value.push(uploadFile)
+        const reader = new FileReader()
+        reader.readAsDataURL(uploadFile.raw as Blob)
+        reader.onload = () => {
+            const base64data = reader.result
+            const img = base64data as string;
+            fileBase_cv.value = img.split('data:application/pdf;base64,')[1]
+        }
+    } else {
+        fileList_cv.value[0] = uploadFile
+        const reader = new FileReader()
+        reader.readAsDataURL(uploadFile.raw as Blob)
+        reader.onload = () => {
+            const base64data = reader.result
+            const img = base64data as string;
+            fileBase_cv.value = img.split('data:application/pdf;base64,')[1]
+        }
+    }
+    currentStep.value = 1;
+}
+
+// 当上传的文件超过1 个时， 则替换之前的那一个
+const handleExceed_cv: UploadProps['onExceed'] = (files, fileList) => {
+    upload_cv.value!.clearFiles()
+    const file = files[0] as UploadRawFile
+    file.uid = genFileId()
+    upload_cv.value!.handleStart(file)
+}
+
+const handleRemove_cv: UploadProps['onRemove'] = (file, uploadFiles) => {
+    fileBase_cv.value = ''
+}
+
+const currentStep = ref(0)
+const status1 = ref("")
+const status2 = ref("")
+
+const submitUpload = () => {
+    if (fileBase_ad.value == '' && fileBase_cv.value == '') {
+        errorNotification("You haven't select any document yet.");
+        return;
+    }
+    let p1: Promise<any>, p2: Promise<any>
+    if (fileBase_ad.value) {
+        p1 = post('/api/getCV/' + personalInfo.value.id, { "cv": fileBase_ad.value }).then(_ => {
+            successNotification('New Acdemic Transcript uploaded.')
+        })
+    }
+    if (fileBase_cv.value) {
+        p2 = post('/api/getCV/' + personalInfo.value.id, { "cv": fileBase_cv.value }).then(_ => {
+            successNotification('New CV uploaded.')
+        })
+    }
+
+    Promise.all([p1, p2]).then(_ => {
+        currentStep.value = 2;
+    }).catch(err => {
+        errorNotification('Something went wrong during uploading :(')
+    })
+}
+
+const onEdit = ref(false);
+
+const loadingCV = ref(false);
+const loadingAD = ref(false);
 const academicRecord = ref<string>();
 const cv = ref<string>();
-// const createDateTime = ref<string>();
-
-type usertype = {
-  id: string;
-  name? : string
-  upi?: string;
-  auid?: number;
-  email?: string;
-  currentlyOverseas: boolean;
-  willBackToNZ: boolean;
-  isCitizenOrPR: boolean;
-  haveValidVisa: boolean;
-  enrolDetails?: string;
-  studentDegree?: string;
-  haveOtherContracts: boolean;
-  otherContracts: string;
-  maximumWorkingHours: number;
-  // cv : string;
-  // academicRecord: string;
-  createDateTime: string;
-}
-
-const detil = ref({} as usertype)
-
-async function getUserProfile() {
-  let user = await get(`api/currentUserProfile`)
-
-    // let user = await get(`api/currentUserProfile`)
-    // console.log(user)
-    // id.value = user.id;
-    // name.value = user.name;
-    // email.value = user.email;
-    // upi.value = user.upi;
-    // auid.value = user.auid;
-    // currentlyOverseas.value = user.currentlyOverseas;
-    // willBackToNZ.value = user.willBackToNZ;
-    // isCitizenOrPR.value = user.isCitizenOrPR;
-    // haveValidVisa.value = user.haveValidVisa;
-    // enrolDetails.value = user.enrolDetails;
-    // studentDegree.value = user.studentDegree;
-    // otherContracts.value = user.otherContracts;
-    // maximunWorking.value = user.maximumWorkingHours;
-    // createDateTime.value = user.createDateTime;
-    //
-    detil.value['id'] = user.id
-    detil.value['name'] = user.name;
-    detil.value['email'] = user.email;
-    detil.value['upi'] = user.upi;
-    detil.value['auid'] = user.auid;
-    detil.value['currentlyOverseas'] = user.currentlyOverseas ;
-    detil.value['willBackToNZ'] = user.willBackToNZ;
-    detil.value['isCitizenOrPR'] = user.isCitizenOrPR;
-    detil.value['haveValidVisa'] = user.haveValidVisa;
-    detil.value['enrolDetails'] = user.enrolDetails;
-    detil.value['studentDegree'] = user.studentDegree;
-    detil.value['haveOtherContracts'] = user.haveOtherContracts;
-    detil.value['otherContracts'] = user.otherContracts;
-    detil.value['maximumWorkingHours'] = user.maximumWorkingHours;
-    // detil.value['cv'] = user.cv;
-    // detil.value['academicRecord'] = user.academicRecord;
-
-}
-
-
-
-async function getAcademicRecord() {
-  loadingAD.value = true;
-  let user = await get(`api/getAcademicTranscript/` + detil.value['id'] )
-  // console.log(user.cv)
-  if (user.AcademicTranscript != null && user.AcademicTranscript != undefined && user.AcademicTranscript != "") {
-    academicRecord.value = user.AcademicTranscript;
-    // let blob = base64toBlob(academicRecord.value, 'application/pdf');
-    var Blob = base64ToBlob(academicRecord.value)
-    let bloburl = window.URL.createObjectURL(Blob);
-    window.open(bloburl);
-  }else{
-    warningNotification('Did not detect your academic transcript, please upload your academic transcript')
-  }
-  loadingAD.value = false;
-}
 
 async function getCV() {
   loadingCV.value = true;
   // console.log(id.value)
-  let user = await get(`api/getCV/` + detil.value['id'])
+  console.log(personalInfo.value.id);
+  let user = await get(`api/getCV/` + personalInfo.value.id)
   // console.log(user.cv)
   if (user.cv != null && user.cv != undefined && user.cv != "") {
     academicRecord.value = user.cv;
@@ -123,569 +317,489 @@ async function getCV() {
   loadingCV.value = false;
 }
 
-getUserProfile()
-// -------------------- update profile -------------------- start
-
-const dialogVisible = ref(false);
-const dialogUploadVisible = ref(false);
-
-const updateProfile = ref({} as usertype)
-
-const showUploadDialog= () => {
-  dialogUploadVisible.value = true;
-  dialog_openEvent()
-}
-
-const showDiaglog = () => {
-  dialogVisible.value = true;
-  dialog_openEvent()
-}
-
-
-const dialog_update_name = ref(true);
-const dialog_update_email = ref(true);
-const dialog_update_upi = ref(true);
-const dialog_update_auid = ref(true);
-const dialog_update_enrolDetails = ref(true);
-const dialog_update_studentDegree = ref(true);
-const dialog_check_email = ref(false);
-const dialog_validated_email = ref(false);
-
-const dialog_upload_cv = ref(true);
-const dialog_upload_ad = ref(true);
-
-const loadingCV = ref(false);
-const loadingAD = ref(false);
-
-const showinfo = () => {
-  // console.log(updateProfile.value)
-}
-
-
-const validationCode = ref('')
-
-
-
-const submitUpdateForm = (form : usertype) => {
-  // console.log(form)
-  const submitStatus = ref(true)
-  for (let key in form) {
-    if (key === 'studentDegree') {
-      if ( form[key].toLowerCase() != "undergraduate" && form[key].toLowerCase() != "postgraduate" ) {
-        normalNotification('Student Degree form: Not a Valid degree !!!!!', 'We are only accepting Undergraduate and Postgraduate students. Please check your spelling .')
-        submitStatus.value = false;
-      }
-    }
-    if (key === 'auid'){
-      // console.log(isNaN(Number(form[key])))
-      if ( isNaN(Number(form[key]))){
-        normalNotification('AUID form: Not a Valid AUID !!!!!', 'Please check your AUID again.')
-        submitStatus.value = false;
-      }
-    }
-    if (key === 'email'){
-      if (dialog_validated_email.value == false){
-        normalNotification('Email form: Not a Valid code !!!!!', 'Please check your validation code from your email again.')
-        submitStatus.value = false;
-      }
-    }
-
-
+async function getAcademicRecord() {
+  loadingAD.value = true;
+  let user = await get(`api/getAcademicTranscript/` + personalInfo.value.id )
+  // console.log(user.cv)
+  if (user.AcademicTranscript != null && user.AcademicTranscript != undefined && user.AcademicTranscript != "") {
+    academicRecord.value = user.AcademicTranscript;
+    // let blob = base64toBlob(academicRecord.value, 'application/pdf');
+    var Blob = base64ToBlob(academicRecord.value)
+    let bloburl = window.URL.createObjectURL(Blob);
+    window.open(bloburl);
+  }else{
+    warningNotification('Did not detect your academic transcript, please upload your academic transcript')
   }
-
-  if (submitStatus.value == false) {
-    errorNotification('Update Failed')
-  }
-  else{
-    // console.log(updateProfile.value)
-    // const data = updateProfile.value
-    put('api/currentUserProfile' , {
-      data : updateProfile.value
-    }).then((res) => {
-      // console.log(res.status)
-      if (res.status == 1) {
-        successNotification('Update Success')
-        getUserProfile()
-        dialogVisible.value = false;
-      }else{
-        errorNotification('Update Failed')
-      }
-    })
-  }
+  loadingAD.value = false;
 }
 
-async function check_email(email? : string) {
-  normalNotification('Sending an email to ' + email, 'Please wait for a few seconds')
-  const respsone = await post('api/sendValidationEmail', {email: email})
-  // console.log(respsone)
-  successNotification('Send email to '+ email +  'successfully. Please type the validation code, validation code will be expired in 5 minutes')
-  // normalNotification('Sending email to '+ email, )
-}
-
-
-async function validValidationCode(email?: string , code? : string){
-  const response = await post('/api/validateValidationCode/'+email+'/'+code)
-  // console.log(response)
-  // console.log(response['status'])
-  if (response['status'] === 1){
-    successNotification('Validation Code is correct')
-    dialog_validated_email.value = true;
-  }
-  else{
-    errorNotification( code + ' Code is incorrect')
-  }
-}
-
-
-// 初始化数值， 在打开dialog的时候， 会调用这个函数
-const dialog_openEvent = () =>{
-  dialog_update_name.value = true;
-  dialog_update_email.value = true;
-  dialog_update_upi.value = true;
-  dialog_update_auid.value = true;
-  dialog_update_enrolDetails.value = true;
-  dialog_update_studentDegree.value = true;
-  dialog_check_email.value = false;
-  validationCode.value = ''
-  dialog_validated_email.value = false;
-
-  fileBase_cv.value = ''
-  fileList_cv.value = []
-
-}
-
-const fileList_cv = ref<UploadUserFile[]>([]);
-const fileBase_cv = ref<string>('')    // 上传的文件的base64
-const upload_cv = ref<UploadInstance>()
-const handleChange_cv: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
-  if (fileList_cv.value.length == 0) {
-    fileList_cv.value.push(uploadFile)
-    const reader = new FileReader()
-    reader.readAsDataURL(uploadFile.raw as Blob)
-    reader.onload = () => {
-      const base64data = reader.result
-      const img = base64data as string;
-      fileBase_cv.value = img.split('data:application/pdf;base64,')[1]
-    }
-  } else {
-    fileList_cv.value[0] = uploadFile
-    const reader = new FileReader()
-    reader.readAsDataURL(uploadFile.raw as Blob)
-    reader.onload = () => {
-      const base64data = reader.result
-      const img = base64data as string;
-      fileBase_cv.value = img.split('data:application/pdf;base64,')[1]
-    }
-  }
-}
-// 当上传的文件超过1 个时， 则替换之前的那一个
-const handleExceed_cv: UploadProps['onExceed'] = (files, fileList) => {
-  upload_cv.value!.clearFiles()
-  const file = files[0] as UploadRawFile
-  file.uid = genFileId()
-  upload_cv.value!.handleStart(file)
-}
-
-const handleRemove_cv: UploadProps['onRemove'] = (file, uploadFiles) => {
-  fileBase_cv.value = ''
-}
-
-
-async function testUPloadCV() {
-  if (fileBase_cv.value == ''){
-    errorNotification('Please upload your CV')
-  }
-  else{
-    await post('/api/getCV/' + detil.value.id, {"cv": fileBase_cv.value})
-    successNotification('uploading your CV successfully')
-    dialog_upload_cv.value = false;
-  }
-}
-
-
-const fileList_ad = ref<UploadUserFile[]>([]);
-const fileBase_ad = ref<string>('')    // 上传的文件的base64
-const upload_ad = ref<UploadInstance>()
-const handleChange_ad: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
-  if (fileList_ad.value.length == 0) {
-    fileList_ad.value.push(uploadFile)
-    const reader = new FileReader()
-    reader.readAsDataURL(uploadFile.raw as Blob)
-    reader.onload = () => {
-      const base64data = reader.result
-      const img = base64data as string;
-      fileBase_ad.value = img.split('data:application/pdf;base64,')[1]
-    }
-  } else {
-    fileList_ad.value[0] = uploadFile
-    const reader = new FileReader()
-    reader.readAsDataURL(uploadFile.raw as Blob)
-    reader.onload = () => {
-      const base64data = reader.result
-      const img = base64data as string;
-      fileBase_ad.value = img.split('data:application/pdf;base64,')[1]
-    }
-  }
-}
-// 当上传的文件超过1 个时， 则替换之前的那一个
-const handleExceed_ad: UploadProps['onExceed'] = (files, fileList) => {
-  upload_ad.value!.clearFiles()
-  const file = files[0] as UploadRawFile
-  file.uid = genFileId()
-  upload_ad.value!.handleStart(file)
-}
-
-const handleRemove_ad: UploadProps['onRemove'] = (file, uploadFiles) => {
-  fileBase_ad.value = ''
-}
-
-
-async function testUPloadAD() {
-  if (fileBase_ad.value == ''){
-    errorNotification('Please upload your application document')
-  }
-  else{
-    await post('/api/getAcademicTranscript/' + detil.value.id, {"AcademicTranscript": fileBase_ad.value})
-    successNotification('uploading your Academic transcript successfully')
-    dialog_upload_ad.value = false;
-  }
-
-}
-
-defineExpose({
-
-})
-// -------------------- update profile -------------------- end
 </script>
 
 <template>
-    <!-- below are presented using Mock data -->
-    <div class="profile-container">
-        <div class="profile-avatar">
-            <img src="@/assets/avatar.svg" alt="avatar" />
-        </div>
+    <div class="profile-pane">
+        <el-tabs tab-position="left" style="height:450px" class="demo-tabs" id="my-tab" v-model="currentTab">
+            <el-tab-pane>
+                <template #label>
+                    <el-icon>
+                        <UserFilled />
+                    </el-icon>
+                </template>
 
-        <div class="profile-info">
-            <div class="profile-info-general">
+                <div class="content">
+                    <h3>Personal info</h3>
+                    <h4>name</h4>
 
-                <div>{{ detil.name }}</div>
+                    <div style="display:flex">
+                        <p>{{ personalInfo.name }}</p>
+                        <div class="groups" v-for="group of personalInfo.groups">
+                            <el-tag style="margin-left: 20px;">{{group}}</el-tag>
+                        </div>
+                    </div>
 
-                <div>{{detil.email}}</div>
-            </div>
+                    <p v-if="!personalInfo.name">Missing :(</p>
 
-            <div class="profile-info-details">
-                <h2>Infomation</h2>
-                <pre>UPI:                      {{detil.upi}}</pre>
-                <pre>AUID:                   {{detil.auid}}</pre>
-                <pre>Preferred Email:   {{ detil.email}}</pre>
-              <div v-if="detil.currentlyOverseas===null">
-                <pre>Currently Overseas:  Unknown</pre>
-              </div>
-              <div v-else-if="detil.currentlyOverseas===true">
-                <pre>Currently Overseas:  Yes</pre>
-              </div>
-              <div v-else-if="detil.currentlyOverseas===false">
-                <pre>Currently Overseas:  No</pre>
-              </div>
+                    <h4>email</h4>
+                    <p>{{ personalInfo.email }}</p>
+                    <p v-if="!personalInfo.email">Missing :(</p>
+
+                    <h4>upi</h4>
+                    <p>{{ personalInfo.upi }}</p>
+                    <p v-if="!personalInfo.upi ">Missing :(</p>
+
+                    <h4>auid</h4>
+                    <p>{{ personalInfo.auid }}</p>
+                    <p v-if="!personalInfo.auid">Missing :(</p>
+                    <h4>degree</h4>
+                    <p>{{ personalInfo.degree }}</p>
+                    <p v-if="!personalInfo.degree">Missing :(</p>
+                    <h4>Enrolment detail</h4>
+                    <p>{{ personalInfo.enrolDetails }}</p>
+                    <p v-if="!personalInfo.enrolDetails">Missing :(</p>
+                </div>
+            </el-tab-pane>
+
+            <el-tab-pane>
+                <template #label>
+                    <el-icon>
+                        <Message />
+                    </el-icon>
+                </template>
+
+                <div class="content">
+                    <h3>Recent Messages</h3>
+                </div>
+            </el-tab-pane>
+
+            <el-tab-pane>
+                <template #label>
+                    <el-icon>
+                        <DocumentCopy />
+                    </el-icon>
+                </template>
+                <Transition name="slide-fade">
+                    <div class="content document-edit" v-if="onEdit">
+                        <div class="back" @click="onEdit = false">
+                            <el-icon>
+                                <ArrowLeft />
+                            </el-icon>
+                        </div>
+                        <h3>Change Documents</h3>
+                        <div style="height: 90px; margin-bottom: 10px;">
+                            <el-steps direction="vertical" :active="currentStep" finish-status="success">
+                                <el-step title="Step 1" description="Select pdf file from your local PC" />
+                                <el-step title="Step 2" description="Click 'Upload' button to upload to the server"
+                                    :status="status2" />
+                            </el-steps>
+                        </div>
+                        <el-upload :limit="1" ref="uploadCV" accept="application/pdf" v-model:file-list="fileList_ad"
+                            :on-change="handleChange_ad" :on-exceed="handleExceed_ad" :on-remove="handleRemove_ad"
+                            :auto-upload="false">
+                            <template #trigger>
+                                <el-button type="primary">Select your Academic Transcript</el-button>
+                            </template>
+
+                            <template #tip>
+                                <div class="el-upload__tip text-red">
+                                    Requirement: PDF files less than 2MB
+                                </div>
+                            </template>
+                        </el-upload>
+                        <!-- -----------------------AD在上---------CV在下------------------------------- -->
+                        <el-upload :limit="1" ref="uploadCV" accept="application/pdf" v-model:file-list="fileList_cv"
+                            :on-change="handleChange_cv" :on-exceed="handleExceed_cv" :on-remove="handleRemove_cv"
+                            :auto-upload="false">
+                            <template #trigger>
+                                <el-button type="primary">Select your CV</el-button>
+                            </template>
+
+                            <template #tip>
+                                <div class="el-upload__tip text-red">
+                                    Requirement: PDF files less than 2MB
+                                </div>
+                            </template>
+                        </el-upload>
+
+                        <el-button class="ml-3" type="success" @click="submitUpload">
+                            Upload
+                        </el-button>
+                    </div>
+                    <div v-else class="content document-check">
+                        <div class="back" @click="onEdit = true">
+                            <el-icon>
+                                <DocumentAdd />
+                            </el-icon>
+                        </div>
+
+                        <h3>Download Documents</h3>
+                        <div style="height: 90px; margin-bottom: 10px;" class="document-check-wrapper">
+                            <div class="document" v-loading="loadingAD" @click="getAcademicRecord">
+                                <el-icon>
+                                    <Document />
+                                </el-icon><span>Academic Transcript</span>
+                            </div>
+                            <div class="document" v-loading="loadingCV" @click="getCV" >
+                                <el-icon>
+                                    <Document />
+                                </el-icon><span>CV</span>
+                            </div>
+                        </div>
+                    </div>
+                </Transition>
+
+            </el-tab-pane>
+
+            <el-tab-pane>
+                <template #label>
+                    <el-icon>
+                        <Setting />
+                    </el-icon>
+                </template>
+                <div class="content" ref="contentRef">
+                    <h3>Change your personal details</h3>
+                    <el-tooltip class="box-item" effect="light" content="Select fields to update" placement="right">
+                        <el-select v-model="fieldsToChange" multiple placeholder="Select fields to update"
+                            style="width: 80%">
+                            <el-option key="name" label="Name" value="name" />
+                            <el-option key="upi" label="UPI" value="upi" />
+                            <el-option key="auid" label="AUID" value="auid" />
+                            <el-option key="degree" label="Degree" value="degree" />
+                            <el-option key="email" label="Email" value="email" />
+                            <el-option key="enrolDetails" label="Enrolment detail" value="enrolDetails" />
+                        </el-select>
+                    </el-tooltip>
+
+                    <el-form :model="changeProfileDTO" status-icon label-position="top" style="width: 80%;"
+                        :rules="rules" hide-required-asterisk ref="UpdateProfileRef">
+                        <el-form-item prop="name" v-if="fieldsToChange.find(v => v === 'name')">
+                            <template #label>
+                                <h4>name</h4>
+                            </template>
+                            <el-input v-model="changeProfileDTO.name" />
+                        </el-form-item>
+
+                        <el-form-item prop="email" v-if="fieldsToChange.find(v => v === 'email')">
+                            <template #label>
+                                <h4>email</h4>
+                            </template>
+                            <div style="display:flex; column-gap: 20px; width: 100%;">
+                                <el-input v-model="changeProfileDTO.email" />
+                                <el-button type="info" @click="" plain disabled v-if="waiting" class="verification">
+                                    {{(timeLeft / 1000).toFixed(0)}}s
+                                </el-button>
+                                <el-button type="primary" @click="sendCode(60)" plain v-else class="verification">Send
+                                    Code
+                                </el-button>
+                            </div>
 
 
-              <div v-if="detil.enrolDetails===null">
-                <pre>Enrol Detail:  Unknown</pre>
-              </div>
-              <div v-else>
-                <pre>Enrol Detail:  {{ detil.enrolDetails }}</pre>
-              </div>
+                        </el-form-item>
 
-              <div v-if="detil.studentDegree===null">
-                <pre>Degree:  Unknown</pre>
-              </div>
-              <div v-else>
-                <pre>Degree:  {{ detil.studentDegree }}</pre>
-              </div>
+                        <el-form-item prop="code" v-if="fieldsToChange.find(v => v === 'email')">
+                            <h4>verification&nbspcode</h4>
+                            <el-input v-model="changeProfileDTO.code" />
+                        </el-form-item>
 
-            </div>
-        </div>
 
-        <div class="profile-download">
-            <p>Personal documents</p>
-<!--            <div>visa.pdf</div>-->
-            <div @click="getCV" v-loading="loadingCV">cv</div>
-            <div @click="getAcademicRecord" v-loading="loadingAD">Academic Transcript</div>
-          <el-button @click="showUploadDialog" >
-            Upload<el-icon class="el-icon--right"><Upload/></el-icon>
-          </el-button>
-        </div>
+                        <el-form-item prop="upi" v-if="fieldsToChange.find(v => v === 'upi')">
+                            <template #label>
+                                <h4>upi</h4>
+                            </template>
+                            <el-input v-model="changeProfileDTO.upi" />
+                        </el-form-item>
 
+                        <el-form-item prop="auid" v-if="fieldsToChange.find(v => v === 'auid')">
+                            <template #label>
+                                <h4>auid</h4>
+                            </template>
+                            <el-input v-model.number="changeProfileDTO.auid" />
+                        </el-form-item>
+
+                        <el-form-item prop="degree" v-if="fieldsToChange.find(v => v === 'degree')">
+                            <template #label>
+                                <h4>degree</h4>
+                            </template>
+                            <el-input v-model="changeProfileDTO.degree" />
+                        </el-form-item>
+
+                        <el-form-item prop="enrolDetails" v-if="fieldsToChange.find(v => v === 'enrolDetails')">
+                            <template #label>
+                                <h4>Enrolment detail</h4>
+                            </template>
+                            <el-input v-model="changeProfileDTO.enrolDetails" />
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="onSubmit(UpdateProfileRef)" style="margin-bottom: 20px"
+                                v-if="fieldsToChange.length > 0">Submit
+                            </el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+            </el-tab-pane>
+        </el-tabs>
     </div>
-
-    <el-button class="profile-update" @click="showDiaglog">Update profile</el-button>
-<!--    <el-button class="profile-update" @click="">Change Password</el-button>-->
-
-  <el-dialog v-model="dialogUploadVisible" title="Upload File"  class="dialog-Upload-container" >
-    <el-button @click="dialog_upload_cv=true" v-if="dialog_upload_cv===false">Upload CV</el-button>
-    <el-button @click="dialog_upload_ad=true" v-if="dialog_upload_ad===false">Upload Academic transcript</el-button>
-
-
-    <div>
-    <div class="dialog-upload-ad" v-if="dialog_upload_ad===true">
-      <p>Upload your Academic transcript</p>
-      <div>
-        <el-upload
-            :limit = "1"
-            ref="upload_cv"
-            accept="application/pdf"
-            v-model:file-list="fileList_ad"
-            :on-change="handleChange_ad"
-            :on-exceed="handleExceed_ad"
-            :on-remove="handleRemove_ad"
-            action = ""
-            drag>
-          <el-icon class="el-icon--upload">
-            <upload-filled/>
-          </el-icon>
-          <div class="el-upload__text">
-            Drop your Academic transcript here or <em>click to upload</em>
-          </div>
-          <template #tip>
-            <div class="el-upload__tip">
-              Require: PDF files with a size less than 2MB
-            </div>
-          </template>
-
-        </el-upload>
-        <div>
-          <el-button @click="testUPloadAD">Test</el-button>
-          <el-button @click="dialog_upload_ad=false">Cancel</el-button>
-        </div>
-      </div>
-    </div>
-
-    </div>
-    <el-divider></el-divider>
-    <div>
-    <div class="dialog-upload-cv" v-if="dialog_upload_cv===true">
-      <p>Upload your cv</p>
-      <div>
-        <el-upload
-            :limit = "1"
-            ref="upload_cv"
-            accept="application/pdf"
-            v-model:file-list="fileList_cv"
-            :on-change="handleChange_cv"
-            :on-exceed="handleExceed_cv"
-            :on-remove="handleRemove_cv"
-            action = ""
-            drag>
-          <el-icon class="el-icon--upload">
-            <upload-filled/>
-          </el-icon>
-          <div class="el-upload__text">
-            Drop your CV here or <em>click to upload</em>
-          </div>
-          <template #tip>
-            <div class="el-upload__tip">
-              Require: PDF files with a size less than 2MB
-            </div>
-          </template>
-
-        </el-upload>
-      </div>
-      <div>
-        <el-button @click="testUPloadCV">Test</el-button>
-        <el-button @click="dialog_upload_cv=false">Cancel</el-button>
-      </div>
-    </div>
-    </div>
-  </el-dialog>
-
-
-    <el-dialog v-model="dialogVisible" title="Quick Update"  class="dialog-container" width="80%" >
-<!--      <UpdateDialog/>-->
-      <el-header>
-        <el-button @click="dialog_update_name=true" v-if="dialog_update_name===false">update name</el-button>
-        <el-button @click="dialog_update_email=true" v-if="dialog_update_email===false">update email</el-button>
-        <el-button @click="dialog_update_upi=true" v-if="dialog_update_upi===false">update upi</el-button>
-        <el-button @click="dialog_update_auid=true" v-if="dialog_update_auid===false">update auid</el-button>
-        <el-button @click="dialog_update_enrolDetails=true" v-if="dialog_update_enrolDetails===false">update enrol details </el-button>
-        <el-button @click="dialog_update_studentDegree=true" v-if="dialog_update_studentDegree===false">update student degree</el-button>
-      </el-header>
-      <el-form label-position="left" :model="updateProfile" >
-
-
-        <div class="dialog-update-name" v-if="dialog_update_name===true">
-          <el-form-item
-              label="Name"
-              prop="name"
-            :rules="{
-            required: true,
-            message: 'name can not be empty',
-            trigger: 'blur',
-          }">
-            <el-input v-model="updateProfile.name" :placeholder="`origin:  ${detil.name}`" ></el-input>
-            <el-button @click="dialog_update_name=false; delete updateProfile.name">cancel</el-button>
-          </el-form-item>
-
-        </div>
-
-
-        <div class="dialog-update-email" v-if="dialog_update_email===true">
-          <el-form-item
-              label="Email"
-              prop="email"
-              :rules="{
-            required: true,
-            message: 'Email can not be empty',
-            trigger: 'blur',
-          }" >
-            <el-input v-model="updateProfile.email" :placeholder="`origin:  ${detil.email}`"></el-input>
-            <div v-if="dialog_check_email===true">
-              <el-input v-model="validationCode" placeholder="Validation Code" ></el-input>
-
-            </div>
-
-            <el-button @click="dialog_check_email=true; check_email(updateProfile.email)" >Check Email</el-button>
-            <el-button @click="validValidationCode(updateProfile.email, validationCode)" v-if="dialog_check_email===true">Valid the code</el-button>
-            <el-button @click="dialog_update_email=false; delete updateProfile.email">cancel</el-button>
-          </el-form-item>
-        </div>
-
-
-        <div class="dialog-update-upi" v-if="dialog_update_upi===true">
-          <el-form-item
-              label="UPI"
-              prop="UPI"
-              :rules="{
-            required: true,
-            message: 'UPI can not be empty',
-            trigger: 'blur',
-          }" >
-            <el-input v-model="updateProfile.upi" :placeholder="`origin:  ${detil.upi}`" ></el-input>
-            <el-button @click="dialog_update_upi=false; delete updateProfile.upi">cancel</el-button>
-          </el-form-item>
-        </div>
-
-
-        <div class="dialog-update-auid" v-if="dialog_update_auid===true">
-          <el-form-item
-              label="AUID"
-              :rules="{
-            required: true,
-            message: 'auid can not be empty and auid must be a number',
-            trigger: 'blur',
-          }" >
-            <el-input v-model="updateProfile.auid" :placeholder="`Note auid must be a number. origin:  ${detil.auid}`" ></el-input>
-            <el-button @click="dialog_update_auid=false; delete updateProfile.auid">cancel</el-button>
-          </el-form-item>
-        </div>
-
-
-        <div class="dialog-update-enrolDetails" v-if="dialog_update_enrolDetails===true">
-          <el-form-item
-              label="Enrol Details"
-              :rules="{
-            required: true,
-            message: 'Enrol details can not be empty',
-            trigger: 'blur',
-          }" >
-            <el-input v-model="updateProfile.enrolDetails" :placeholder="`origin:  ${detil.enrolDetails}`" ></el-input>
-            <el-button @click="dialog_update_enrolDetails=false; delete updateProfile.enrolDetails">cancel</el-button>
-          </el-form-item>
-        </div>
-
-
-        <div class="dialog-update-studentDegree" v-if="dialog_update_studentDegree===true">
-          <el-form-item
-              label="Student Degree"
-              :rules="{
-            required: true,
-            message: 'Student degree can not be empty',
-            trigger: 'blur',
-          }" >
-<!--            <el-input v-model="updateProfile.studentDegree" :placeholder="`origin:  ${detil.studentDegree}`" ></el-input>-->
-            <el-radio-group v-model="updateProfile.studentDegree ">
-              <el-radio label="Undergraduate" />
-              <el-radio label="Postgraduate" />
-            </el-radio-group>
-
-            <el-button @click="dialog_update_studentDegree=false; delete updateProfile.studentDegree">cancel</el-button>
-          </el-form-item>
-        </div>
-
-      </el-form>
-    <el-footer class="dialog-footer"><el-button @click="showinfo">Test</el-button>
-      <el-button @click="submitUpdateForm(updateProfile)">submit</el-button></el-footer>
-    </el-dialog>
-
 
 </template>
 
-<style scoped lang="scss">
-.dialog-container{
-  width: 70%;
-  height: 70%;
-  .dialog-basic-info{
-    width: 100%;
-    height: 250px;
-  }
 
-}
-
-.profile-update{
-    padding: 20px 60px;
-    font-size: 20px;
-    width: 160px;
-    margin-left: 180px;
-}
-.profile-container {
-    margin: 40px 60px;
-    display: flex;
-    .profile-avatar {
-        width: 80px;
-        margin-right: 40px;
-    }
-
-    .profile-info {
-        &-general {
-            font-size: 25px;
-            font-weight: 600;
-            :last-child {
-                font-size: 20px;
-                font-weight: 500;
-            }
-        }
-
-        &-details {
-            margin-top: 30px;
-            h2 {
-                font-size: 20px;
-            }
-
-            pre {
-                padding-left: 10px;
-                font-size: 16px;
-                color: #aaa;
-            }
-        }
-    }
-
-    .profile-download {
-        margin-left: auto;
-        align-self: flex-start;
-        p {
-            font-size: 20px;
-            border-bottom: 1px solid rgb(233, 233, 233);
-        }
-
-        div {
-            font-size: 16px;
-            margin-left: 20px;
-            color:rgb(160, 211, 253);
-            cursor:pointer;
-        }
-        div:hover {
-            color:rgb(109, 189, 254);
-        }
-    }
-
+<style>
+.el-tabs__content {
+    height: 100%;
+    overflow: visible;
 }
 </style>
+<style scoped lang="scss">
+@import url('https://fonts.googleapis.com/css?family=Nunito:400,900|Montserrat|Roboto');
+
+.back {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    left: 100px;
+    width: 30px;
+    height: 100%;
+    background-color: rgb(236, 236, 236);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.back:hover {
+    width: 40px;
+
+    .el-icon {
+        font-size: 30px;
+    }
+}
+
+.slide-fade-enter-active {
+    transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+    transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+    transform: translateX(-20px);
+    opacity: 0;
+}
+
+
+
+.slide-fade-enter-active.document-check {
+    transition: all 0.3s ease-out;
+    transition-delay: .5s;
+}
+
+.slide-fade-leave-active.document-check {
+    transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+
+}
+
+.slide-fade-enter-active.document-edit {
+    transition: all 0.3s ease-out;
+    transition-delay: .5s;
+}
+
+.slide-fade-leave-active.document-edit {
+    transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+
+}
+
+$logo: #3DBB3D;
+$gray: #777777;
+$black: #070707;
+$green: #7ED386;
+$aqua: #3FB6A8;
+$white: #FFFFFF;
+
+$hulu: 'Nunito Sans', sans-serif;
+$heading: 'Montserrat', sans-serif;
+$body: 'Roboto', sans-serif;
+$primary: #64bee8;
+
+
+.profile-pane {
+    position: relative;
+    margin-top: 50px;
+    width: 100%;
+    display: flex;
+
+    .el-tabs {
+        margin-left: 10vw;
+    }
+
+    .el-tabs--left {
+        overflow: visible;
+    }
+
+
+    .el-tab-pane {
+        position: relative;
+        width: 100%;
+        height: 100%;
+
+        .content {
+            background-color: rgb(255, 255, 255);
+            position: relative;
+            width: 600px;
+            min-height: 350px;
+            left: -30px;
+            top: 40px;
+            box-shadow: var(--el-box-shadow-light);
+            padding-left: 120px;
+
+            h3 {
+                font-family: $heading;
+                font-size: 20px;
+                color: $primary;
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+
+            h4 {
+                font-family: $body;
+                color: $gray;
+                width: 80%;
+                text-transform: uppercase;
+                font-size: 10px;
+                letter-spacing: 1px;
+                margin-left: 2px;
+            }
+        }
+
+        .document-edit {
+            padding-left: 200px;
+            position: relative;
+        }
+
+        .document-check {
+            padding-left: 200px;
+            position: relative;
+
+            &-wrapper {
+                display: flex;
+                column-gap: 10px;
+                height: 260px !important;
+                align-items: center;
+
+                .el-button {
+                    padding: 50px 30px;
+                }
+
+                .el-icon {
+                    font-size: 80px;
+
+                }
+
+                .document {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    border: 1px solid rgb(160, 207, 255);
+                    border-radius: 4px;
+                    color: rgb(64, 158, 255);
+                    cursor: pointer;
+                    padding: 20px;
+                    background-color: rgb(236, 245, 255);
+                    transition: all .1s ease;
+                }
+
+                .document:hover {
+                    background-color: rgb(64, 158, 255);
+                    color: #fff;
+                }
+
+                .document:active {
+                    background-color: rgb(236, 245, 255);
+                    color: rgb(64, 158, 255);
+                }
+
+
+            }
+        }
+    }
+}
+
+.el-icon {
+    width: 50px;
+    font-size: 20px;
+    transition: all .3s ease-in-out;
+}
+
+:deep(.el-tabs__nav-wrap.is-left) {
+    box-shadow: 3px 3px 10px rgba(119, 119, 119, 0.5);
+}
+
+
+:deep(.el-tabs__header.is-left) {
+    z-index: 10;
+}
+
+:deep(.el-tabs__nav-scroll) {
+    background-color: $primary;
+    padding: 30px 0;
+}
+
+
+:deep(.el-tabs__nav) {
+    margin: 0 2px;
+    /* 使用rpx没有效果 */
+}
+
+:deep(.el-tabs__item.is-left) {
+    padding: 50px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+:deep(.el-tabs__item:hover) {
+    color: #06487f;
+
+    .el-icon {
+        font-size: 25px;
+        transition: all .3s ease-in-out;
+    }
+}
+
+
+:deep(.el-tabs__item) {
+    color: #fff;
+}
+
+
+:deep(.el-tabs__item.is-active) {
+    color: #06487f;
+
+    .el-icon {
+        font-size: 25px;
+    }
+}
+
+/*隐藏tab下面的一横*/
+:deep(.el-tabs__active-bar) {
+    display: none;
+}
+</style>
+  
