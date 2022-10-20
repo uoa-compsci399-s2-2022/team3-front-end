@@ -3,7 +3,7 @@
     <div v-for="course in courseData" @click="openCourse(course)">
       <el-card class="box-card">
         <p class="title">{{ course.courseNum }}</p>
-        <p class="sub-title">{{course.courseName}}</p>
+        <p class="sub-title">{{ course.courseName }}</p>
         <el-tag effect="dark" class="tag" v-show="course.needMarkers">
           Marker
         </el-tag>
@@ -14,7 +14,9 @@
           No position
         </el-tag>
         <div class="hint-icon">
-          <el-icon><ArrowRightBold /></el-icon>
+          <el-icon>
+            <ArrowRightBold/>
+          </el-icon>
         </div>
       </el-card>
     </div>
@@ -68,16 +70,21 @@
       </el-descriptions-item>
     </el-descriptions>
     <h2 class="course-drawer-title">Tutor Responsibility</h2>
-    <p class="text">{{ currentCourse.tutorResponsibility? currentCourse.tutorResponsibility: "No data" }}</p>
+    <p class="text">{{ currentCourse.tutorResponsibility ? currentCourse.tutorResponsibility : "No data" }}</p>
     <h2 class="course-drawer-title">Marker Responsibility</h2>
-    <p class="text">{{ currentCourse.markerResponsibility? currentCourse.markerResponsibility: "No data"  }}</p>
+    <p class="text">{{ currentCourse.markerResponsibility ? currentCourse.markerResponsibility : "No data" }}</p>
     <h2 class="course-drawer-title">Tutor Responsibility</h2>
-    <p class="text"> {{ currentCourse.tutorResponsibility? currentCourse.tutorResponsibility: "No data" }}</p>
+    <p class="text"> {{ currentCourse.tutorResponsibility ? currentCourse.tutorResponsibility : "No data" }}</p>
     <p class="course-drawer-title">Course Coordinator</p>
     <el-table :data="currentCourse.courseCoordinators" style="width: 100%" :show-header="false">
-      <el-table-column prop="name" label="Name" />
-      <el-table-column prop="email" label="Email" />
+      <el-table-column prop="name" label="Name"/>
+      <el-table-column prop="email" label="Email"/>
     </el-table>
+    <div class="apply-button-wrapper">
+      <router-link :to="{path:'/applicationlist'}">
+        <el-button type="primary" class="apply-button" plain>Apply Now</el-button>
+      </router-link>
+    </div>
   </el-drawer>
 
 </template>
@@ -169,7 +176,6 @@ watch(searchCourse, () => {
 })
 
 
-
 const responsiveLayout = () => {
   if (isMobile768()) {
     drawerWidth.value = '100%';
@@ -204,49 +210,54 @@ onBeforeMount(() => {
 }
 
 
-.box-card{
+.box-card {
   border-radius: 15px;
   position: relative;
 }
-.box-card:hover{
+
+.box-card:hover {
   background-color: #0b416d;
   cursor: pointer;
   border: #0b416d;
   -moz-box-shadow: #0b416d 0 0 6px;
   -webkit-box-shadow: #0b416d 0 0 6px;
   box-shadow: #0b416d 0 0 6px;
-  .title{
+
+  .title {
     color: #ffffff;
   }
-  .sub-title{
+
+  .sub-title {
     color: #ffffff;
   }
-  .hint-icon{
+
+  .hint-icon {
     color: #ffffff;
   }
 }
 
-.title{
+.title {
   font-size: 20px;
   font-weight: bold;
   margin-bottom: 5px;
   color: #0b416d;
 }
-.sub-title{
+
+.sub-title {
   font-size: 15px;
   margin-bottom: 10px;
   font-weight: 20;
   color: rgb(106, 107, 108);
 }
 
-.tag{
+.tag {
   margin-right: 8px;
   margin-bottom: 3px;
   width: 80px;
   border-radius: 20px;
 }
 
-.hint-icon{
+.hint-icon {
   position: absolute;
   right: 25px;
   top: 50%;
@@ -254,14 +265,31 @@ onBeforeMount(() => {
   font-size: 30px;
   color: #0b416d;
 }
-.course-drawer-title{
+
+.course-drawer-title {
   margin-top: 10px;
   font-weight: bold;
   font-size: 15px;
   color: rgb(106, 107, 108);
 }
-.text{
+
+.text {
   font-size: 10px;
 }
+
+.apply-button-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+a {
+  text-decoration: none;
+}
+
+.router-link-active {
+  text-decoration: none;
+}
+
 
 </style>
