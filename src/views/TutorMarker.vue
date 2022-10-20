@@ -4,7 +4,7 @@
       <el-col :md="12" :xs="24">
         <el-card class="box-card">
           <el-descriptions
-              title="Basic Information"
+              title="Course Information"
               direction="vertical"
               :column="4"
               border
@@ -24,25 +24,11 @@
             </el-descriptions-item>
             <el-descriptions-item label="Num Of Tutorials Per Week">{{ courseInformation.numOfTutorialsPerWeek }}
             </el-descriptions-item>
-          </el-descriptions>
-          <br/>
-          <el-descriptions
-              title="Application Information"
-              direction="vertical"
-              :column="4"
-              border
-          >
-            <el-descriptions-item label="Need Markers">{{ courseInformation.needMarkers }}</el-descriptions-item>
-            <el-descriptions-item label="Need Tutors">{{ courseInformation.needTutors }}</el-descriptions-item>
-            <el-descriptions-item label="Total Available Hours">{{ courseInformation.totalAvailableHours }}
+            <el-descriptions-item label="Expected workload">{{ estimateworkload.workload }}
             </el-descriptions-item>
-            <el-descriptions-item label="Can Pre Assign">{{ courseInformation.canPreAssign }}</el-descriptions-item>
-            <el-descriptions-item label="Application DeadLine">{{ courseInformation.deadLine }}</el-descriptions-item>
-            <el-descriptions-item label="Prerequisite" :span="3">{{ courseInformation.prerequisite }}
-            </el-descriptions-item>
-            <el-descriptions-item label="Tutor Responsibility" :span="4">{{ courseInformation.tutorResponsibility }}
-            </el-descriptions-item>
-            <el-descriptions-item label="Marker Responsibility" :span="4">{{ courseInformation.markerResponsibility }}
+            <el-descriptions-item label="Submit workload">
+              <el-input v-model="inputWorkload.workload" style="width: 50%"></el-input>
+              <el-button @click="SubmitedWorkload" type="primary" style="float: right">Submit</el-button>
             </el-descriptions-item>
           </el-descriptions>
         </el-card>
@@ -101,133 +87,21 @@
   </div>
 
 
-  <el-dialog v-model="courseEditModalOpened" title="Edit Course Information" width="60%" top="5vh"
-             v-loading="editCourseLoading">
-    <div class="modal-container">
-      <div class="course-modal">
-        <el-form ref="courseEditRef" :model="courseForm" label-width="220px">
-          <div class="modal-content">
-            <el-form-item label="Course Name" prop="courseName">
-              <el-input v-model="courseForm.courseName" placeholder=""/>
-            </el-form-item>
-            <el-row>
-              <el-form-item label="Can be preassigned" prop="canPreAssign" label-width="220px">
-                <el-switch v-model="courseForm.canPreAssign" class="ml-2" inline-prompt
-                           style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-                           active-text="Y" inactive-text="N"/>
-              </el-form-item>
-              <el-form-item label="Need markers" prop="needMarkers" label-width="150px">
-                <el-switch v-model="courseForm.needMarkers" class="ml-2" inline-prompt
-                           style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-                           active-text="Y" inactive-text="N"/>
-              </el-form-item>
-              <el-form-item label="Need tutors" prop="needTutors" label-width="150px">
-                <el-switch v-model="courseForm.needTutors" class="ml-2" inline-prompt
-                           style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-                           active-text="Y" inactive-text="N"/>
-              </el-form-item>
-            </el-row>
-            <el-form-item label="Estimated number of students" prop="estimatedNumOfStudents">
-              <el-input v-model.number="courseForm.estimatedNumOfStudents" placeholder=""/>
-            </el-form-item>
-
-            <el-form-item label="Current number of students" prop="currentlyNumOfStudents">
-              <el-input v-model.number="courseForm.currentlyNumOfStudents" placeholder=""/>
-            </el-form-item>
-
-            <el-form-item label="Number of Tutorials per week" prop="numOfTutorialsPerWeek">
-              <el-input v-model.number="courseForm.numOfTutorialsPerWeek" placeholder=""/>
-            </el-form-item>
-
-            <el-form-item label="Number of Labs per week" prop="numOfLabsPerWeek">
-              <el-input v-model.number="courseForm.numOfLabsPerWeek" placeholder=""/>
-            </el-form-item>
-
-            <el-form-item label="Number of assignments" prop="numOfAssignments">
-              <el-input v-model.number="courseForm.numOfAssignments" placeholder=""/>
-            </el-form-item>
-
-            <el-form-item label="Total available hours" prop="totalAvailableHours">
-              <el-input v-model.number="courseForm.totalAvailableHours" placeholder="">
-                <template #append>hours</template>
-              </el-input>
-            </el-form-item>
-            <el-form-item label="Prerequisite" prop="prerequisite">
-              <el-input v-model="courseForm.prerequisite" autosize type="textarea"
-                        placeholder="Please input"/>
-            </el-form-item>
-            <el-form-item label="Marker responsibility" prop="markerResponsibility">
-              <el-input v-model="courseForm.markerResponsibility" autosize type="textarea"
-                        placeholder="Please input"/>
-            </el-form-item>
-            <el-form-item label="Tutor responsibility" prop="tutorResponsibility">
-              <el-input v-model="courseForm.tutorResponsibility" autosize type="textarea"
-                        placeholder="Please input"/>
-            </el-form-item>
-          </div>
-          <div class="modal-btns">
-            <el-form-item>
-              <el-button type="primary" @click="handleCourseEdit">Edit course</el-button>
-            </el-form-item>
-          </div>
-        </el-form>
-      </div>
-    </div>
-  </el-dialog>
-
-  <el-drawer v-model="enrollUserModalOpened" title="Enroll to the Course" size="50%" direction="rtl">
-
-    <p class="emphasis">Find Users</p>
-    <el-input
-        v-model="userIDSearch"
-        class="w-50 m-2"
-        placeholder="Please Input User ID"
-        style="margin-bottom: 10px"
-        :prefix-icon="Search"
-        @input="handleUserSearch"
-    />
-
-    <el-table :data="tableData" style="width: 100%" v-loading="tableLoading">
-      <el-table-column label="ID" prop="id"/>
-      <el-table-column label="Email" prop="email"/>
-      <el-table-column label="Name" prop="name"/>
-      <el-table-column label="UPI" prop="upi"/>
-      <el-table-column label="AUID" prop="auid"/>
-      <el-table-column align="right">
-        <template #default="scope">
-          <el-button size="small"
-          >Enroll
-          </el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
 
 
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="enrollUserModalOpened = false">Cancel</el-button>
-        <el-button type="primary" @click="enrollUserModalOpened = false"
-        >Confirm</el-button
-        >
-      </span>
-    </template>
-  </el-drawer>
+
 </template>
 
 <script setup lang="ts">
-import {Check, Edit, Search} from '@element-plus/icons-vue';
+
 import {reactive, ref} from 'vue';
 import {get, put} from "@/utils/request";
 import {useRoute} from "vue-router";
 import {ElMessage} from "element-plus";
-import dayjs from "dayjs";
 import {useAsyncState} from "@vueuse/core";
 
+
 const route = useRoute();
-
-
-const courseEditModalOpened = ref(false);
 
 
 type courseFormCCType = {
@@ -246,7 +120,6 @@ type courseFormCCType = {
   prerequisite: string;
 }
 
-
 const courseForm = reactive<courseFormCCType>({
   needTutors: false,
   estimatedNumOfStudents: '',
@@ -264,28 +137,17 @@ const courseForm = reactive<courseFormCCType>({
 })
 
 const courseInformation = ref({} as any)
-const editCourseLoading = ref(false)
 
-const handleCourseEdit = () => {
-  editCourseLoading.value = true;
-  put(`/api/courseManagement/${route.params.courseId}`, {data: courseForm}).then(() => {
-    getCourseInfo();
-  }).then(() => {
-    courseEditModalOpened.value = false;
-    ElMessage({
-      message: `Edit success.`,
-      type: 'success',
-    })
-    editCourseLoading.value = false;
-  }).catch(err => {
-    ElMessage({
-      message: 'Oops. An error has occurred!',
-      type: 'error',
-    })
-    editCourseLoading.value = false;
-    console.error(err)
-  })
+type inputWorkloadCCType = {
+  workload:number
 }
+const inputWorkload = reactive<estimateworkloadCCType>({
+  workload: 0
+})
+const SubmitedWorkload = () => {
+  console.log(inputWorkload.workload)
+}
+
 
 
 const getCourseInfo = () => {
@@ -312,6 +174,7 @@ const getCourseInfo = () => {
 getCourseInfo()
 
 
+
 interface User {
   id: string
   email: string
@@ -320,34 +183,7 @@ interface User {
   auid: number
 }
 
-const enrollUserModalOpened = ref(false);
-const tableData = ref<Array<User>>([])
-const tableLoading = ref(false)
-const userIDSearch = ref('');
 
-
-const getUser = () => {
-  tableLoading.value = true
-  get('api/UserProfile/' + userIDSearch.value).then((res) => {
-    tableData.value = []
-    tableData.value.push({
-      id: res.id,
-      email: res.email,
-      name: res.name,
-      upi: res.upi,
-      auid: res.auid
-    })
-    tableLoading.value = false
-  }).catch((e) => {
-    console.log(e)
-    tableLoading.value = false
-  })
-}
-
-
-const handleUserSearch = () => {
-  getUser()
-}
 
 
 const currentMarkerList = ref([])
@@ -385,7 +221,26 @@ const getCurrentMarkerTutorCCList = () => {
 }
 
 getCurrentMarkerTutorCCList()
+const termID = route.params.termID
 
+type estimateworkloadCCType = {
+  workload:number
+}
+const estimateworkload = reactive<estimateworkloadCCType>({
+  workload: 0
+})
+const getworkload =  () => {
+   get('/api/getCurrentUserEnrollByTerm/' + termID).then(res => {
+    res.forEach((item: any) => {
+      if (item.courseID == route.params.courseId) {
+        if (item.roleName === route.query.role){
+          estimateworkload.workload = item.estimatedHours
+        }
+      }
+    })
+  })
+}
+getworkload()
 
 </script>
 
