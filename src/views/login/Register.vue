@@ -33,7 +33,7 @@ const validatePass = (rule: any, value: any, callback: any) => {
     } else {
         if (registerForm.repeatPassword !== '') {
             if (!registerFormRef.value) return
-            registerFormRef.value.validateField('rep    eatPassword', () => null)
+            registerFormRef.value.validateField('repeatPassword', () => null)
         }
         callback()
     }
@@ -62,7 +62,7 @@ const rules = reactive({
     userID: [{ required: true, message: 'Please input userID', trigger: 'blur', }],
     password: [{ validator: validatePass, trigger: 'blur' }],
     repeatPassword: [{ validator: validatePass2, trigger: 'blur' }],
-    email: [{ required: true, message: 'Please input email address', trigger: 'blur', }],
+    email: [{ type: 'email',required: true, message: 'Please input email address', trigger: 'blur', }],
     name: [{ required: true, message: 'Please input your name', trigger: 'blur', }],
     code: [{ required: true, message: 'Please input validation code', trigger: 'blur', }]
 })
@@ -168,8 +168,8 @@ const submitForm = (formEl: FormInstance | undefined) => {
         <div class="register-window">
             <img src="@/assets/logo/uoa.svg" alt="" class="logo">
             <h1>Register</h1>
-            <el-form ref="registerFormRef" :model="registerForm" status-icon :rules="rules"
-                class="demo-registerForm" size="large" hide-required-asterisk >
+            <el-form style="width: 100%" ref="registerFormRef" :model="registerForm" status-icon :rules="rules"
+                 size="large" hide-required-asterisk >
                 <el-form-item prop="userID">
                     <el-input v-model="registerForm.userID" type="text" placeholder="User ID" />
                 </el-form-item>
@@ -184,7 +184,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
                     <el-input v-model="registerForm.name" type="text" placeholder="Name"  />
                 </el-form-item>
                 <div style="display:flex; column-gap: 20px;">
-                    <el-form-item prop="email">
+                    <el-form-item prop="email" style="width: 65%">
                         <el-input v-model="registerForm.email" type="text" placeholder="Email" />
                     </el-form-item>
                     <el-button type="info" @click="" plain disabled v-if="waiting" class="verification">
@@ -218,13 +218,12 @@ const submitForm = (formEl: FormInstance | undefined) => {
 }
 
 .register-window {
-    margin-right: 10vw;
-    margin-top: 100px;
     display: flex;
     flex-direction: column;
     justify-self: center;
     align-items: center;
-    width: 550px;
+    width: 430px;
+    margin: 100px 18vw 0 0;
 
     h1 {
         font-size: 28.83px;
@@ -256,7 +255,8 @@ const submitForm = (formEl: FormInstance | undefined) => {
 
         .register-window {
             width: 100%;
-            margin: 40px 0 0;
+            margin: 40px 40px 0 40px;
+
 
           h1 {
               font-size: 28.83px;
@@ -280,6 +280,6 @@ const submitForm = (formEl: FormInstance | undefined) => {
 
 
 .verification {
-    width: 150px;
+    width: 35%;
 }
 </style>
