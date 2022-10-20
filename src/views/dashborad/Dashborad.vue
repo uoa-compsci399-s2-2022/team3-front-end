@@ -39,7 +39,7 @@ const {
 
 
 const courseList = ref([] as any[])
-const semesterID = ref<Number>()
+const semesterID = ref<any>()
 
 async function GetCourse(termID: Number) {
   semesterID.value=termID
