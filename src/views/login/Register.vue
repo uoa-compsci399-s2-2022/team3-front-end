@@ -185,7 +185,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
           <el-input v-model="registerForm.name" type="text" placeholder="Name"/>
         </el-form-item>
         <div style="display:flex; column-gap: 20px;">
-          <el-form-item prop="email" style="width: 80%">
+          <el-form-item prop="email" style="width: 76%">
             <el-input v-model="registerForm.email" type="text" placeholder="Email"/>
           </el-form-item>
           <el-button type="info" @click="" plain disabled v-if="waiting" class="verification">
@@ -281,6 +281,6 @@ const submitForm = (formEl: FormInstance | undefined) => {
 
 
 .verification {
-  width: 20%;
+  width: 24%;
 }
 </style>
