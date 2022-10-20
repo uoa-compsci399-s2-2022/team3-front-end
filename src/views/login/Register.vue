@@ -185,14 +185,14 @@ const submitForm = (formEl: FormInstance | undefined) => {
           <el-input v-model="registerForm.name" type="text" placeholder="Name"/>
         </el-form-item>
         <div style="display:flex; column-gap: 20px;">
-          <el-form-item prop="email" style="width: 65%">
+          <el-form-item prop="email" style="width: 80%">
             <el-input v-model="registerForm.email" type="text" placeholder="Email"/>
           </el-form-item>
           <el-button type="info" @click="" plain disabled v-if="waiting" class="verification">
             <el-icon>
               <Timer/>
             </el-icon>
-            After {{ (timeLeft / 1000).toFixed(0) }}s to resend
+            {{ (timeLeft / 1000).toFixed(0) }}s
           </el-button>
           <el-button type="primary" @click="sendCode(60)" plain v-else class="verification">Send Code
           </el-button>
@@ -281,6 +281,6 @@ const submitForm = (formEl: FormInstance | undefined) => {
 
 
 .verification {
-  width: 35%;
+  width: 20%;
 }
 </style>
