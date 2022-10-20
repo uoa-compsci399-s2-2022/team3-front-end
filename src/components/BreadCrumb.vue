@@ -37,6 +37,7 @@ const getPath = () => {
   }
   if (route.name === "tutor-marker") {
     let courseID = route.params.courseId;
+    let termID = route.params.termID;
     get('api/getCourse/' + courseID).then((res) => {
       matched.value = [
         {
@@ -44,7 +45,7 @@ const getPath = () => {
           title: "DashBoard",
         },
         {
-          path: "/tutor-marker/" + courseID,
+          path: "/tutor-marker/" + courseID +"/"+termID,
           title: res.courseNum,
         }
       ]

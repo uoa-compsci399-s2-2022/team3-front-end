@@ -75,7 +75,7 @@ const routes:RouteRecordRaw[] = [
                 component: () => import('@/views/CourseCoordinator.vue')
             },
             {
-                path: "tutor-marker/:courseId",
+                path: "tutor-marker/:courseId/:termID",
                 name: "tutor-marker",
                 meta: { title:'Tutor Marker', permission: '2' },
                 component: () => import('@/views/TutorMarker.vue')
@@ -128,7 +128,6 @@ const router = createRouter({
 const Vnode = createVNode(LoadingBar)
 render(Vnode, document.body)
 router.beforeEach((to, from, next) => {
-    console.log("going to", to.path)
     document.title = `${to.meta.title}`;
     Vnode.component?.exposed?.startLoading(); // start the loading bar animation
     const store = usePermissionStore();
@@ -142,7 +141,6 @@ router.beforeEach((to, from, next) => {
     // redirect to 403
     
     if (to.path === '/404') {
-        console.log('404')
         next();
         return;
     }
@@ -150,14 +148,12 @@ router.beforeEach((to, from, next) => {
     // if the user has token, but he don't have the permitted page list
     // then send a request to get the user's groups.
     if (localStorage.getItem('mtms_token') && store.key.size === 0) {
-        console.log('redirectBasedOnLoginStatus without key');
         restoreUserKey().then(
             () => redirectBasedOnLoginStatus()
         ).catch(() => {
             redirectBasedOnLoginStatus();
         })
     } else {
-        console.log('redirectBasedOnLoginStatus with key');
         redirectBasedOnLoginStatus();
     }
    
@@ -201,7 +197,6 @@ router.beforeEach((to, from, next) => {
     function restoreUserKey(): Promise<any> {
         return get('/api/currentUser').then(
             responce => {
-                console.log(responce)
                 store.setKeyFromGroups(responce.groups);
                 sessionStorage.setItem('mtms_keys', JSON.stringify(store.getKey))
             }

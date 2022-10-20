@@ -779,11 +779,12 @@ $primary: #64bee8;
         width: 100%;
         height: 100%;
 
+
         .content {
             background-color: rgb(255, 255, 255);
             position: relative;
             width: 600px;
-            min-height: 350px;
+            min-height: 380px;
             left: -30px;
             top: 40px;
             box-shadow: var(--el-box-shadow-light);

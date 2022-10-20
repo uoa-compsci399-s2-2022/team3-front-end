@@ -11,7 +11,7 @@
     <el-table
         v-loading="!courseLoaded"
         ref="courseTableRef"
-        :data="tableData"
+        :data="filterTableData"
         highlight-current-row
         style="width: 100%"
         @current-change="handleCurrentChange"
@@ -68,7 +68,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column property="courseNum" label="Course Num" width="110"/>
+      <el-table-column property="courseNum" label="Course Num" width="140"/>
       <el-table-column property="courseName" label="Course Name"/>
     </el-table>
 
@@ -86,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import {onBeforeMount, reactive, ref} from 'vue'
+import {computed, onBeforeMount, reactive, ref, watch} from 'vue'
 import {ElButton, ElDrawer, ElMessage, ElTable} from 'element-plus'
 import {get, post} from "@/utils/request";
 import {useRouter, useRoute} from 'vue-router';
@@ -100,6 +100,7 @@ const route = useRoute()
 type Props = {
   visible: any
   termID: number
+  role: string
 }
 const props = defineProps<Props>()
 const courseLoaded = ref(false);
@@ -107,7 +108,26 @@ const searchCourseNum = ref("");
 const courseTableRef = ref<InstanceType<typeof ElTable>>()
 const tableData: courseList[] = reactive([] as courseList[])
 const currentRow = ref()
-const emit = defineEmits(['added_course'])
+const emit = defineEmits(['added_course', 'update:role'])
+
+
+const roleSync = computed({
+  get() {
+    return props.role as String
+  },
+  set(value) {
+    emit('update:role', value)
+  }
+})
+
+
+
+const filterTableData = computed(() => {
+  if (tableData.length === 0) {
+    return []
+  }
+  return tableData.filter((item) => item.courseNum.toLowerCase().includes(searchCourseNum.value.toLowerCase()))
+})
 
 const sendCourse = () => {
   if (currentRow.value) {
@@ -131,7 +151,6 @@ const confirmEvent = () =>{
 
 interface courseList {
   [key: string]: any;
-
   courseID: number;
   courseNum: string;
   courseName: string;
@@ -143,7 +162,6 @@ interface courseList {
   tutorResponsibility: string;
   markerResponsibility: string;
   prerequisite: string;
-
 }
 
 
@@ -152,24 +170,33 @@ const handleCurrentChange = (val: courseList | undefined) => {
 }
 
 
-get('api/getCourseByTerm/' + props.termID).then((res) => {
-  res.forEach((item: any) => {
-    tableData.push({
-      courseID: item.courseID,
-      courseNum: item.courseNum,
-      courseName: item.courseName,
-      estimatedNumOfStudents: item.estimatedNumOfStudents,
-      currentlyNumOfStudents: item.currentlyNumOfStudents,
-      numOfAssignments: item.numOfAssignments,
-      numOfLabsPerWeek: item.numOfLabsPerWeek,
-      numOfTutorialsPerWeek: item.numOfTutorialsPerWeek,
-      tutorResponsibility: item.tutorResponsibility,
-      markerResponsibility: item.markerResponsibility,
-      prerequisite: item.prerequisite,
-    })
-  })
-  courseLoaded.value = true;
+watch(roleSync, (val) => {
+    getCourseList()
 })
+
+const getCourseList = () => {
+  courseLoaded.value = false
+  tableData.splice(0, tableData.length)
+  get(`api/getAvailableCourseByTerm/${props.termID}/${roleSync.value}`).then((res) => {
+    res.forEach((item: any) => {
+      tableData.push({
+        courseID: item.courseID,
+        courseNum: item.courseNum,
+        courseName: item.courseName,
+        estimatedNumOfStudents: item.estimatedNumOfStudents,
+        currentlyNumOfStudents: item.currentlyNumOfStudents,
+        numOfAssignments: item.numOfAssignments,
+        numOfLabsPerWeek: item.numOfLabsPerWeek,
+        numOfTutorialsPerWeek: item.numOfTutorialsPerWeek,
+        tutorResponsibility: item.tutorResponsibility,
+        markerResponsibility: item.markerResponsibility,
+        prerequisite: item.prerequisite,
+      })
+    })
+    courseLoaded.value = true;
+  })
+}
+
 
 const drawerSize = ref()
 const drawerDirection = ref()
@@ -190,6 +217,7 @@ const responsiveLayout = () => {
 
 onBeforeMount(() => {
   responsiveLayout()
+  getCourseList()
 })
 
 

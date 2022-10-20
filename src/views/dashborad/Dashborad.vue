@@ -39,8 +39,10 @@ const {
 
 
 const courseList = ref([] as any[])
+const semesterID = ref<any>()
 
 async function GetCourse(termID: Number) {
+  semesterID.value=termID
   get('/api/getCurrentUserEnrollByTerm/' + termID).then(res => {
     courseList.value = []
     res.forEach((item: any) => {
@@ -48,7 +50,7 @@ async function GetCourse(termID: Number) {
         item.path = `course-coordinator/${item.courseID}`
         courseList.value.push(item)
       } else {
-        item.path = `tutor-marker/${item.courseID}`
+        item.path = `tutor-marker/${item.courseID}/${semesterID.value}`
         courseList.value.push(item)
       }
     })
@@ -102,7 +104,7 @@ watch(courseList, (courseList) => {
       <div>
         <div class="course-container">
           <div v-for="item in courseList">
-            <router-link :to="{path:item.path, query:{role:item.roleName}}">
+            <router-link :to="{path:item.path, query:{role:item.roleName,termID:semesterID.value}}">
               <CourseCard :course="item"/>
             </router-link>
           </div>
