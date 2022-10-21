@@ -285,7 +285,7 @@ const submitUpload = () => {
     }
     let p1: Promise<any>, p2: Promise<any>
     if (fileBase_ad.value) {
-        p1 = post('/api/getAcademicTranscript/' + personalInfo.value.id, { "ad": fileBase_ad.value }).then(_ => {
+        p1 = post('/api/getAcademicTranscript/' + personalInfo.value.id, { "AcademicTranscript": fileBase_ad.value }).then(_ => {
             successNotification('New Acdemic Transcript uploaded.')
         })
     }
@@ -456,7 +456,7 @@ const previewCV = async () => {
                                         :status="status2" />
                                 </el-steps>
                             </div>
-                            <el-upload :limit="1" ref="uploadCV" accept="application/pdf"
+                            <el-upload :limit="1" ref="uploadAD" accept="application/pdf"
                                 v-model:file-list="fileList_ad" :on-change="handleChange_ad"
                                 :on-exceed="handleExceed_ad" :on-remove="handleRemove_ad" :auto-upload="false">
                                 <template #trigger>
