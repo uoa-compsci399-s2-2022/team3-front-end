@@ -1,8 +1,12 @@
 <template>
+
+
   <el-card class="working-hour-card" v-loading="chartLoading">
     <div id="chart">
     </div>
+    <span class="totalHours">{{totalWorkingHours}} h</span>
   </el-card>
+
 
 </template>
 
@@ -22,7 +26,7 @@ const drawChart = () => {
   let option: EChartsOption;
   option = {
     title: {
-      text: 'Working Hours',
+      text: 'Estimated Working Hours',
       left: 'left',
       top: 4,
       textStyle: {
@@ -90,7 +94,17 @@ function getData() {
     })
   }).then(() => {
     drawChart()
+    countTotalWoringHours()
   })
+}
+
+const totalWorkingHours = ref(0)
+const countTotalWoringHours = () => {
+  let total = 0
+  estimateHours.value.forEach((item: ChartData) => {
+    total += item.value
+  })
+  totalWorkingHours.value = total
 }
 
 watch(termID, () => {
@@ -133,6 +147,16 @@ onUnmounted(() => {
 #chart {
   width: 100%;
   height: 500px;
+}
+
+.totalHours{
+  position: absolute;
+  top: 200px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 23px;
+  font-weight: 600;
+  color: #183153;
 }
 
 

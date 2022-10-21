@@ -109,7 +109,7 @@ watch(courseList, (courseList) => {
         </div>
       </div>
 
-      <div>
+      <div v-permission="2">
         <div class="working-hour-card-wrapper">
           <WorkingHourCard v-model:termID="value_semester" v-show="!noCourse"/>
         </div>
