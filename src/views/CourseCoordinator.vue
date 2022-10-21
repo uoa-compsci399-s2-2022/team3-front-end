@@ -50,11 +50,32 @@
               :column="4"
               border
           >
-            <el-descriptions-item label="Need Markers">{{ courseInformation.needMarkers }}</el-descriptions-item>
-            <el-descriptions-item label="Need Tutors">{{ courseInformation.needTutors }}</el-descriptions-item>
+            <el-descriptions-item label="Need Markers" >
+              <p v-if="courseInformation.needMarkers">
+                Yes
+              </p>
+              <p v-else>
+                No
+              </p>
+            </el-descriptions-item>
+            <el-descriptions-item label="Need Tutors">
+              <p v-if="courseInformation.needTutors">
+                Yes
+              </p>
+              <p v-else>
+                No
+              </p>
+            </el-descriptions-item>
             <el-descriptions-item label="Total Available Hours">{{ courseInformation.totalAvailableHours }}
             </el-descriptions-item>
-            <el-descriptions-item label="Can Pre Assign">{{ courseInformation.canPreAssign }}</el-descriptions-item>
+            <el-descriptions-item label="Can Pre Assign">
+              <p v-if="courseInformation.canPreAssign">
+                Yes
+              </p>
+              <p v-else>
+                No
+              </p>
+            </el-descriptions-item>
             <el-descriptions-item label="Application DeadLine">{{ courseInformation.deadLine }}</el-descriptions-item>
             <el-descriptions-item label="Prerequisite" :span="3">{{ courseInformation.prerequisite }}
             </el-descriptions-item>

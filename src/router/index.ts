@@ -75,7 +75,7 @@ const routes:RouteRecordRaw[] = [
                 component: () => import('@/views/CourseCoordinator.vue')
             },
             {
-                path: "tutor-marker/:courseId",
+                path: "tutor-marker/:courseId/:termID",
                 name: "tutor-marker",
                 meta: { title:'Tutor Marker', permission: '2' },
                 component: () => import('@/views/TutorMarker.vue')

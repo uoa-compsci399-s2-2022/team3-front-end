@@ -70,6 +70,7 @@ declare module '@vue/runtime-core' {
     ImportCourseTemplate: typeof import('./src/components/ImportCourseTemplate.vue')['default']
     LoadingBar: typeof import('./src/components/LoadingBar.vue')['default']
     LoginBackground: typeof import('./src/components/backgrounds/LoginBackground.vue')['default']
+    PDFViewer: typeof import('./src/components/pdf/PDFViewer.vue')['default']
     People: typeof import('./src/components/icons/People.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
