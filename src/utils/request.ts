@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 
 
-// export const baseURL = 'https://api.uoamtms.com/'
-export const baseURL = import.meta.env.VITE_API_URL as string
+export const baseURL = 'https://api.uoamtms.com/'
+//export const baseURL = import.meta.env.VITE_API_URL as string
 
 
 // create axios instance
