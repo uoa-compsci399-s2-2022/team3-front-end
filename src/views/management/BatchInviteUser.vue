@@ -272,13 +272,13 @@ const saveEvent = async () => {
   const $table = tableRef.value
   console.log($table.getRecordset())
   const {insertRecords, removeRecords, updateRecords} = $table.getRecordset()
-  if (insertRecords.length <= 0 && removeRecords.length <= 0 && updateRecords.length <= 0) {
-    ElMessage({
-      message: 'Save: No changes',
-      type: 'warning'
-    })
-    return false
-  }
+  // if (insertRecords.length <= 0 && removeRecords.length <= 0 && updateRecords.length <= 0) {
+  //   ElMessage({
+  //     message: 'Save: No changes',
+  //     type: 'warning'
+  //   })
+  //   return false
+  // }
   const errMap = await $table?.validate()
   if (errMap) {
     return false

@@ -24,12 +24,12 @@
             </el-descriptions-item>
             <el-descriptions-item label="Num Of Tutorials Per Week">{{ courseInformation.numOfTutorialsPerWeek }}
             </el-descriptions-item>
-            <el-descriptions-item label="Expected workload">{{ estimateworkload.workload }}
+            <el-descriptions-item label="Workload">{{ estimateworkload.workload }}
             </el-descriptions-item>
-            <el-descriptions-item label="Submit workload">
-              <el-input v-model="inputWorkload.workload" style="width: 50%"></el-input>
-              <el-button @click="SubmitedWorkload" type="primary" style="float: right">Submit</el-button>
-            </el-descriptions-item>
+<!--            <el-descriptions-item label="Submit workload">-->
+<!--              <el-input v-model="inputWorkload.workload" style="width: 50%"></el-input>-->
+<!--              <el-button @click="SubmitedWorkload" type="primary" style="float: right">Submit</el-button>-->
+<!--            </el-descriptions-item>-->
           </el-descriptions>
         </el-card>
       </el-col>

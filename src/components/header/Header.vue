@@ -125,7 +125,7 @@ getCourseNum()
   </section>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
 
 section {
