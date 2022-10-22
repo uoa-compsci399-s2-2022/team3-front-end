@@ -1,7 +1,11 @@
-### Installation
+# MTMS Frontend
+Marker & Tutor Management System - One COMPSCI399 Project
 
+The University of Auckland
 
+---
 
+## Installation for Development
 Clone the repository to your PC
 
 ```bash
@@ -28,3 +32,9 @@ Run the Vite development server. (which will run the script defined in the packg
 npm run dev
 ```
 
+## Build for Production
+Build the project for production
+```bash
+npm run build
+```
+After running, a static folder dist will be generated in the project root directory, you can deploy this folder to a static web server (Apache2, Nginx and so on)
