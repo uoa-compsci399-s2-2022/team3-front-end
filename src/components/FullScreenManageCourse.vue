@@ -72,7 +72,7 @@ const filterCoursesSync = computed({
 
 const searchCourseSync = computed({
   get() {
-    return props.searchCourse as boolean
+    return props.searchCourse as string
   },
   set(val) {
     emit('update:searchCourse', val)
