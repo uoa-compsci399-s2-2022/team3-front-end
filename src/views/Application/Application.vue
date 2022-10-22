@@ -358,7 +358,7 @@ const validateStep = async (step: number) => {
   }
   if (step === 0) {
     await formRef.value?.validateField(
-        ['name', 'upi','auid', 'studentId', 'email'],
+        ['name', 'upi', 'auid', 'studentId', 'email'],
         (valid) => {
           flag = valid;
         })
@@ -517,7 +517,7 @@ const handleChange_ad: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
 const saveToServerLoading = ref(false)
 const save = () => {
   saveToServerLoading.value = true
-  post(`api/saveApplication/${applicationID.value}`, {
+  return post(`api/saveApplication/${applicationID.value}`, {
     "applicationPersonalDetail": data,
     "course": preferCourseList.value,
     "fileURLCV": fileBase_cv,
@@ -552,24 +552,26 @@ const saveSession = () => {
 const submitLoading = ref(false)
 
 const submitEvent = () => {
-  save()
-  submitLoading.value = true
-  get('api/submitApplication/' + applicationID.value).then(res => {
-    submitLoading.value = false
-    router.push({path: "/congratulation", query: {text: "Submit Successful!", next: "/applicationlist"}})
-  }).catch(res => {
-    console.log(res)
-    let errorMessage = "<p style='font-weight: bold'>Don't forget SAVE application first</p>"
-    res.response.data.message.forEach((item: any) => {
-      errorMessage += `<p>${item}</p>`
-    })
-    ElNotification({
-      title: 'Submit Error',
-      message: errorMessage,
-      dangerouslyUseHTMLString: true,
-      type: 'error'
+  save().then(() => {
+    submitLoading.value = true
+    get('api/submitApplication/' + applicationID.value).then(res => {
+      submitLoading.value = false
+      router.push({path: "/congratulation", query: {text: "Submit Successful!", next: "/applicationlist"}})
+    }).catch(res => {
+      console.log(res)
+      let errorMessage = "<p style='font-weight: bold'>Don't forget SAVE application first</p>"
+      res.response.data.message.forEach((item: any) => {
+        errorMessage += `<p>${item}</p>`
+      })
+      ElNotification({
+        title: 'Submit Error',
+        message: errorMessage,
+        dangerouslyUseHTMLString: true,
+        type: 'error'
+      })
     })
   })
+
 }
 // ---------back button------end
 const backTohome = () => {
@@ -825,7 +827,7 @@ const check = async () => {
   </div>
 
   <ApplicationCourse v-if="applicationMetaInfo.termID" :visible="courseVisible" :termID="applicationMetaInfo.termID"
-                     @added_course="add_course"  v-model:role="applicationMetaInfo.type"/>
+                     @added_course="add_course" v-model:role="applicationMetaInfo.type"/>
 
 
 </template>

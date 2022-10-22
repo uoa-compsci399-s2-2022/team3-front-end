@@ -15,7 +15,7 @@
     <div class="manage-course-container">
       <section>
         <div class="manage-course-subtitle">
-          <el-input v-model="searchCourse" placeholder="Search by course number. e.g. COMPSCI235" size="small"
+          <el-input v-model="searchCourseSync" placeholder="Search by course number. e.g. COMPSCI235" size="small"
                     clearable/>
           <el-button type="info" plain @click="importShowEvent">Import</el-button>
           <el-button type="primary" plain @click="handleCourseAdd">Add Course</el-button>
@@ -24,7 +24,7 @@
           <div style="height: calc(100vh - 173px)">
             <el-auto-resizer>
               <template #default="{ height, width }">
-                <el-table-v2 :columns="columns" :data="filterCourses" :width="width" :height="height" style="margin: 0; padding: 0;" fixed>
+                <el-table-v2 :columns="columns" :data="filterCoursesSync" :width="width" :height="height" style="margin: 0; padding: 0;" fixed>
                   <template #empty>
                     <div class="flex items-center justify-center h-100%">
                       <el-empty description="Please select term from above" :image-size="120"/>
@@ -46,7 +46,7 @@ import {computed, ref} from "vue";
 import { useElementBounding } from '@vueuse/core'
 
 
-const props = defineProps(['fullScreenCourseVisible', 'onSelectName', 'searchCourse', 'importShowEvent', 'handleCourseAdd', 'filterCourses', 'columns'])
+const props = defineProps(['fullScreenCourseVisible', 'onSelectName', 'searchCourse', 'importShowEvent', 'filterCourses', 'columns', 'handleCourseAdd'])
 const emit = defineEmits(['update:fullScreenCourseVisible', 'update:onSelectName', 'update:searchCourse', 'update:importShowEvent', 'update:handleCourseAdd', 'update:filterCourses', 'update:columns'])
 
 const visibleSync = computed({
@@ -57,6 +57,42 @@ const visibleSync = computed({
     emit('update:fullScreenCourseVisible', val)
   }
 })
+
+
+const filterCoursesSync = computed({
+  get() {
+    return props.filterCourses as boolean
+  },
+  set(val) {
+    emit('update:filterCourses', val)
+  }
+})
+
+
+const searchCourseSync = computed({
+  get() {
+    return props.searchCourse as boolean
+  },
+  set(val) {
+    emit('update:searchCourse', val)
+  }
+})
+
+
+
+
+const handleCourseAdd = computed({
+  get() {
+    return props.handleCourseAdd as boolean
+  },
+  set(val) {
+    emit('update:handleCourseAdd', val)
+  }
+})
+
+
+
+
 
 </script>
 
