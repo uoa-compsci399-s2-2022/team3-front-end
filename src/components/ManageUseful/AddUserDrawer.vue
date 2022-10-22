@@ -11,7 +11,7 @@
     <br />
     <el-alert title="Notice" description="Position ending with '(not published)' means the position has been approved."
       show-icon />
-    <el-table :data="filterTableData" style="width: 100%" v-loading="tableLoading">
+    <el-table :data="search ? tableDataFilter.filteredData : tableData" style="width: 100%" v-loading="tableLoading">
       <el-table-column label="ID" prop="id" width="100px" />
       <el-table-column label="Name" prop="name" width="100px" />
       <el-table-column label="Groups" prop="groups" width="200px" />
@@ -29,15 +29,25 @@
           <el-button size="small" @click="handleAddUser3(scope.row)">
             Appoint as CourseCoordinator
           </el-button> -->
-          <el-select v-model="roles[scope.$index]" multiple :placeholder="`Appoint position for ${scope.row.name}`"
-            style="width: 240px" @change="role => appointPosition(role, scope.row, scope.$index)"
-            >
+          <el-select v-model="filteredRoles[scope.$index]" multiple
+            :placeholder="`Appoint position for ${scope.row.name}`" style="width: 240px"
+            @change="role => appointPositionSearched(role, scope.row, scope.$index)" v-if="search">
 
             <el-option key="marker" label="Marker" value="marker" />
             <el-option key="tutor" label="Tutor" value="tutor" />
             <el-option key="student" label="Student" value="student" />
             <el-option key="courseCoordinator" label="Course Coordinator" value="courseCoordinator" />
           </el-select>
+
+          <el-select v-model="roles[scope.$index]" multiple :placeholder="`Appoint position for ${scope.row.name}`"
+            style="width: 240px" @change="role => appointPosition(role, scope.row, scope.$index)" v-else>
+
+            <el-option key="marker" label="Marker" value="marker" />
+            <el-option key="tutor" label="Tutor" value="tutor" />
+            <el-option key="student" label="Student" value="student" />
+            <el-option key="courseCoordinator" label="Course Coordinator" value="courseCoordinator" />
+          </el-select>
+
         </template>
 
       </el-table-column>
@@ -52,12 +62,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { ElDrawer, ElMessage, ElMessageBox } from 'element-plus'
 import { Delete, get, post, put } from "@/utils/request";
 import dayjs from "dayjs";
 import { cloneDeep } from 'lodash';
-
+import { watchDebounced } from '@vueuse/core'
 
 
 type Props = {
@@ -91,13 +101,28 @@ interface User {
 }
 
 const search = ref('')
-const filterTableData = computed(() =>
-  tableData.value.filter(
-    (data) =>
-      !search.value ||
-      data.id.toLowerCase().includes(search.value.toLowerCase())
-  )
-)
+
+
+const tableDataFilter = reactive({
+  filteredData: [],
+  filteredindex: []
+})
+watchDebounced(search, () => {
+  tableDataFilter.filteredindex.length = 0;
+  tableDataFilter.filteredData = tableData.value.filter(
+    (data, index) => {
+      if (!search.value ||
+        data.id.toLowerCase().includes(search.value.toLowerCase())) {
+        tableDataFilter.filteredindex.push(index)
+        return true
+      }
+    }
+  );
+  filteredRoles.value.length = 0;
+  for (let i of tableDataFilter.filteredindex) {
+        filteredRoles.value.push(roles.value[i])
+      }
+}, { debounce: 1000 })
 
 
 const tableData = ref([] as User[])
@@ -145,14 +170,25 @@ const getUserRoles = async () => {
 getUserRoles()
 
 
+const filteredRoles = ref<any[][]>([])
+watch(roles, () => {
+  filteredRoles.value.length = 0;
+  if (search.value) {
+      for (let i of tableDataFilter.filteredindex) {
+        filteredRoles.value.push(roles.value[i])
+      }
+    }
+})
+
+
 const appointPosition = async (role: string[], user: User, index: number) => {
   // element to delete
-  let toDelete: string|null = null;
+  let toDelete: string | null = null;
   // if its a delete operation
   if (rolesCopy[index].length > roles.value[index].length) {
     let set = new Set(roles.value[index])
     for (let item of rolesCopy[index]) {
-      if (! set.has(item)) {
+      if (!set.has(item)) {
         toDelete = item;
       }
     }
@@ -223,36 +259,17 @@ const appointPosition = async (role: string[], user: User, index: number) => {
   }
 }
 
-type dismissal = {
-  courseID: number;
-  role: string;
-  userID: string;
+const appointPositionSearched = (role: string[], user: User, index: number) => {
+  appointPosition(role, user, tableDataFilter.filteredindex[index]);
 }
 
-
-// const dismissPosition = async (role: string, user: User) => {
-//   deleting.value = true;
-//   const data: dismissal = {
-//     courseID: props.currentCourse.courseID,
-//     userID: user.id,
-//     role: role!,
-//   }
-
-//   Delete('/api/enrolment', { data: data }).then(_ => {
-//     ElMessage({
-//       message: `${user.name} has been dismissed from ${role} position.`,
-//       type: 'success'
-//     })
-//     rolesCopy = cloneDeep(roles.value);
-//   }).catch(err => {
-//     ElMessage({
-//       message: err.response.data['message'],
-//       type: 'error'
-//     })
-//   })
-//   await new Promise(resolve => setTimeout(() => { resolve("") }, 110)); //缓冲0.11秒
-//   deleting.value = false;
+// type dismissal = {
+//   courseID: number;
+//   role: string;
+//   userID: string;
 // }
+
+
 </script>
 
 <style scoped>
