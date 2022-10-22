@@ -8,8 +8,8 @@ import {ElMessage} from "element-plus";
 
 
 const data = reactive({
-  userID: "admin",
-  password: "admin"
+  userID: "",
+  password: ""
 })
 
 const userStore = useUserStore()
