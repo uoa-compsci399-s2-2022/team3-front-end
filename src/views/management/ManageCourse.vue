@@ -1212,6 +1212,7 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
 .manage-course-container {
   display: flex;
   flex-direction: column;
+  margin: 0 34px;
 
   section {
     flex-shrink: 1;
