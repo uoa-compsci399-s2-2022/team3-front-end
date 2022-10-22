@@ -28,7 +28,8 @@ export default defineConfig({
             },
             includeAssets: ['logo.svg', 'pwa-uoa-512.png', 'pwa-uoa-192.png', 'apple-touch-icon.png'],
             workbox: {
-                sourcemap: true
+                sourcemap: true,
+                maximumFileSizeToCacheInBytes: 10000000
             },
             manifest: {
                 name: 'MTMS UoA',
