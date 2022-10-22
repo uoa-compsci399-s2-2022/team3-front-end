@@ -82,7 +82,6 @@ const chartLoading = ref(false)
 function getData() {
   chartLoading.value = true
   get('/api/getCurrentUserEnrollByTerm/' + termID.value).then(res => {
-    console.log(res)
     estimateHours.value = []
     res.forEach((item: any) => {
       if (item.roleName !== "courseCoordinator") {
@@ -128,11 +127,26 @@ onUnmounted(() => {
 
 
 .working-hour-card {
+  position: relative;
   width: 100%;
   border-radius: 20px;
   box-shadow: #0b416d 0 0 12px;
   height: calc(100vh - 170px);
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
+
+
+.working-hour-card::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.working-hour-card {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 
 
 :deep(.el-card) .is-always-shadow {
@@ -146,12 +160,15 @@ onUnmounted(() => {
 
 #chart {
   width: 100%;
-  height: 500px;
+  height: 580px;
+
 }
+
+
 
 .totalHours{
   position: absolute;
-  top: 200px;
+  top: 230px;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 23px;

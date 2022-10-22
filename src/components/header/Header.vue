@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import {get} from '@/utils/request'
 import {ElMessage, ElMessageBox} from 'element-plus';
-import {ref, watch} from 'vue';
-import {useRouter, useRoute} from 'vue-router';
+import {onBeforeMount, ref, watch} from 'vue';
+import {useRoute, useRouter} from 'vue-router';
 import 'element-plus/theme-chalk/display.css';
 import {useSidebarStore} from "@/store";
+import {Expand} from '@element-plus/icons-vue';
 
 const sidebar = useSidebarStore();
 
@@ -80,17 +81,23 @@ const getCourseNum = () => {
 }
 
 watch(route, () => {
-  getUserProfile()
   getCourseNum()
+  getUserProfile()
 })
-getUserProfile()
-getCourseNum()
+
+onBeforeMount(() => {
+  getCourseNum()
+  getUserProfile()
+})
+
+
+
 </script>
 
 <template>
   <section>
 
-    <div class="title" v-if="$route.name==='course-coordinator' || $route.name==='tutor-marker'" @click="sidebar.handleCollase()">
+    <div class="title" v-loading="!$route.name" v-if="$route.name==='course-coordinator' || $route.name==='tutor-marker'" @click="sidebar.handleCollase()">
       <el-icon class="expand-sidebar">
         <Expand/>
       </el-icon>

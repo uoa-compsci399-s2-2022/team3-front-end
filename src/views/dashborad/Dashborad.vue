@@ -219,7 +219,7 @@ a {
 }
 
 .working-hour-card-wrapper {
-  width: 300px;
+  width: 310px;
   position: fixed;
   right: 15px;
   top: 140px;

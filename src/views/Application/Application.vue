@@ -91,7 +91,6 @@ const statusArr = reactive<('process' | 'wait' | 'finish' | 'error' | 'success')
 // throttled version next function in case of too many clicks at the same time.
 // the callback function will only be excuted once every 0.8s
 const next = useThrottleFn(() => {
-  save()
   step.value++;
   saveSession(); // save the data to sessionStorage
   if (step.value >= 3) {

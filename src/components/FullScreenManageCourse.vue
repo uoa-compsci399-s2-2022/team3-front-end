@@ -18,7 +18,7 @@
           <el-input v-model="searchCourseSync" placeholder="Search by course number. e.g. COMPSCI235" size="small"
                     clearable/>
           <el-button type="info" plain @click="importShowEvent">Import</el-button>
-          <el-button type="primary" plain @click="handleCourseAdd">Add Course</el-button>
+          <el-button ref="addCourseButton" type="primary" plain @click="addCourse">Add Course</el-button>
         </div>
         <article>
           <div style="height: calc(100vh - 173px)">
@@ -46,9 +46,10 @@ import {computed, ref} from "vue";
 import { useElementBounding } from '@vueuse/core'
 
 
-const props = defineProps(['fullScreenCourseVisible', 'onSelectName', 'searchCourse', 'importShowEvent', 'filterCourses', 'columns', 'handleCourseAdd'])
-const emit = defineEmits(['update:fullScreenCourseVisible', 'update:onSelectName', 'update:searchCourse', 'update:importShowEvent', 'update:handleCourseAdd', 'update:filterCourses', 'update:columns'])
+const props = defineProps(['fullScreenCourseVisible', 'onSelectName', 'searchCourse', 'importShowEvent', 'filterCourses', 'columns'])
+const emit = defineEmits(['update:fullScreenCourseVisible', 'update:onSelectName', 'update:searchCourse', 'update:importShowEvent', 'handleCourseAdd', 'update:filterCourses', 'update:columns'])
 
+const addCourseButton = ref()
 const visibleSync = computed({
   get() {
     return props.fullScreenCourseVisible as boolean
@@ -81,14 +82,15 @@ const searchCourseSync = computed({
 
 
 
-const handleCourseAdd = computed({
-  get() {
-    return props.handleCourseAdd as boolean
-  },
-  set(val) {
-    emit('update:handleCourseAdd', val)
-  }
-})
+const handleCourseAdd = () =>{
+  emit('handleCourseAdd')
+}
+
+
+const addCourse = () => {
+  addCourseButton.value.$el.blur()
+  handleCourseAdd()
+}
 
 
 

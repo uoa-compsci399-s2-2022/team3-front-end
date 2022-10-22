@@ -504,6 +504,8 @@ const filterCourses = computed(() =>
 const handleCourseAdd = () => {
   if (onSelect.value) {
     courseModalOpened.value = true;
+
+
     courseForm.termID = onSelect.value;
   } else {
     ElMessage({
@@ -1117,7 +1119,7 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
   <ImportCourseTemplate v-model:importVisible="importVisible" v-model:term="onSelect" v-model:termName="onSelectName"/>
   <FullScreenManageCourse v-model:fullScreenCourseVisible="fullScreenCourseVisible" v-model:onSelectName="onSelectName"
                           v-model:searchCourse="searchCourse" v-model:importShowEvent="importShowEvent"
-                          v-model:handleCourseAdd="handleCourseAdd" v-model:filter-courses="filterCourses"
+                          @handleCourseAdd="handleCourseAdd" v-model:filter-courses="filterCourses"
                           v-model:columns="columns"/>
 </template>
 
