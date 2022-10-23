@@ -548,7 +548,7 @@ const previewCV = async () => {
                                 <el-option key="name" label="Name" value="name" />
                                 <el-option key="upi" label="UPI" value="upi" />
                                 <el-option key="auid" label="AUID" value="auid" />
-                                <el-option key="degree" label="Degree" value="degree" />
+                                <el-option key="studentDegree" label="Degree" value="studentDegree" />
                                 <el-option key="email" label="Email" value="email" />
                                 <el-option key="enrolDetails" label="Enrolment detail" value="enrolDetails" />
                             </el-select>
@@ -601,7 +601,7 @@ const previewCV = async () => {
                                 <el-input v-model.number="changeProfileDTO.auid" />
                             </el-form-item>
 
-                            <el-form-item prop="degree" v-if="fieldsToChange.find(v => v === 'studentDegree')">
+                            <el-form-item prop="studentDegree" v-if="fieldsToChange.find(v => v === 'studentDegree')">
                                 <template #label>
                                     <h4>degree</h4>
                                 </template>
