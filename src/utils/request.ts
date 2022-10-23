@@ -9,9 +9,6 @@ export const baseURL = import.meta.env.VITE_API_URL as string
 const instance = axios.create({
     baseURL: baseURL,
     timeout: 200000,
-    headers:{
-        'Cache-Control': 'no-cache'
-    }
     //withCredentials: true
 })
 
