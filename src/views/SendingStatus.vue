@@ -62,7 +62,7 @@
         { text: 'Invite User', value: 'invite_user' },
         { text: 'Application Result', value: 'application_result' },
       ]" :filter-method="filterHandler"/>
-      <el-table-column prop="createdDateTime" label="Send Date"/>
+      <el-table-column prop="createdDateTime" label="Send Date" :formatter="datetimeFormat"/>
     </el-table>
   </div>
 
@@ -76,6 +76,7 @@ import {ElMessage} from "element-plus";
 import {TableColumnCtx} from "element-plus/es/components/table/src/table-column/defaults";
 import { EditorState } from '@codemirror/state'
 import {Codemirror} from "vue-codemirror";
+import {datetimeFormat} from "@/utils/datetimeFormat";
 
 const statusTag = {
   'sending': '',

@@ -352,11 +352,15 @@ const removeEvent = async () => {
 const loadList = async () => {
   tableLoading.value = true
   tableData.value = []
+  const $table = tableRef.value
   try {
     const res: InviteUser[] = await get('api/inviteUserSaved')
     tableData.value = res.sort((a, b) => b.index - a.index)
+    await $table.reloadData(tableData.value)
+
   } catch (e) {
     tableData.value = []
+    await $table.reloadData(tableData.value)
   }
   tableLoading.value = false
 }

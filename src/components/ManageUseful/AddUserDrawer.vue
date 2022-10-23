@@ -32,7 +32,6 @@
           <el-select v-model="filteredRoles[scope.$index]" multiple
             :placeholder="`Appoint position for ${scope.row.name}`" style="width: 240px"
             @change="role => appointPositionSearched(role, scope.row, scope.$index)" v-if="search">
-
             <el-option key="marker" label="Marker" value="marker" />
             <el-option key="tutor" label="Tutor" value="tutor" />
             <el-option key="courseCoordinator" label="Course Coordinator" value="courseCoordinator" />
@@ -43,7 +42,6 @@
 
             <el-option key="marker" label="Marker" value="marker" />
             <el-option key="tutor" label="Tutor" value="tutor" />
-            <el-option key="student" label="Student" value="student" />
             <el-option key="courseCoordinator" label="Course Coordinator" value="courseCoordinator" />
           </el-select>
 
