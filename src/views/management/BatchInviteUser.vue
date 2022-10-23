@@ -2,13 +2,13 @@
 
   <div class="page-container">
     <el-row class="hidden-md-and-up" justify="center" style="margin-bottom: 7px">
-        <el-button class="button_md_down" type="warning" @click="saveEvent">
-          <font-awesome-icon icon="fa-solid fa-cloud-arrow-up"/> &nbsp; Save
-        </el-button>
-        <el-button class="button_md_down" type="primary" :icon="Plus" @click="addRow(null)">Row</el-button>
-        <el-button class="button_md_down" :icon="DeleteFilled" type="danger" @click="removeButtonClickEvent">Delete
-        </el-button>
-        <el-button class="button_md_down" type="success" :icon="Promotion" @click="send">Send</el-button>
+      <el-button class="button_md_down" type="warning" @click="saveEvent">
+        <font-awesome-icon icon="fa-solid fa-cloud-arrow-up"/> &nbsp; Save
+      </el-button>
+      <el-button class="button_md_down" type="primary" :icon="Plus" @click="addRow(null)">Row</el-button>
+      <el-button class="button_md_down" :icon="DeleteFilled" type="danger" @click="removeButtonClickEvent">Delete
+      </el-button>
+      <el-button class="button_md_down" type="success" :icon="Promotion" @click="send">Send</el-button>
     </el-row>
 
 
@@ -24,7 +24,7 @@
               :loading-config="{icon: 'vxe-icon-indicator roll', text: 'Loading...'}"
               :keyboard-config="{isArrow: true, isDel: true, isEnter: true, isTab: true, isEdit: true, isChecked: true}"
               :mouse-config="{selected: true}"
-              :data="tableData"
+              :data="tableData.value"
               :column-config="{resizable: true}"
               :edit-config="{trigger: 'click', mode: 'row', showStatus: true}"
               :sort-config="{trigger: 'cell', defaultSort: {field: 'age', order: 'desc'}, orders: ['desc', 'asc', null]}"
@@ -66,20 +66,28 @@
           </el-button>
         </el-row>
         <el-row justify="center" class="button-wrapper">
-          <el-button class="button" type="primary" :icon="Plus" @click="addRow(null)">Add Row</el-button>
+          <el-button class="button" type="primary" :icon="Plus" @click="addRow(null)" :loading="tableLoading">Add Row
+          </el-button>
         </el-row>
         <el-row justify="center" class="button-wrapper">
-          <el-button class="button" type="primary" @click="addRow('student')">Add Student</el-button>
+          <el-button class="button" type="primary" :icon="Plus" @click="addRow('student')" :loading="tableLoading">
+            Student
+          </el-button>
         </el-row>
         <el-row justify="center" class="button-wrapper">
-          <el-button class="button" type="primary" @click="addRow('courseCoordinator')">Add CourseCoord</el-button>
+          <el-button class="button" type="primary" :icon="Plus" @click="addRow('courseCoordinator')"
+                     :loading="tableLoading">Course Coord
+          </el-button>
         </el-row>
         <el-row justify="center" class="button-wrapper">
-          <el-button class="button" :icon="DeleteFilled" type="danger" @click="removeButtonClickEvent">Delete
+          <el-button class="button" :icon="DeleteFilled" type="danger" @click="removeButtonClickEvent"
+                     :loading="tableLoading">Delete
           </el-button>
         </el-row>
         <el-row justify="center" class="SendButton-wrapper">
-          <el-button class="button" type="success" :icon="Promotion" size="large" @click="send">Send</el-button>
+          <el-button class="button" type="success" :icon="Promotion" size="large" @click="send" :loading="tableLoading">
+            Send
+          </el-button>
         </el-row>
       </el-col>
     </el-row>
@@ -97,9 +105,8 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="deleteDialogVisible = false">Cancel</el-button>
-        <el-button type="warning" @click="() =>{removeEvent();deleteDialogVisible = false;}">Confirm</el-button>
         <el-button type="danger"
-                   @click="() =>{removeEvent();saveEvent();deleteDialogVisible = false;}">Confirm & Save</el-button>
+                   @click="deleteSaveEvent">Confirm & Save</el-button>
       </span>
     </template>
   </el-dialog>
@@ -134,7 +141,9 @@ type Group = {
 
 const tableRef = ref<VxeTableInstance>({} as VxeTableInstance)
 const tableLoading = ref(false)
-const tableData = ref([] as InviteUser[])
+const tableData = reactive({
+  value: [] as InviteUser[]
+})
 const groups = ref([] as Group[])
 const deleteDialogVisible = ref(false)
 
@@ -146,8 +155,17 @@ const editClosedEvent: VxeTableEvents.EditClosed = ({row, column}) => {
 }
 
 const addRow = async (group: string | null) => {
-  let user: InviteUser;
+  tableLoading.value = true
   const $table = tableRef.value;
+  try {
+    const res: InviteUser[] = await get('api/inviteUserSaved')
+    tableData.value = res.sort((a, b) => b.index - a.index)
+
+  } catch (e) {
+    tableData.value = []
+  }
+  await $table.reloadData(tableData.value)
+  let user: InviteUser;
   const indexList = $table.data!.map(i => i.index)
   let indexNum: number = 0;
   if (tableData.value.length == 0) {
@@ -172,7 +190,7 @@ const addRow = async (group: string | null) => {
       groups: [group]
     }
   }
-  await $table.insertAt(user, null)
+  const {row}  = await $table.insert(user)
   const {insertRecords} = $table.getRecordset()
   const errMap = await $table?.validate()
   if (errMap) {
@@ -186,15 +204,17 @@ const addRow = async (group: string | null) => {
           type: 'success',
           grouping: true
         })
+        loadList().then(() => {
+          $table.setEditCell($table.data[0], 'userID')
+        })
       }).catch((err) => {
     ElMessage({
       message: err.response.data['message'],
       type: 'error',
       grouping: true
     })
+    loadList()
   })
-  await loadList()
-  await $table.setEditCell($table.data[0], 'userID')
 }
 
 
@@ -340,25 +360,29 @@ const removeEvent = async () => {
     return
   }
   tableLoading.value = true
-  const {rows} = await $table?.removeCheckboxRow()
-  rows.forEach((row: InviteUser) => {
-    const index = tableData.value.findIndex((item: InviteUser) => item.index === row.index)
-    tableData.value.splice(index, 1)
-  })
-  tableLoading.value = false
+  await $table?.removeCheckboxRow()
 }
 
 
 const loadList = async () => {
   tableLoading.value = true
-  tableData.value = []
+  const $table = tableRef.value
   try {
     const res: InviteUser[] = await get('api/inviteUserSaved')
+    tableData.value = []
     tableData.value = res.sort((a, b) => b.index - a.index)
   } catch (e) {
     tableData.value = []
   }
+  await $table.reloadData(tableData.value)
   tableLoading.value = false
+}
+
+
+const deleteSaveEvent = async () => {
+  await removeEvent();
+  await saveEvent();
+  deleteDialogVisible.value = false;
 }
 
 
@@ -398,7 +422,7 @@ onBeforeMount(() => {
   }
 }
 
-.button_md_down{
+.button_md_down {
   width: 100px;
 }
 

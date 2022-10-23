@@ -28,7 +28,8 @@ type personalInfoType = {
     upi: string;
     auid: string;
     groups: string[];
-    degree: string;
+    // degree: string;
+  studentDegree : string;
     enrolDetails: string;
 }
 const personalInfo = ref<personalInfoType>({} as personalInfoType)
@@ -40,7 +41,8 @@ const getUserProfile = () => {
         personalInfo.value.upi = res.upi;
         personalInfo.value.auid = res.auid;
         personalInfo.value.groups = res.groups;
-        personalInfo.value.degree = res.degree;
+        // personalInfo.value.degree = res.degree;
+        personalInfo.value.studentDegree = res.studentDegree;
         personalInfo.value.enrolDetails = res.enrolDetails;
 
     })
@@ -52,11 +54,11 @@ getUserProfile()
 const fieldsToChange = ref<Array<keyof profileType>>([])
 
 type profileType = {
-    name: string;
+  name: string;
     email: string;
     upi: string;
     auid: string;
-    degree: string;
+    studentDegree: string;
     enrolDetails: string;
     code: string;
 }
@@ -71,6 +73,17 @@ const removeEmptyFields = () => {
     }
     removeArr.forEach(v => delete (changeProfileDTO.value as any)[v])
 }
+// const degreeOptionsvalue = ref('')
+const degreeOptions =[
+  {
+    value : 'Undergraduate',
+    label :'Undergraduate'
+  },
+  {
+    value : 'Postgraduate',
+    label :'Postgraduate'
+  }
+]
 
 watch(changeProfileDTO.value, () => {
     removeEmptyFields()
@@ -78,6 +91,7 @@ watch(changeProfileDTO.value, () => {
 
 const onSubmit = (formEl: FormInstance | undefined) => {
     if (!formEl) return;
+    console.log(changeProfileDTO.value)
     if (fieldsToChange.value.find(v => v === 'email')) {
         formEl.validate(async (valid) => {
             if (valid) {
@@ -415,8 +429,8 @@ const previewCV = async () => {
                         <p>{{ personalInfo.auid }}</p>
                         <p v-if="!personalInfo.auid">Missing :(</p>
                         <h4>degree</h4>
-                        <p>{{ personalInfo.degree }}</p>
-                        <p v-if="!personalInfo.degree">Missing :(</p>
+                        <p>{{ personalInfo.studentDegree }}</p>
+                        <p v-if="!personalInfo.studentDegree">Missing :(</p>
                         <h4>Enrolment detail</h4>
                         <p>{{ personalInfo.enrolDetails }}</p>
                         <p v-if="!personalInfo.enrolDetails">Missing :(</p>
@@ -587,11 +601,19 @@ const previewCV = async () => {
                                 <el-input v-model.number="changeProfileDTO.auid" />
                             </el-form-item>
 
-                            <el-form-item prop="degree" v-if="fieldsToChange.find(v => v === 'degree')">
+                            <el-form-item prop="degree" v-if="fieldsToChange.find(v => v === 'studentDegree')">
                                 <template #label>
                                     <h4>degree</h4>
                                 </template>
-                                <el-input v-model="changeProfileDTO.degree" />
+<!--                                <el-input v-model="changeProfileDTO.degree" />-->
+                                <el-select v-model="changeProfileDTO.studentDegree">
+                                  <el-option
+                                      v-for="item in degreeOptions"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value"
+                                  />
+                                  </el-select>
                             </el-form-item>
 
                             <el-form-item prop="enrolDetails" v-if="fieldsToChange.find(v => v === 'enrolDetails')">
