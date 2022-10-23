@@ -35,6 +35,11 @@ const routes:RouteRecordRaw[] = [
                 meta: { title:'Application Approval', permission: '5' },
                 component: () => import('@/views/Application/ApplicationApproval.vue')
             },
+            {
+                path: 'sendingstatus',
+                meta: { title:'Email Sending Status', permission: '3' },
+                component: () => import('@/views/SendingStatus.vue')
+            },
             //management
             {
                 path: "managecourse",

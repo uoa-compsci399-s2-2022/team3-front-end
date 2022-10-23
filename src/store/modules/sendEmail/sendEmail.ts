@@ -21,7 +21,7 @@ export const useSendEmailStore = defineStore('sendEmail', () => {
             currentNotification.value.close()
             ElNotification({
                 title: 'Success',
-                message: 'Send Emails Successfully',
+                message: 'Sending completed, please go to Email Sending Status to check the sending result.',
                 type: 'success',
             })
             status.value = ''
@@ -30,7 +30,7 @@ export const useSendEmailStore = defineStore('sendEmail', () => {
             setTimeout(() => {
                 ElNotification({
                     title: 'Error',
-                    message: 'Send Emails Failed',
+                    message: 'Send Emails Failed, please go to Email Sending Status to check the sending result.',
                     type: 'error',
                 })
             }, 10)

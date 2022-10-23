@@ -45,6 +45,12 @@ const items: sidebarMenu = [
     permission: "1",
   },
   {
+    icon: "MessageBox",
+    index: '/sendingstatus',
+    title: "Email Sending Status",
+    permission: "3",
+  },
+  {
     icon: 'Management',
     index: '3',
     title: 'Management',

@@ -11,7 +11,7 @@
               :value="item.termID"
           />
         </el-select>
-        <el-select v-model="tutorOrMarker" class="m-2" placeholder="Marker or Tutor">
+        <el-select v-model="tutorOrMarker" class="m-2" placeholder="Marker or Tutor" style="margin-bottom: 5px">
           <el-option key="marker" label="Marker" value="marker" v-permission="7"/>
           <el-option key="tutor" label="Tutor" value="tutor" v-permission="6"/>
         </el-select>
@@ -26,7 +26,6 @@
             Publish
           </el-button>
         </el-badge>
-
       </el-col>
     </el-row>
     <br/>
@@ -115,13 +114,14 @@
         <el-table-column property="applicationID" label="Application ID"/>
         <el-table-column property="status" label="Status" />
         <el-table-column property="name" label="Name"/>
+        <el-table-column property="email" label="Email" min-width="120"/>
         <el-table-column property="upi" label="UPI"/>
       </el-table>
 
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="publishDialogVisible = false">Cancel</el-button>
-        <el-button type="success" @click="submitPublishEvent"  v-loading="publishTableLoading" plain>Confirm</el-button>
+        <el-button type="success" @click="submitPublishEvent"  :loading="publishTableLoading" plain>Confirm</el-button>
       </span>
     </template>
   </el-dialog>
@@ -136,7 +136,7 @@ import {useAsyncState} from "@vueuse/core";
 import {get, post} from "@/utils/request";
 import ApprovalTable from '@/components/applicationUseful/ApprovalTable.vue'
 import {CircleCheckFilled, CircleCloseFilled} from '@element-plus/icons-vue'
-import {usePermissionStore} from '@/store'
+import {usePermissionStore, useSendEmailStore} from '@/store'
 
 const selectedTerm = ref()
 const tutorOrMarker = ref("")
@@ -391,9 +391,18 @@ const publishEvent = async () => {
   publishTableLoading.value = false
 }
 
+const sendEmail = useSendEmailStore()
 
 const submitPublishEvent = () => {
   publishTableLoading.value = true
+  if (sendEmail.status !== '') {
+    ElMessage({
+      message: 'Please wait for the previous email to be sent!',
+      type: 'warning'
+    })
+    return
+  }
+  sendEmail.status = 'processing'
   post('api/publishApplication', submitPublishData.value).then((res) => {
     getApplicationApprovalList()
     ElMessage({
@@ -402,6 +411,7 @@ const submitPublishEvent = () => {
     })
     publishTableLoading.value = false
     publishDialogVisible.value = false
+    sendEmail.status = 'success'
   }).catch((err) => {
     ElMessage({
       message: err.response.data.message,
@@ -409,6 +419,7 @@ const submitPublishEvent = () => {
     })
     publishTableLoading.value = false
     publishDialogVisible.value = false
+    sendEmail.status = 'error'
   })
 }
 

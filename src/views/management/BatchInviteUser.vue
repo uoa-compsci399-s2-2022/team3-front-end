@@ -218,14 +218,16 @@ const send = async () => {
     console.log(res)
     ElMessage({
       message: '',
-      type: 'success'
+      type: 'success',
+      grouping: true
     })
     sendEmail.status = 'success'
   }).catch((err) => {
     console.log(err)
     ElMessage({
       message: err.response.data['message'],
-      type: 'error'
+      type: 'error',
+      grouping: true
     })
     sendEmail.status = 'error'
   })
@@ -246,7 +248,8 @@ const autoSaveUpdateEvent = async () => {
         (res) => {
           ElMessage({
             message: 'Save success',
-            type: 'success'
+            type: 'success',
+            grouping: true
           })
           updateRecords.forEach((item) => {
             $table.reloadRow(item)
@@ -290,7 +293,8 @@ const saveEvent = async () => {
         (res) => {
           ElMessage({
             message: 'Save success',
-            type: 'success'
+            type: 'success',
+            grouping: true
           })
         }).catch((err) => {
       ElMessage({
@@ -316,7 +320,8 @@ const removeButtonClickEvent = () => {
   if ($table.getCheckboxRecords().length <= 0) {
     ElMessage({
       message: 'Please select the row to delete',
-      type: 'warning'
+      type: 'warning',
+      grouping: true
     })
     return
   }
@@ -329,7 +334,8 @@ const removeEvent = async () => {
   if ($table.getCheckboxRecords().length <= 0) {
     ElMessage({
       message: 'Please select the row to delete',
-      type: 'warning'
+      type: 'warning',
+      grouping: true
     })
     return
   }
