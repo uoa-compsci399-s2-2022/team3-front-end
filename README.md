@@ -137,23 +137,27 @@ If you have Cross Origin Request Blocked problem, you can config the proxy url
 
 Step 1
 
-![image-20221023180645088](.\public\tutorial-images\image-20221023180645088.png)
+<img src=".\public\tutorial-images\image-20221023180645088.png" alt="image-20221023180008092" style="zoom:50%;" />
+
+<img src=".\public\tutorial-images\image-20221023180840518.png" alt="image-20221023180008092" style="zoom:50%;" />
 
 Step 2
 
-![image-20221023180840518](.\public\tutorial-images\image-20221023180840518.png)
+
 
 Enter term information and add term
 
-![image-20221023181354313](.\public\tutorial-images\image-20221023181354313.png)
+<img src=".\public\tutorial-images\image-20221023181354313.png" alt="image-20221023180008092" style="zoom:50%;" />
 
 Add a new course
 
-![image-20221023181741443](.\public\tutorial-images\image-20221023181741443.png)
+<img src=".\public\tutorial-images\image-20221023181741443.png" alt="image-20221023180008092" style="zoom:50%;" />
 
 New Course is added, you can delete / modify or add another course as you wish.
 
-![image-20221023182044687](.\public\tutorial-images\image-20221023182044687.png)
+<img src=".\public\tutorial-images\image-20221023182044687.png" alt="image-20221023180008092" style="zoom:50%;" />
+
+
 
 ## Online Demo
 
