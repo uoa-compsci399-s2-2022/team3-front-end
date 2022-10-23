@@ -66,20 +66,28 @@
           </el-button>
         </el-row>
         <el-row justify="center" class="button-wrapper">
-          <el-button class="button" type="primary" :icon="Plus" @click="addRow(null)" :loading="tableLoading">Add Row</el-button>
+          <el-button class="button" type="primary" :icon="Plus" @click="addRow(null)" :loading="tableLoading">Add Row
+          </el-button>
         </el-row>
         <el-row justify="center" class="button-wrapper">
-          <el-button class="button" type="primary" :icon="Plus" @click="addRow('student')" :loading="tableLoading">Student</el-button>
+          <el-button class="button" type="primary" :icon="Plus" @click="addRow('student')" :loading="tableLoading">
+            Student
+          </el-button>
         </el-row>
         <el-row justify="center" class="button-wrapper">
-          <el-button class="button" type="primary" :icon="Plus" @click="addRow('courseCoordinator')" :loading="tableLoading">Course Coord</el-button>
+          <el-button class="button" type="primary" :icon="Plus" @click="addRow('courseCoordinator')"
+                     :loading="tableLoading">Course Coord
+          </el-button>
         </el-row>
         <el-row justify="center" class="button-wrapper">
-          <el-button class="button" :icon="DeleteFilled" type="danger" @click="removeButtonClickEvent" :loading="tableLoading">Delete
+          <el-button class="button" :icon="DeleteFilled" type="danger" @click="removeButtonClickEvent"
+                     :loading="tableLoading">Delete
           </el-button>
         </el-row>
         <el-row justify="center" class="SendButton-wrapper">
-          <el-button class="button" type="success" :icon="Promotion" size="large" @click="send" :loading="tableLoading">Send</el-button>
+          <el-button class="button" type="success" :icon="Promotion" size="large" @click="send" :loading="tableLoading">
+            Send
+          </el-button>
         </el-row>
       </el-col>
     </el-row>
@@ -148,15 +156,16 @@ const editClosedEvent: VxeTableEvents.EditClosed = ({row, column}) => {
 
 const addRow = async (group: string | null) => {
   tableLoading.value = true
+  const $table = tableRef.value;
   try {
     const res: InviteUser[] = await get('api/inviteUserSaved')
-    tableData.value = []
     tableData.value = res.sort((a, b) => b.index - a.index)
+
   } catch (e) {
     tableData.value = []
   }
+  await $table.reloadData(tableData.value)
   let user: InviteUser;
-  const $table = tableRef.value;
   const indexList = $table.data!.map(i => i.index)
   let indexNum: number = 0;
   if (tableData.value.length == 0) {
@@ -181,7 +190,7 @@ const addRow = async (group: string | null) => {
       groups: [group]
     }
   }
-  await $table.insertAt(user, null)
+  const {row}  = await $table.insert(user)
   const {insertRecords} = $table.getRecordset()
   const errMap = await $table?.validate()
   if (errMap) {
@@ -357,6 +366,7 @@ const removeEvent = async () => {
 
 const loadList = async () => {
   tableLoading.value = true
+  const $table = tableRef.value
   try {
     const res: InviteUser[] = await get('api/inviteUserSaved')
     tableData.value = []
@@ -364,6 +374,7 @@ const loadList = async () => {
   } catch (e) {
     tableData.value = []
   }
+  await $table.reloadData(tableData.value)
   tableLoading.value = false
 }
 
