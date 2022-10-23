@@ -188,3 +188,7 @@ New Course is added, you can delete / modify or add another course as you wish.
 5. [Vue3 documentation](https://vuejs.org/)
 6. [vue-router documentation](https://router.vuejs.org/installation.html)
 7. [Axios Tutorials](https://masteringjs.io/axios)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0110b661cd7ba903cfedef4c50589eb843265f28
