@@ -24,7 +24,7 @@
               :loading-config="{icon: 'vxe-icon-indicator roll', text: 'Loading...'}"
               :keyboard-config="{isArrow: true, isDel: true, isEnter: true, isTab: true, isEdit: true, isChecked: true}"
               :mouse-config="{selected: true}"
-              :data="tableData"
+              :data="tableData.value"
               :column-config="{resizable: true}"
               :edit-config="{trigger: 'click', mode: 'row', showStatus: true}"
               :sort-config="{trigger: 'cell', defaultSort: {field: 'age', order: 'desc'}, orders: ['desc', 'asc', null]}"
@@ -66,20 +66,20 @@
           </el-button>
         </el-row>
         <el-row justify="center" class="button-wrapper">
-          <el-button class="button" type="primary" :icon="Plus" @click="addRow(null)">Add Row</el-button>
+          <el-button class="button" type="primary" :icon="Plus" @click="addRow(null)" :loading="tableLoading">Add Row</el-button>
         </el-row>
         <el-row justify="center" class="button-wrapper">
-          <el-button class="button" type="primary" @click="addRow('student')">Add Student</el-button>
+          <el-button class="button" type="primary" :icon="Plus" @click="addRow('student')" :loading="tableLoading">Student</el-button>
         </el-row>
         <el-row justify="center" class="button-wrapper">
-          <el-button class="button" type="primary" @click="addRow('courseCoordinator')">Add CourseCoord</el-button>
+          <el-button class="button" type="primary" :icon="Plus" @click="addRow('courseCoordinator')" :loading="tableLoading">Course Coord</el-button>
         </el-row>
         <el-row justify="center" class="button-wrapper">
-          <el-button class="button" :icon="DeleteFilled" type="danger" @click="removeButtonClickEvent">Delete
+          <el-button class="button" :icon="DeleteFilled" type="danger" @click="removeButtonClickEvent" :loading="tableLoading">Delete
           </el-button>
         </el-row>
         <el-row justify="center" class="SendButton-wrapper">
-          <el-button class="button" type="success" :icon="Promotion" size="large" @click="send">Send</el-button>
+          <el-button class="button" type="success" :icon="Promotion" size="large" @click="send" :loading="tableLoading">Send</el-button>
         </el-row>
       </el-col>
     </el-row>
@@ -133,7 +133,9 @@ type Group = {
 
 const tableRef = ref<VxeTableInstance>({} as VxeTableInstance)
 const tableLoading = ref(false)
-const tableData = ref([] as InviteUser[])
+const tableData = reactive({
+  value: [] as InviteUser[]
+})
 const groups = ref([] as Group[])
 const deleteDialogVisible = ref(false)
 
@@ -145,7 +147,14 @@ const editClosedEvent: VxeTableEvents.EditClosed = ({row, column}) => {
 }
 
 const addRow = async (group: string | null) => {
-  await loadList()
+  tableLoading.value = true
+  try {
+    const res: InviteUser[] = await get('api/inviteUserSaved')
+    tableData.value = []
+    tableData.value = res.sort((a, b) => b.index - a.index)
+  } catch (e) {
+    tableData.value = []
+  }
   let user: InviteUser;
   const $table = tableRef.value;
   const indexList = $table.data!.map(i => i.index)
@@ -342,26 +351,19 @@ const removeEvent = async () => {
     return
   }
   tableLoading.value = true
-  const {rows} = await $table?.removeCheckboxRow()
-  rows.forEach((row: InviteUser) => {
-    const index = tableData.value.findIndex((item: InviteUser) => item.index === row.index)
-    tableData.value.splice(index, 1)
-  })
-  tableLoading.value = false
+  await $table?.removeCheckboxRow()
 }
 
 
 const loadList = async () => {
   tableLoading.value = true
-  tableData.value = []
-  const $table = tableRef.value
   try {
     const res: InviteUser[] = await get('api/inviteUserSaved')
+    tableData.value = []
     tableData.value = res.sort((a, b) => b.index - a.index)
   } catch (e) {
     tableData.value = []
   }
-  await $table.reloadData(tableData.value)
   tableLoading.value = false
 }
 
@@ -370,8 +372,6 @@ const deleteSaveEvent = async () => {
   await removeEvent();
   await saveEvent();
   deleteDialogVisible.value = false;
-
-
 }
 
 
