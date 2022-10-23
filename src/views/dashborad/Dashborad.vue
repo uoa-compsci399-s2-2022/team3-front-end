@@ -49,8 +49,12 @@ async function GetCourse(termID: Number) {
       if (item.roleName === 'courseCoordinator') {
         item.path = `course-coordinator/${item.courseID}`
         courseList.value.push(item)
-      } else {
+      } else if ((item.roleName === 'tutor')||(item.roleName === 'marker') ){
         item.path = `tutor-marker/${item.courseID}/${semesterID.value}`
+        courseList.value.push(item)
+      }
+      else {
+        item.path =`/`
         courseList.value.push(item)
       }
     })
