@@ -367,7 +367,6 @@ const loadList = async () => {
 
 
 const deleteSaveEvent = async () => {
-  await loadList();
   await removeEvent();
   await saveEvent();
   deleteDialogVisible.value = false;
