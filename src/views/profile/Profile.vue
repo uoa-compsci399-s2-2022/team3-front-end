@@ -61,7 +61,6 @@ type profileType = {
     studentDegree: string;
     enrolDetails: string;
     code: string;
-    degree: string;
 }
 const varificationCode = ref<string>("")
 const changeProfileDTO = ref<profileType>({} as profileType);
@@ -602,7 +601,7 @@ const previewCV = async () => {
                                 <el-input v-model.number="changeProfileDTO.auid" />
                             </el-form-item>
 
-                            <el-form-item prop="degree" v-if="fieldsToChange.find(v => v === 'degree')">
+                            <el-form-item prop="degree" v-if="fieldsToChange.find(v => v === 'studentDegree')">
                                 <template #label>
                                     <h4>degree</h4>
                                 </template>
