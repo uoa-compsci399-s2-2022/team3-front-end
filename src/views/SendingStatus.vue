@@ -18,7 +18,8 @@
             <el-descriptions-item label="Email Category">
               {{ props.row.category }}
             </el-descriptions-item>
-            <el-descriptions-item label="Error Message" v-if="props.row.status === 'failed'" style="margin: 0; padding: 0">
+            <el-descriptions-item label="Error Message" v-if="props.row.status === 'failed'"
+                                  style="margin: 0; padding: 0">
               <codemirror style="max-width: 750px; padding: 0; margin: 0" v-model="props.row.error_message" disabled/>
             </el-descriptions-item>
             <el-descriptions-item label="Receiver Name">
@@ -62,7 +63,11 @@
         { text: 'Invite User', value: 'invite_user' },
         { text: 'Application Result', value: 'application_result' },
       ]" :filter-method="filterHandler"/>
-      <el-table-column prop="createdDateTime" label="Send Date" :formatter="datetimeFormat"/>
+      <el-table-column label="Send Date">
+        <template #default="scope">
+          {{ datetimeFormat(scope.row.createdDateTime) }}
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 
@@ -74,7 +79,7 @@ import {useAsyncState} from "@vueuse/core";
 import {get} from "@/utils/request";
 import {ElMessage} from "element-plus";
 import {TableColumnCtx} from "element-plus/es/components/table/src/table-column/defaults";
-import { EditorState } from '@codemirror/state'
+import {EditorState} from '@codemirror/state'
 import {Codemirror} from "vue-codemirror";
 import {datetimeFormat} from "@/utils/datetimeFormat";
 

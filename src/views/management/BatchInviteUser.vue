@@ -2,13 +2,13 @@
 
   <div class="page-container">
     <el-row class="hidden-md-and-up" justify="center" style="margin-bottom: 7px">
-        <el-button class="button_md_down" type="warning" @click="saveEvent">
-          <font-awesome-icon icon="fa-solid fa-cloud-arrow-up"/> &nbsp; Save
-        </el-button>
-        <el-button class="button_md_down" type="primary" :icon="Plus" @click="addRow(null)">Row</el-button>
-        <el-button class="button_md_down" :icon="DeleteFilled" type="danger" @click="removeButtonClickEvent">Delete
-        </el-button>
-        <el-button class="button_md_down" type="success" :icon="Promotion" @click="send">Send</el-button>
+      <el-button class="button_md_down" type="warning" @click="saveEvent">
+        <font-awesome-icon icon="fa-solid fa-cloud-arrow-up"/> &nbsp; Save
+      </el-button>
+      <el-button class="button_md_down" type="primary" :icon="Plus" @click="addRow(null)">Row</el-button>
+      <el-button class="button_md_down" :icon="DeleteFilled" type="danger" @click="removeButtonClickEvent">Delete
+      </el-button>
+      <el-button class="button_md_down" type="success" :icon="Promotion" @click="send">Send</el-button>
     </el-row>
 
 
@@ -97,9 +97,8 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="deleteDialogVisible = false">Cancel</el-button>
-        <el-button type="warning" @click="() =>{removeEvent();deleteDialogVisible = false;}">Confirm</el-button>
         <el-button type="danger"
-                   @click="() =>{removeEvent();saveEvent();deleteDialogVisible = false;}">Confirm & Save</el-button>
+                   @click="deleteSaveEvent">Confirm & Save</el-button>
       </span>
     </template>
   </el-dialog>
@@ -146,6 +145,7 @@ const editClosedEvent: VxeTableEvents.EditClosed = ({row, column}) => {
 }
 
 const addRow = async (group: string | null) => {
+  await loadList()
   let user: InviteUser;
   const $table = tableRef.value;
   const indexList = $table.data!.map(i => i.index)
@@ -186,15 +186,17 @@ const addRow = async (group: string | null) => {
           type: 'success',
           grouping: true
         })
+        loadList().then(() => {
+          $table.setEditCell($table.data[0], 'userID')
+        })
       }).catch((err) => {
     ElMessage({
       message: err.response.data['message'],
       type: 'error',
       grouping: true
     })
+    loadList()
   })
-  await loadList()
-  await $table.setEditCell($table.data[0], 'userID')
 }
 
 
@@ -356,13 +358,21 @@ const loadList = async () => {
   try {
     const res: InviteUser[] = await get('api/inviteUserSaved')
     tableData.value = res.sort((a, b) => b.index - a.index)
-    await $table.reloadData(tableData.value)
-
   } catch (e) {
     tableData.value = []
-    await $table.reloadData(tableData.value)
   }
+  await $table.reloadData(tableData.value)
   tableLoading.value = false
+}
+
+
+const deleteSaveEvent = async () => {
+  await loadList();
+  await removeEvent();
+  await saveEvent();
+  deleteDialogVisible.value = false;
+
+
 }
 
 
@@ -402,7 +412,7 @@ onBeforeMount(() => {
   }
 }
 
-.button_md_down{
+.button_md_down {
   width: 100px;
 }
 
