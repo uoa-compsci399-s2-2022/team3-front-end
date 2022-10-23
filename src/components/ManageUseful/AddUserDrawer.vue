@@ -35,7 +35,6 @@
 
             <el-option key="marker" label="Marker" value="marker" />
             <el-option key="tutor" label="Tutor" value="tutor" />
-            <el-option key="student" label="Student" value="student" />
             <el-option key="courseCoordinator" label="Course Coordinator" value="courseCoordinator" />
           </el-select>
 
