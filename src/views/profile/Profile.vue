@@ -61,6 +61,7 @@ type profileType = {
     studentDegree: string;
     enrolDetails: string;
     code: string;
+    degree: string;
 }
 const varificationCode = ref<string>("")
 const changeProfileDTO = ref<profileType>({} as profileType);
