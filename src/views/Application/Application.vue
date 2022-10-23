@@ -281,6 +281,19 @@ const validateHasWorkVisa = (rule: any, value: any, callback: any) => {
     callback();
   }
 }
+const validateotherContracts = (rule: any, value: any, callback: any) => {
+  //console.log(value)
+  if (data.haveOtherContracts === false) {
+    //console.log(1)
+    callback();
+  } else if (!value) {
+    callback(new Error('Please Describe these TA/GTA contracts...'));
+    //console.log(2)
+  } else {
+    callback();
+    //console.log(3)
+  }
+}
 
 // form validation rules for data
 const dataRules = reactive<FormRules>({
@@ -321,6 +334,9 @@ const dataRules = reactive<FormRules>({
   ],
   haveOtherContracts: [
     {required: true, message: 'Please select one option', trigger: 'change'},
+  ],
+  otherContracts: [
+    {validator: validateotherContracts, trigger: ['change','blur']},
   ],
   maximumWorkingHours: [
     {required: true, message: 'Please enter your preffered working hours', trigger: 'change'},
@@ -364,7 +380,7 @@ const validateStep = async (step: number) => {
   } else if (step === 1) {
     await formRef.value?.validateField(
         ['currentlyOverseas', 'willBackToNZ', 'isCitizenOrPR',
-          'haveValidVisa', 'studentDegree', 'hasOtherContract', 'maximumWorkingHours'],
+          'haveValidVisa', 'studentDegree', 'haveOtherContracts','otherContracts', 'maximumWorkingHours'],
         (valid) => {
           flag = valid;
           // console.log(flag)
@@ -515,6 +531,7 @@ const handleChange_ad: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
 
 const saveToServerLoading = ref(false)
 const save = () => {
+ // console.log(data.otherContracts)
   saveToServerLoading.value = true
   return post(`api/saveApplication/${applicationID.value}`, {
     "applicationPersonalDetail": data,
@@ -716,7 +733,7 @@ const check = async () => {
               </div>
               <div>
                 <p>Do you have any other TA/GTA contracts for that semester?</p>
-                <el-form-item prop="hasOtherContract">
+                <el-form-item prop="haveOtherContracts">
                   <el-radio-group v-model="data.haveOtherContracts">
                     <el-radio :label="true">Yes</el-radio>
                     <el-radio :label="false">No</el-radio>
@@ -724,7 +741,7 @@ const check = async () => {
                 </el-form-item>
               </div>
               <div class="indent" v-show="data.haveOtherContracts">
-                <el-form-item>
+                <el-form-item prop="otherContracts">
                   <el-input v-model="data.otherContracts" maxlength="200"
                             placeholder="Please Describe these TA/GTA contracts..." show-word-limit
                             type="textarea"/>
