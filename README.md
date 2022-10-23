@@ -181,13 +181,11 @@ New Course is added, you can delete / modify or add another course as you wish.
 
 ## Acknowledgement
 
-1. **Database Migration** https://alembic.sqlalchemy.org/en/latest/
-2. **Config Celery** https://docs.celeryq.dev/en/stable/getting-started/introduction.html
-3. **Config Sentry** https://docs.sentry.io/platforms/python/flask/
-4. **Config uWSGI** https://uwsgi-docs.readthedocs.io/en/latest/ https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-uswgi-and-nginx-on-ubuntu-18-04
-5. **Config Database** https://www.sqlalchemy.org/
-6. Compsci235 The flask knowledge taught served as the cornerstone of the back end of our project.
-7. Compsci340 The knowledge of threads and processes taught provides support for projects to solve resource seizure problems.
-
-
+1. Many thanks to our Clients: Burkhard and Sudeep,Coordinator: Asma,Tutor: Anshul for all the assistance, feedback and suggestions they have given us throughout the project.
+2. Compsci335 The distributed system knowledge taught served as the cornerstone of the front-end end of our project.
+3. Compsci345 The knowledge of design principle and UX increases the usability of our website
+4. [Pinia documentation](https://pinia.vuejs.org/introduction.html)
+5. [Vue3 documentation](https://vuejs.org/)
+6. [vue-router documentation](https://router.vuejs.org/installation.html)
+7. [Axios Tutorials](https://masteringjs.io/axios)
 
