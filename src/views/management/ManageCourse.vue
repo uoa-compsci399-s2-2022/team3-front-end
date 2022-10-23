@@ -101,20 +101,20 @@ const handleTermEdit = (index: number, row: term) => {
   termDTO.termName = row.termName;
   termDTO.startDate = row.startDate;
   termDTO.isAvailable = row.isAvailable;
-  termDTO.endDate = row.endDate;
-  dateRange.value = [new Date(row.startDate), new Date(row.endDate)];
-  // if two deadline exists
-  if (row.defaultMarkerDeadLine && row.defaultTutorDeadLine) {
-    termDTO.defaultMarkerDeadLine = row.defaultMarkerDeadLine;
-    termDTO.defaultTutorDeadLine = row.defaultTutorDeadLine;
-    defaultMarkerDeadLine.value = new Date(row.defaultMarkerDeadLine);
-    defaultTutorDeadLine.value = new Date(row.defaultTutorDeadLine);
-  } else { // if two deadline doesn't exist, then set the current Time as deadline
-    termDTO.defaultMarkerDeadLine = new Date().toISOString();
-    termDTO.defaultTutorDeadLine = new Date().toISOString();
-    defaultMarkerDeadLine.value = new Date();
-    defaultTutorDeadLine.value = new Date();
-  }
+  // termDTO.endDate = row.endDate;
+  // dateRange.value = [new Date(row.startDate), new Date(row.endDate)];
+  // // if two deadline exists
+  // if (row.defaultMarkerDeadLine && row.defaultTutorDeadLine) {
+  //   termDTO.defaultMarkerDeadLine = row.defaultMarkerDeadLine;
+  //   termDTO.defaultTutorDeadLine = row.defaultTutorDeadLine;
+  //   defaultMarkerDeadLine.value = new Date(row.defaultMarkerDeadLine);
+  //   defaultTutorDeadLine.value = new Date(row.defaultTutorDeadLine);
+  // } else { // if two deadline doesn't exist, then set the current Time as deadline
+  //   termDTO.defaultMarkerDeadLine = new Date().toISOString();
+  //   termDTO.defaultTutorDeadLine = new Date().toISOString();
+  //   defaultMarkerDeadLine.value = new Date();
+  //   defaultTutorDeadLine.value = new Date();
+  // }
   return function () {
     put(`/api/modifyTerm/${row.termID}`, {data: termDTO})
         .then(
@@ -197,6 +197,7 @@ const setCurrent = (row?: term) => {
  */
 async function getTermList() {
   let termList = await get('api/term');
+
   terms.length = 0;
   (termList as term[]).forEach((term) => {
     terms.push(term)
@@ -749,8 +750,8 @@ let editCourse = ref<any>(null);
 const handleCourseEdit = (row: number) => {
   courseEditModalOpened.value = true;
   setCourseForm(row);
-  markerDeadLine.value = new Date(courses.value[row].markerDeadLine);
-  tutorDeadLine.value = new Date(courses.value[row].tutorDeadLine);
+  // markerDeadLine.value = new Date(courses.value[row].markerDeadLine);
+  // tutorDeadLine.value = new Date(courses.value[row].tutorDeadLine);
   const courseID = courses.value[row].courseID;
   return function () {
     put(`/api/courseManagement/${courseID}`, {data: courseForm}).then(() => {
@@ -921,10 +922,10 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
                        inactive-text="N"/>
           </div>
           <el-date-picker v-model="termDTO.defaultMarkerDeadLine" type="datetime"
-                          placeholder="Pick a Date for Marker deadline" style="width:100%;" format="YYYY/MM/DD HH:mm:ss"
+                          placeholder="Pick a Date for Marker deadline" style="width:100%;" format="YYYY-MM-DDTHH:mm:ssZ"
                           value-format="YYYY-MM-DDTHH:mm:ssZ"/>
           <el-date-picker v-model="termDTO.defaultTutorDeadLine" type="datetime"
-                          placeholder="Pick a Date for Tutor deadline" style="width:100%;" format="YYYY/MM/DD HH:mm:ss"
+                          placeholder="Pick a Date for Tutor deadline" style="width:100%;" format="YYYY-MM-DDTHH:mm:ssZ"
                           value-format="YYYY-MM-DDTHH:mm:ssZ"/>
         </div>
         <div class="modal-btns">
