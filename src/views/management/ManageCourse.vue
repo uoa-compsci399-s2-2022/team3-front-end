@@ -870,7 +870,7 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
           </button>
         </div>
         <div class="modal-content">
-          <el-input v-model.trim="termDTO.termName" placeholder="Enter term name" clearable/>
+          <el-input v-model="termDTO.termName" placeholder="Enter term name" clearable/>
           <el-date-picker v-model="dateRange" type="datetimerange" range-separator="To"
                           start-placeholder="Start date" end-placeholder="End date" style="width:100%;"/>
           <div class="modal-content-switch">
@@ -905,7 +905,7 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
           </button>
         </div>
         <div class="modal-content">
-          <el-input v-model.trim="termDTO.termName" placeholder="Enter term name" clearable/>
+          <el-input v-model="termDTO.termName" placeholder="Enter term name" clearable/>
           <el-date-picker v-model="dateRange" type="datetimerange" range-separator="To"
                           start-placeholder="Start date" end-placeholder="End date" style="width:100%;"/>
           <div class="modal-content-switch">
@@ -940,10 +940,10 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
         <el-form ref="courseAddRef" :model="courseForm" label-width="220px" :rules="rules">
           <div class="modal-content">
             <el-form-item label="Course Number" prop="courseNum">
-              <el-input v-model.trim="courseForm.courseNum" placeholder="e.g. COMPSCI399"/>
+              <el-input v-model="courseForm.courseNum" placeholder="e.g. COMPSCI399"/>
             </el-form-item>
             <el-form-item label="Course Name" prop="courseName">
-              <el-input v-model.trim="courseForm.courseName" placeholder=""/>
+              <el-input v-model="courseForm.courseName" placeholder=""/>
             </el-form-item>
             <div style="display: flex">
               <el-form-item label="Can be preassigned" prop="canPreAssign" label-width="220px">
@@ -1085,12 +1085,12 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
             </el-form-item>
 
             <el-form-item label="Marker Deadline" prop="deadLine">
-              <el-date-picker v-model="courseForm.markerDeadLine" type="datetime"
+              <el-date-picker v-model="markerDeadLine" type="datetime"
                               placeholder="Pick a Date"/>
             </el-form-item>
 
             <el-form-item label="Tutor Deadline" prop="deadLine">
-              <el-date-picker v-model="courseForm.tutorDeadLine" type="datetime"
+              <el-date-picker v-model="tutorDeadLine" type="datetime"
                               placeholder="Pick a Date"/>
             </el-form-item>
           </div>
