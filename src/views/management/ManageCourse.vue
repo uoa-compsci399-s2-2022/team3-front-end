@@ -8,6 +8,12 @@ import ImportCourseTemplate from "@/components/ImportCourseTemplate.vue";
 import FullScreenManageCourse from "@/components/FullScreenManageCourse.vue";
 import {FullScreen} from '@element-plus/icons-vue'
 import {dateFormat, datetimeFormat} from "@/utils/datetimeFormat";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc"
+import timezone from "dayjs/plugin/timezone"
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 const fullScreenCourseVisible = ref(false);
 const importVisible = ref(false);
@@ -99,9 +105,9 @@ let editTerm = ref<any>(null)
 const handleTermEdit = (index: number, row: term) => {
   termEditModalOpened.value = true
   termDTO.termName = row.termName;
-  termDTO.startDate = row.startDate;
+  dateRange.value = [new Date(row.startDate) , new Date(row.endDate)];
   termDTO.isAvailable = row.isAvailable;
-  // termDTO.endDate = row.endDate;
+  defaultMarkerDeadLine.value = dayjs(row.defaultMarkerDeadLine).toISOString();
   // dateRange.value = [new Date(row.startDate), new Date(row.endDate)];
   // // if two deadline exists
   // if (row.defaultMarkerDeadLine && row.defaultTutorDeadLine) {
@@ -213,32 +219,26 @@ getTermList() // get term list
  * @description a varable which records the date range (Term start date and Term end date).
  */
 const dateRange = ref<[Date, Date]>();
-const defaultMarkerDeadLine = ref<any>();
-const defaultTutorDeadLine = ref<any>();
+const defaultMarkerDeadLine = ref<Date>();
+const defaultTutorDeadLine = ref<Date>();
 // 监听dateRange，当用户选择日期后，自动转换为yyyy-mm-dd格式 
 watch(dateRange, (date) => {
   if (date) {
-    termDTO.startDate = new Date(date![0]).toISOString().slice(0, 10)
-    termDTO.endDate = new Date(date![1]).toISOString().slice(0, 10)
+    termDTO.startDate = date[0].toISOString();
+    termDTO.endDate = date[1].toISOString();
   }
 })
 // defaultMarkerDeadLine改变时自动转换日期为正确的ISO格式
 watchDebounced(defaultMarkerDeadLine, (date) => {
   if (date) {
-    let ISOtime = new Date(date).getTime();
-    let localTimeOffset = new Date(date).getTimezoneOffset() * 60 * 1000
-    let localTime = ISOtime - localTimeOffset
-    termDTO.defaultMarkerDeadLine = new Date(localTime).toISOString()
+    termDTO.defaultMarkerDeadLine = defaultMarkerDeadLine.value.toISOString()
   }
 }, {debounce: 300, maxWait: 1000})
 
 // defaultMarkerDeadLine改变时自动转换日期为正确的ISO格式
 watchDebounced(defaultTutorDeadLine, (date) => {
   if (date) {
-    let ISOtime = new Date(date).getTime();
-    let localTimeOffset = new Date(date).getTimezoneOffset() * 60 * 1000
-    let localTime = ISOtime - localTimeOffset
-    termDTO.defaultTutorDeadLine = new Date(localTime).toISOString()
+    termDTO.defaultTutorDeadLine = defaultMarkerDeadLine.value.toISOString()
   }
 }, {debounce: 300, maxWait: 1000})
 
@@ -524,26 +524,20 @@ const handleCourseAdd = () => {
 /**
  * @description deaLine is a intermediate variable used to get the correct date form.
  */
-const markerDeadLine = ref<any>();
-const tutorDeadLine = ref<any>();
+const markerDeadLine = ref<Date>();
+const tutorDeadLine = ref<Date>();
 /**
  * @description gennerate correct Date form once the markerDeadLine has been changed
  */
 watchDebounced(markerDeadLine, (date) => {
   if (date) {
-    let ISOtime = new Date(date).getTime();
-    let localTimeOffset = new Date(date).getTimezoneOffset() * 60 * 1000
-    let localTime = ISOtime - localTimeOffset
-    courseForm.markerDeadLine = new Date(localTime).toISOString()
+    courseForm.markerDeadLine = date.toISOString()
   }
 }, {debounce: 300, maxWait: 1000})
 
 watchDebounced(tutorDeadLine, (date) => {
   if (date) {
-    let ISOtime = new Date(date).getTime();
-    let localTimeOffset = new Date(date).getTimezoneOffset() * 60 * 1000
-    let localTime = ISOtime - localTimeOffset
-    courseForm.tutorDeadLine = new Date(localTime).toISOString()
+    courseForm.tutorDeadLine = date.toISOString()
   }
 }, {debounce: 300, maxWait: 1000})
 /**
@@ -551,19 +545,19 @@ watchDebounced(tutorDeadLine, (date) => {
  */
 const courseForm = reactive<courseFormType>({
   needTutors: false,
-  estimatedNumOfStudents: '',
-  numOfTutorialsPerWeek: '',
+  estimatedNumOfStudents: null,
+  numOfTutorialsPerWeek: null,
   canPreAssign: false,
   termID: NaN,
-  numOfAssignments: '',
+  numOfAssignments: null,
   courseNum: '',
-  markerResponsibility: '',
+  markerResponsibility: null,
   courseName: '',
   tutorResponsibility: '',
-  numOfLabsPerWeek: '',
-  totalAvailableHours: '',
+  numOfLabsPerWeek: null,
+  totalAvailableHours: null,
   needMarkers: false,
-  currentlyNumOfStudents: '',
+  currentlyNumOfStudents: null,
   markerDeadLine: '',
   tutorDeadLine: '',
 })
@@ -622,7 +616,6 @@ const defaultRemovedCourseForm = (courseForm: courseFormType) => {
  * @description function for adding new course
  */
 const addCourse = async () => {
-  console.log(defaultRemovedCourseForm(courseForm));
   try {
     await post('api/courseManagement', defaultRemovedCourseForm(courseForm));
     await getCourseList();
@@ -678,19 +671,19 @@ const handleCourseDelete = (courseID: number) => {
  */
 const clearCourseForm = () => {
   courseForm.needTutors = false;
-  courseForm.estimatedNumOfStudents = '';
-  courseForm.numOfTutorialsPerWeek = '';
+  courseForm.estimatedNumOfStudents = null;
+  courseForm.numOfTutorialsPerWeek = null;
   courseForm.canPreAssign = false;
   courseForm.termID = NaN;
-  courseForm.numOfAssignments = '';
+  courseForm.numOfAssignments = null;
   courseForm.courseNum = '';
   courseForm.markerResponsibility = '';
   courseForm.courseName = '';
   courseForm.tutorResponsibility = '';
-  courseForm.numOfLabsPerWeek = '';
-  courseForm.totalAvailableHours = '';
+  courseForm.numOfLabsPerWeek = null;
+  courseForm.totalAvailableHours = null;
   courseForm.needMarkers = false;
-  courseForm.currentlyNumOfStudents = '';
+  courseForm.currentlyNumOfStudents = null;
   courseForm.markerDeadLine = '';
   courseForm.tutorDeadLine = '';
 }
@@ -750,8 +743,8 @@ let editCourse = ref<any>(null);
 const handleCourseEdit = (row: number) => {
   courseEditModalOpened.value = true;
   setCourseForm(row);
-  // markerDeadLine.value = new Date(courses.value[row].markerDeadLine);
-  // tutorDeadLine.value = new Date(courses.value[row].tutorDeadLine);
+  markerDeadLine.value = new Date(courses.value[row].markerDeadLine);
+  tutorDeadLine.value = new Date(courses.value[row].tutorDeadLine);
   const courseID = courses.value[row].courseID;
   return function () {
     put(`/api/courseManagement/${courseID}`, {data: courseForm}).then(() => {
@@ -876,8 +869,8 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
           </button>
         </div>
         <div class="modal-content">
-          <el-input v-model="termDTO.termName" placeholder="Enter term name" clearable/>
-          <el-date-picker v-model="dateRange" type="daterange" range-separator="To"
+          <el-input v-model.trim="termDTO.termName" placeholder="Enter term name" clearable/>
+          <el-date-picker v-model="dateRange" type="datetimerange" range-separator="To"
                           start-placeholder="Start date" end-placeholder="End date"/>
           <div class="modal-content-switch">
             <span>Is available to apply</span>
@@ -886,11 +879,10 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
                        inactive-text="N"/>
           </div>
           <el-date-picker v-model="defaultMarkerDeadLine" type="datetime"
-                          placeholder="Pick a Date for Marker deadline" style="width:100%;" format="YYYY/MM/DD HH:mm:ss"
-                          value-format="YYYY-MM-DDTHH:mm:ssZ"/>
+                          placeholder="Pick a Date for Marker deadline" style="width:100%;"/>
           <el-date-picker v-model="defaultTutorDeadLine" type="datetime"
-                          placeholder="Pick a Date for Tutor deadline" style="width:100%;" format="YYYY/MM/DD HH:mm:ss"
-                          value-format="YYYY-MM-DDTHH:mm:ssZ"/>
+                          placeholder="Pick a Date for Tutor deadline" style="width:100%;" format="DD-MM-YYYY HH:mm:ss"
+                          value-format="YYYY-MM-DDTHH:mm:ss"/>
         </div>
         <div class="modal-btns">
           <el-button type="primary" @click="handleTermAdd">Add</el-button>
@@ -912,20 +904,20 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
           </button>
         </div>
         <div class="modal-content">
-          <el-input v-model="termDTO.termName" placeholder="Enter term name" clearable/>
-          <el-date-picker v-model="dateRange" type="daterange" range-separator="To"
-                          start-placeholder="Start date" end-placeholder="End date"/>
+          <el-input v-model.trim="termDTO.termName" placeholder="Enter term name" clearable/>
+          <el-date-picker v-model="dateRange" type="datetimerange" range-separator="To"
+                          start-placeholder="Start date" end-placeholder="End date" />
           <div class="modal-content-switch">
             <span>Is available to apply</span>
             <el-switch v-model="termDTO.isAvailable" inline-prompt
                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-text="Y"
                        inactive-text="N"/>
           </div>
-          <el-date-picker v-model="termDTO.defaultMarkerDeadLine" type="datetime"
-                          placeholder="Pick a Date for Marker deadline" style="width:100%;" format="YYYY-MM-DDTHH:mm:ssZ"
+          <el-date-picker v-model="defaultMarkerDeadLine" type="datetime"
+                          placeholder="Pick a Date for Marker deadline" style="width:100%;" format="DD-MM-YYYY HH:mm:ss"
                           value-format="YYYY-MM-DDTHH:mm:ssZ"/>
-          <el-date-picker v-model="termDTO.defaultTutorDeadLine" type="datetime"
-                          placeholder="Pick a Date for Tutor deadline" style="width:100%;" format="YYYY-MM-DDTHH:mm:ssZ"
+          <el-date-picker v-model="defaultMarkerDeadLine" type="datetime"
+                          placeholder="Pick a Date for Tutor deadline" style="width:100%;" format="DD-MM-YYYY HH:mm:ss"
                           value-format="YYYY-MM-DDTHH:mm:ssZ"/>
         </div>
         <div class="modal-btns">
@@ -949,10 +941,10 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
         <el-form ref="courseAddRef" :model="courseForm" label-width="220px" :rules="rules">
           <div class="modal-content">
             <el-form-item label="Course Number" prop="courseNum">
-              <el-input v-model="courseForm.courseNum" placeholder="e.g. COMPSCI399"/>
+              <el-input v-model.trim="courseForm.courseNum" placeholder="e.g. COMPSCI399"/>
             </el-form-item>
             <el-form-item label="Course Name" prop="courseName">
-              <el-input v-model="courseForm.courseName" placeholder=""/>
+              <el-input v-model.trim="courseForm.courseName" placeholder=""/>
             </el-form-item>
             <div style="display: flex">
               <el-form-item label="Can be preassigned" prop="canPreAssign" label-width="220px">
@@ -1007,12 +999,10 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
             </el-form-item>
 
             <el-form-item label="Marker Deadline" prop="deadLine">
-              <el-date-picker v-model="markerDeadLine" type="datetime" placeholder="Pick a Date"
-                              format="YYYY/MM/DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ssZ"/>
+              <el-date-picker v-model="markerDeadLine" type="datetime" placeholder="Pick a Date"/>
             </el-form-item>
             <el-form-item label="Tutor Deadline" prop="deadLine">
-              <el-date-picker v-model="tutorDeadLine" type="datetime" placeholder="Pick a Date"
-                              format="YYYY/MM/DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ssZ"/>
+              <el-date-picker v-model="tutorDeadLine" type="datetime" placeholder="Pick a Date"/>
             </el-form-item>
           </div>
           <div class="modal-btns">
@@ -1062,29 +1052,29 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
               </el-form-item>
             </div>
             <el-form-item label="Estimated number of students" prop="estimatedNumOfStudents">
-              <el-input v-model.number="courseForm.estimatedNumOfStudents" placeholder=""/>
+              <el-input-number v-model.number="courseForm.estimatedNumOfStudents" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Current number of students" prop="currentlyNumOfStudents">
-              <el-input v-model.number="courseForm.currentlyNumOfStudents" placeholder=""/>
+              <el-input-number v-model.number="courseForm.currentlyNumOfStudents" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Number of Tutorials per week" prop="numOfTutorialsPerWeek">
-              <el-input v-model.number="courseForm.numOfTutorialsPerWeek" placeholder=""/>
+              <el-input-number v-model.number="courseForm.numOfTutorialsPerWeek" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Number of Labs per week" prop="numOfLabsPerWeek">
-              <el-input v-model.number="courseForm.numOfLabsPerWeek" placeholder=""/>
+              <el-input-number v-model.number="courseForm.numOfLabsPerWeek" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Number of assignments" prop="numOfAssignments">
-              <el-input v-model.number="courseForm.numOfAssignments" placeholder=""/>
+              <el-input-number v-model.number="courseForm.numOfAssignments" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Total available hours" prop="totalAvailableHours">
-              <el-input v-model.number="courseForm.totalAvailableHours" placeholder="">
+              <el-input-number v-model.number="courseForm.totalAvailableHours" placeholder="">
                 <template #append>hours</template>
-              </el-input>
+              </el-input-number>
             </el-form-item>
             <el-form-item label="Marker responsibility" prop="markerResponsibility">
               <el-input v-model="courseForm.markerResponsibility" autosize type="textarea"
@@ -1097,14 +1087,12 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
 
             <el-form-item label="Marker Deadline" prop="deadLine">
               <el-date-picker v-model="courseForm.markerDeadLine" type="datetime"
-                              placeholder="Pick a Date" format="YYYY/MM/DD HH:mm:ss"
-                              value-format="YYYY-MM-DDTHH:mm:ssZ"/>
+                              placeholder="Pick a Date"/>
             </el-form-item>
 
             <el-form-item label="Tutor Deadline" prop="deadLine">
               <el-date-picker v-model="courseForm.tutorDeadLine" type="datetime"
-                              placeholder="Pick a Date" format="YYYY/MM/DD HH:mm:ss"
-                              value-format="YYYY-MM-DDTHH:mm:ssZ"/>
+                              placeholder="Pick a Date"/>
             </el-form-item>
           </div>
           <div class="modal-btns">
@@ -1149,7 +1137,7 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
   align-items: center;
 
   .modal {
-    width: 400px;
+    width: 450px;
     padding: 15px 20px;
     padding-top: 0;
     background-color: white;

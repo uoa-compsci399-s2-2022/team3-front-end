@@ -39,19 +39,19 @@ interface Course {
 
 type courseFormType = {
     needTutors: boolean;
-    estimatedNumOfStudents: string | number;
-    numOfTutorialsPerWeek: string | number;
+    estimatedNumOfStudents: null | number;
+    numOfTutorialsPerWeek: null | number;
     canPreAssign: boolean;
     termID: number;
-    numOfAssignments: string | number;
+    numOfAssignments: null | number;
     courseNum: string;
     markerResponsibility: string;
     courseName: string;
     tutorResponsibility: string;
-    numOfLabsPerWeek: string | number;
-    totalAvailableHours: string | number;
+    numOfLabsPerWeek: null | number;
+    totalAvailableHours: null | number;
     needMarkers: boolean;
-    currentlyNumOfStudents: string | number;
+    currentlyNumOfStudents: null | number;
     markerDeadLine: string;
     tutorDeadLine: string;
 }
