@@ -37,11 +37,12 @@ const {
     },
 )
 
-
+const dashboardLoading = ref(false)
 const courseList = ref([] as any[])
 const semesterID = ref<any>()
 
 async function GetCourse(termID: Number) {
+  dashboardLoading.value = true
   semesterID.value=termID
   get('/api/getCurrentUserEnrollByTerm/' + termID).then(res => {
     courseList.value = []
@@ -58,10 +59,12 @@ async function GetCourse(termID: Number) {
         courseList.value.push(item)
       }
     })
+    dashboardLoading.value = false
   })
 }
 
 onBeforeMount(() => {
+  dashboardLoading.value = true
   noCourse.value = courseList.value.length == 0;
   executeCurrentTerm().then(() => {
     if (stateCurrentTerm.value === null || stateCurrentTerm.value === undefined || stateCurrentTerm.value.length === 0) {
@@ -105,7 +108,7 @@ watch(courseList, (courseList) => {
         </el-option-group>
       </el-select>
     </div>
-    <div>
+    <div v-loading="dashboardLoading">
       <div>
         <div class="course-container">
           <div v-for="item in courseList">
