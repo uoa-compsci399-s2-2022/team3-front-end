@@ -1117,7 +1117,7 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
     </div>
   </teleport>
 
-  <ImportCourseTemplate v-model:importVisible="importVisible" v-model:term="onSelect" v-model:termName="onSelectName"/>
+  <ImportCourseTemplate v-model:importVisible="importVisible" v-model:term="onSelect" v-model:termName="onSelectName" @getCourseList="getCourseList"/>
   <FullScreenManageCourse v-model:fullScreenCourseVisible="fullScreenCourseVisible" v-model:onSelectName="onSelectName"
                           v-model:searchCourse="searchCourse" v-model:importShowEvent="importShowEvent"
                           @handleCourseAdd="handleCourseAdd" v-model:filter-courses="filterCourses"

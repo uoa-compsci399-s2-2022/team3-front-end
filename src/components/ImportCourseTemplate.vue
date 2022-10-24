@@ -50,10 +50,14 @@ import {
 } from "element-plus";
 import {baseURL} from '@/utils/request';
 const props = defineProps(['importVisible', 'term', 'termName'])
-const emit = defineEmits(['update:importVisible', 'update:term', 'update:termName'])
+const emit = defineEmits(['update:importVisible', 'update:term', 'update:termName', 'getCourseList'])
 const file = ref<UploadUserFile[]>([])
 const header = ref({'Authorization': 'Bearer ' + localStorage.getItem('mtms_token')})
 const upload = ref<UploadInstance>()
+
+const getCourseList = () => {
+  emit('getCourseList')
+}
 const visibleSync = computed({
   get() {
     return props.importVisible as boolean
@@ -99,6 +103,7 @@ const handleSuccess = (response: any, file: UploadUserFile) => {
     response['message'].forEach((e: String) => {
       Notimessage += `<p>${e}</p>`
     })
+    getCourseList()
     ElNotification({
       title: 'Import Course Template Log',
       dangerouslyUseHTMLString: true,
@@ -109,6 +114,7 @@ const handleSuccess = (response: any, file: UploadUserFile) => {
     upload.value!.clearFiles()
     visibleSync.value = false
     uploadLoading.value = false
+
 }
 
 
