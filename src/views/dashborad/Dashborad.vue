@@ -108,7 +108,7 @@ watch(courseList, (courseList) => {
         </el-option-group>
       </el-select>
     </div>
-    <div v-loading="dashboardLoading">
+    <div v-loading.fullscreen.lock="dashboardLoading">
       <div>
         <div class="course-container">
           <div v-for="item in courseList">
