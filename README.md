@@ -1,5 +1,9 @@
 # MTMS Frontend
 
+<div align="center">
+	<img src="team-logo.png" alt="Editor" width="150">
+</div>
+
 Marker & Tutor Management System - One COMPSCI399 Project
 
 
@@ -80,6 +84,8 @@ Marker & Tutor Management System (MTMS) is an web based tool for managing enroll
 
 
 ## Installation for Development
+
+You need to deploy and start MTMS Backend First https://github.com/uoa-compsci399-s2-2022/team3-back-end
 
 Clone the repository to your PC
 
