@@ -107,7 +107,8 @@ const handleTermEdit = (index: number, row: term) => {
   termDTO.termName = row.termName;
   dateRange.value = [new Date(row.startDate) , new Date(row.endDate)];
   termDTO.isAvailable = row.isAvailable;
-  defaultMarkerDeadLine.value = dayjs(row.defaultMarkerDeadLine).toISOString();
+  defaultMarkerDeadLine.value = new Date(row.defaultMarkerDeadLine);
+  defaultTutorDeadLine.value = new Date(row.defaultTutorDeadLine);
   // dateRange.value = [new Date(row.startDate), new Date(row.endDate)];
   // // if two deadline exists
   // if (row.defaultMarkerDeadLine && row.defaultTutorDeadLine) {
@@ -871,7 +872,7 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
         <div class="modal-content">
           <el-input v-model.trim="termDTO.termName" placeholder="Enter term name" clearable/>
           <el-date-picker v-model="dateRange" type="datetimerange" range-separator="To"
-                          start-placeholder="Start date" end-placeholder="End date"/>
+                          start-placeholder="Start date" end-placeholder="End date" style="width:100%;"/>
           <div class="modal-content-switch">
             <span>Is available to apply</span>
             <el-switch v-model="termDTO.isAvailable" inline-prompt
@@ -906,7 +907,7 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
         <div class="modal-content">
           <el-input v-model.trim="termDTO.termName" placeholder="Enter term name" clearable/>
           <el-date-picker v-model="dateRange" type="datetimerange" range-separator="To"
-                          start-placeholder="Start date" end-placeholder="End date" />
+                          start-placeholder="Start date" end-placeholder="End date" style="width:100%;"/>
           <div class="modal-content-switch">
             <span>Is available to apply</span>
             <el-switch v-model="termDTO.isAvailable" inline-prompt
@@ -914,11 +915,9 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
                        inactive-text="N"/>
           </div>
           <el-date-picker v-model="defaultMarkerDeadLine" type="datetime"
-                          placeholder="Pick a Date for Marker deadline" style="width:100%;" format="DD-MM-YYYY HH:mm:ss"
-                          value-format="YYYY-MM-DDTHH:mm:ssZ"/>
+                          placeholder="Pick a Date for Marker deadline" style="width:100%;"/>
           <el-date-picker v-model="defaultMarkerDeadLine" type="datetime"
-                          placeholder="Pick a Date for Tutor deadline" style="width:100%;" format="DD-MM-YYYY HH:mm:ss"
-                          value-format="YYYY-MM-DDTHH:mm:ssZ"/>
+                          placeholder="Pick a Date for Tutor deadline" style="width:100%;"/>
         </div>
         <div class="modal-btns">
           <el-button type="primary" @click="editTerm">Edit</el-button>
