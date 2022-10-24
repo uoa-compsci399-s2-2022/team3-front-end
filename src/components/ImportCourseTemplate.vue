@@ -11,6 +11,7 @@
         :limit="1"
         :on-exceed="handleExceed"
         :on-success="handleSuccess"
+        :on-error="handleError"
         v-model:file-list="file"
         drag>
       <el-icon class="el-icon--upload"><upload-filled /></el-icon>
@@ -115,6 +116,16 @@ const handleSuccess = (response: any, file: UploadUserFile) => {
     visibleSync.value = false
     uploadLoading.value = false
 
+}
+
+const handleError = (err: Error, file: UploadUserFile) => {
+  getCourseList()
+  ElMessage({
+    message: err.message,
+    type: 'error'
+  })
+  upload.value!.clearFiles()
+  uploadLoading.value = false
 }
 
 
