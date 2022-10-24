@@ -8,7 +8,7 @@
         </template>
       </el-popconfirm>
     </div>
-    <el-table :data="stateSend" style="width: 100%" lazy>
+    <el-table :data="stateSend" style="width: 100%" :default-sort="{ prop: 'createdDateTime', order: 'descending' }" lazy>
       <el-table-column type="expand">
         <template #default="props">
           <el-descriptions
@@ -26,7 +26,10 @@
               {{ props.row.receiver_name }}
             </el-descriptions-item>
             <el-descriptions-item label="Receiver Groups">
-              {{ props.row.receiver_groups }}
+              <el-tag v-for="g in props.row.receiver_groups">
+                {{ g }}
+              </el-tag>
+
             </el-descriptions-item>
             <el-descriptions-item label="Receiver UPI">
               {{ props.row.receiver_upi }}
@@ -63,7 +66,7 @@
         { text: 'Invite User', value: 'invite_user' },
         { text: 'Application Result', value: 'application_result' },
       ]" :filter-method="filterHandler"/>
-      <el-table-column label="Send Date">
+      <el-table-column label="Send Date" prop="createdDateTime" sortable>
         <template #default="scope">
           {{ datetimeFormat(scope.row.createdDateTime) }}
         </template>

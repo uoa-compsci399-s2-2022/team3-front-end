@@ -31,8 +31,15 @@
         </el-row>
 
         <el-table v-loading="isLoadingUser" ref="singleTableRef" :data="stateUser" highlight-current-row
-                  style="width: 100%">
+                  style="width: 100%" :default-sort="{ prop: 'isPublished', order: 'descending' }">
           <el-table-column property="id" label="ID" width="100"/>
+          <el-table-column property="isPublished" label="Publish">
+            <template #default="scope">
+              <el-tag :type="scope.row.isPublished? 'success':'warning'">
+                {{ scope.row.isPublished }}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column property="email" label="Email" width="230"/>
           <el-table-column property="name" label="Name"/>
           <el-table-column label="Position" width="150">

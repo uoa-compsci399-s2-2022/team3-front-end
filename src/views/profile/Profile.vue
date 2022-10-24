@@ -54,7 +54,7 @@ getUserProfile()
 const fieldsToChange = ref<Array<keyof profileType>>([])
 
 type profileType = {
-  name: string;
+    name: string;
     email: string;
     upi: string;
     auid: string;
@@ -609,9 +609,9 @@ const previewCV = async () => {
                                 <el-select v-model="changeProfileDTO.studentDegree">
                                   <el-option
                                       v-for="item in degreeOptions"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value"
+                                      :key="item.value"
+                                      :label="item.label"
+                                      :value="item.value"
                                   />
                                   </el-select>
                             </el-form-item>

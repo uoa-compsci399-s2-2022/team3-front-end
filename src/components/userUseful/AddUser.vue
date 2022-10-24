@@ -68,7 +68,6 @@ const groups = ref([] as Group[])
 const form = reactive({} as User)
 
 get('api/groups').then((res) => {
-  console.log(res)
   groups.value = res;
 })
 

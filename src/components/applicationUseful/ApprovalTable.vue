@@ -765,7 +765,6 @@ async function getTranscript(applicationID: any) {
   loadingTranscript.value = true
   let transcriptBase64 = await get('api/ApplicationTranscript/' + applicationID);
   // let blob = base64ToBlob(transcriptBase64.application)
-  console.log(transcriptBase64)
   let blob = base64ToBlob(transcriptBase64.applicationTranscript);
   let bloburl = window.URL.createObjectURL(blob);
   window.open(bloburl);

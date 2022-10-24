@@ -27,6 +27,12 @@ const items: sidebarMenu = [
     permission: '1',
   },
   {
+    icon: "Collection",
+    index: "/courseList",
+    title: "Course List",
+    permission: "1",
+  },
+  {
     icon: 'Document',
     index: '/applicationlist',
     title: 'Application List',
@@ -37,12 +43,6 @@ const items: sidebarMenu = [
     index: '/applicationapproval',
     title: 'Application Approval',
     permission: '5',
-  },
-  {
-    icon: "Collection",
-    index: "/courseList",
-    title: "Course List",
-    permission: "1",
   },
   {
     icon: "MessageBox",

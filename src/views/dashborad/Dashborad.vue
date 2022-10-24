@@ -62,6 +62,7 @@ async function GetCourse(termID: Number) {
 }
 
 onBeforeMount(() => {
+  noCourse.value = courseList.value.length == 0;
   executeCurrentTerm().then(() => {
     if (stateCurrentTerm.value === null || stateCurrentTerm.value === undefined || stateCurrentTerm.value.length === 0) {
       noCourse.value = true
@@ -117,7 +118,7 @@ watch(courseList, (courseList) => {
 
       <div v-permission="2">
         <div class="working-hour-card-wrapper">
-          <WorkingHourCard v-model:termID="value_semester" v-show="!noCourse"/>
+          <WorkingHourCard v-model:termID="value_semester" v-if="!noCourse"/>
         </div>
       </div>
     </div>

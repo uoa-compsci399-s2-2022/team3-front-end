@@ -20,7 +20,7 @@
         <el-alert title="Tips: Rows in the table can be expanded or clicked" type="info" show-icon/>
       </el-col>
       <el-col style="text-align: end" :md="3">
-        <el-badge :value="stateNum.unpublished" type="primary" v-loading="isLoadingNum">
+        <el-badge :value="stateNum.unpublished" type="primary" :loading="isLoadingNum">
           <el-button type="success" size="large" @click="publishEvent">
             <font-awesome-icon style="margin-right: 4px; font-size: 20px" icon="fa-solid fa-bullhorn"/>
             Publish
@@ -242,7 +242,6 @@ const getApplicationApprovalList = () => {
     executeNum()
     if (selectedTab.value === '0') {
       executePendingApplication().then((res) => {
-        console.log(res)
       }).catch((err) => {
         console.log(err)
       })

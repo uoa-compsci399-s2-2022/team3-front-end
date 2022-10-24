@@ -28,24 +28,34 @@
       <el-table-column label="ID" prop="id"/>
       <el-table-column label="Email" prop="email"/>
       <el-table-column label="Name" prop="name"/>
-      <el-table-column label="Groups" prop="groups"/>
+      <el-table-column label="Groups" prop="groups"
+                       :filters="[
+                          { text: 'Admin', value: 'admin' },
+                          { text: 'Tutor Coordinator', value: 'tutorCoordinator' },
+                          { text: 'Marker Coordinator', value: 'markerCoordinator' },
+                          { text: 'Course Coordinator', value: 'courseCoordinator' },
+                          { text: 'Student', value: 'student' },
+                        ]"
+                       :filter-method="filterListHandler"
+                       :filter-multiple="false"
+      />
       <el-table-column align="right">
         <template #header>
-          <el-input v-model="search" size="small" placeholder="Type to search"/>
+          <el-input v-model="search" placeholder="Type to search user"/>
         </template>
         <template #default="scope">
           <div v-permission="5">
-          <el-button size="small" @click="handleEdit(scope.$index, scope.row)"
-          >Edit
-          </el-button
-          >
-          <el-button
-              size="small"
-              type="danger"
-              @click="handleDelete(scope.$index, scope.row)"
-          >Delete
-          </el-button
-          >
+            <el-button size="small" @click="handleEdit(scope.$index, scope.row)"
+            >Edit
+            </el-button
+            >
+            <el-button
+                size="small"
+                type="danger"
+                @click="handleDelete(scope.$index, scope.row)"
+            >Delete
+            </el-button
+            >
           </div>
         </template>
       </el-table-column>
@@ -83,6 +93,7 @@ import AddUser from '@/components/userUseful/AddUser.vue'
 import EditUser from '@/components/userUseful/EditUser.vue'
 import {ElMessage} from 'element-plus'
 import {useRouter, useRoute} from "vue-router";
+import {TableColumnCtx} from "element-plus/es/components/table/src/table-column/defaults";
 
 const router = useRouter()
 const route = useRoute()
@@ -104,6 +115,15 @@ const showAddUser = () => {
   addUserVisible.visible = true
 }
 
+const filterListHandler = (
+    value: string,
+    row: User,
+    column: TableColumnCtx<User>
+) => {
+  const property = column['property']
+  return row[property].includes(value)
+}
+
 
 interface User {
   id: string
@@ -118,7 +138,9 @@ const filterTableData = computed(() =>
     tableData.value.filter(
         (data) =>
             !search.value ||
-            data.id.toLowerCase().includes(search.value.toLowerCase())
+            data.id.toLowerCase().includes(search.value.toLowerCase()) ||
+            (data.email && data.email.toLowerCase().includes(search.value.toLowerCase())) ||
+            (data.name && data.name.toLowerCase().includes(search.value.toLowerCase()))
     )
 )
 const handleEdit = (index: number, row: User) => {
@@ -152,6 +174,7 @@ const deleteUser = () => {
 const tableData = ref([] as User[])
 
 const getUser = () => {
+  tableLoading.value = true
   get('api/users').then((res) => {
     tableData.value = []
     res.forEach((e: User) => {
@@ -237,7 +260,8 @@ onBeforeMount(() => {
 .page-container {
   margin: 30px 30px;
 }
-.header-toolbar{
+
+.header-toolbar {
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
