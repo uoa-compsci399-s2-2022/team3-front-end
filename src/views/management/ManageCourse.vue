@@ -744,8 +744,12 @@ let editCourse = ref<any>(null);
 const handleCourseEdit = (row: number) => {
   courseEditModalOpened.value = true;
   setCourseForm(row);
-  markerDeadLine.value = new Date(courses.value[row].markerDeadLine);
-  tutorDeadLine.value = new Date(courses.value[row].tutorDeadLine);
+  if (courses.value[row].markerDeadLine) {
+    markerDeadLine.value = new Date(courses.value[row].markerDeadLine);
+  }
+  if (courses.value[row].tutorDeadLine) {
+    tutorDeadLine.value = new Date(courses.value[row].tutorDeadLine);
+  }
   const courseID = courses.value[row].courseID;
   return function () {
     put(`/api/courseManagement/${courseID}`, {data: courseForm}).then(() => {
