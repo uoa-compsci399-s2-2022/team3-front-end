@@ -97,13 +97,13 @@ onBeforeMount(() => {
 <template>
   <section>
 
-    <div class="title" v-loading="!$route.name" v-if="$route.name==='course-coordinator' || $route.name==='tutor-marker'" @click="sidebar.handleCollase()">
+    <div class="title" v-loading="!$route.name" v-show="$route.name==='course-coordinator' || $route.name==='tutor-marker'" @click="sidebar.handleCollase()">
       <el-icon class="expand-sidebar">
         <Expand/>
       </el-icon>
       {{ role }} - {{ courseNum }}
     </div>
-    <div class="title" v-else @click="sidebar.handleCollase()">
+    <div class="title" v-show="!($route.name==='course-coordinator' || $route.name==='tutor-marker')" @click="sidebar.handleCollase()">
       <el-icon class="expand-sidebar">
         <Expand/>
       </el-icon>
