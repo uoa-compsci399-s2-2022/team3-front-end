@@ -972,29 +972,29 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
               </el-form-item>
             </div>
             <el-form-item label="Estimated number of students" prop="estimatedNumOfStudents">
-              <el-input v-model.number="courseForm.estimatedNumOfStudents" placeholder=""/>
+              <el-input-number v-model.number="courseForm.estimatedNumOfStudents" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Current number of students" prop="currentlyNumOfStudents">
-              <el-input v-model.number="courseForm.currentlyNumOfStudents" placeholder=""/>
+              <el-input-number v-model.number="courseForm.currentlyNumOfStudents" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Number of Tutorials per week" prop="numOfTutorialsPerWeek">
-              <el-input v-model.number="courseForm.numOfTutorialsPerWeek" placeholder=""/>
+              <el-input-number v-model.number="courseForm.numOfTutorialsPerWeek" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Number of Labs per week" prop="numOfLabsPerWeek">
-              <el-input v-model.number="courseForm.numOfLabsPerWeek" placeholder=""/>
+              <el-input-number v-model.number="courseForm.numOfLabsPerWeek" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Number of assignments" prop="numOfAssignments">
-              <el-input v-model.number="courseForm.numOfAssignments" placeholder=""/>
+              <el-input-number v-model.number="courseForm.numOfAssignments" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Total available hours" prop="totalAvailableHours">
-              <el-input v-model.number="courseForm.totalAvailableHours" placeholder="">
+              <el-input-number v-model.number="courseForm.totalAvailableHours" placeholder="">
                 <template #append>hours</template>
-              </el-input>
+              </el-input-number>
             </el-form-item>
 
             <el-form-item label="Marker responsibility" prop="markerResponsibility">

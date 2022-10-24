@@ -157,63 +157,63 @@
              v-loading="editCourseLoading">
     <div class="modal-container">
       <div class="course-modal">
-        <el-form ref="courseEditRef" :model="courseForm" label-width="220px">
+        <el-form ref="courseEditRef" :model="courseCCForm" label-width="220px">
           <div class="modal-content">
             <el-form-item label="Course Name" prop="courseName">
-              <el-input v-model="courseForm.courseName" placeholder=""/>
+              <el-input v-model="courseCCForm.courseName" placeholder=""/>
             </el-form-item>
             <el-row>
               <el-form-item label="Can be preassigned" prop="canPreAssign" label-width="220px">
-                <el-switch v-model="courseForm.canPreAssign" class="ml-2" inline-prompt
+                <el-switch v-model="courseCCForm.canPreAssign" class="ml-2" inline-prompt
                            style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
                            active-text="Y" inactive-text="N"/>
               </el-form-item>
               <el-form-item label="Need markers" prop="needMarkers" label-width="150px">
-                <el-switch v-model="courseForm.needMarkers" class="ml-2" inline-prompt
+                <el-switch v-model="courseCCForm.needMarkers" class="ml-2" inline-prompt
                            style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
                            active-text="Y" inactive-text="N"/>
               </el-form-item>
               <el-form-item label="Need tutors" prop="needTutors" label-width="150px">
-                <el-switch v-model="courseForm.needTutors" class="ml-2" inline-prompt
+                <el-switch v-model="courseCCForm.needTutors" class="ml-2" inline-prompt
                            style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
                            active-text="Y" inactive-text="N"/>
               </el-form-item>
             </el-row>
             <el-form-item label="Estimated number of students" prop="estimatedNumOfStudents">
-              <el-input v-model.number="courseForm.estimatedNumOfStudents" placeholder=""/>
+              <el-input-number v-model.number="courseCCForm.estimatedNumOfStudents" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Current number of students" prop="currentlyNumOfStudents">
-              <el-input v-model.number="courseForm.currentlyNumOfStudents" placeholder=""/>
+              <el-input-number v-model.number="courseCCForm.currentlyNumOfStudents" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Number of Tutorials per week" prop="numOfTutorialsPerWeek">
-              <el-input v-model.number="courseForm.numOfTutorialsPerWeek" placeholder=""/>
+              <el-input-number v-model.number="courseCCForm.numOfTutorialsPerWeek" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Number of Labs per week" prop="numOfLabsPerWeek">
-              <el-input v-model.number="courseForm.numOfLabsPerWeek" placeholder=""/>
+              <el-input-number v-model.number="courseCCForm.numOfLabsPerWeek" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Number of assignments" prop="numOfAssignments">
-              <el-input v-model.number="courseForm.numOfAssignments" placeholder=""/>
+              <el-input-number v-model.number="courseCCForm.numOfAssignments" placeholder=""/>
             </el-form-item>
 
             <el-form-item label="Total available hours" prop="totalAvailableHours">
-              <el-input v-model.number="courseForm.totalAvailableHours" placeholder="">
+              <el-input-number v-model.number="courseCCForm.totalAvailableHours" placeholder="">
                 <template #append>hours</template>
-              </el-input>
+              </el-input-number>
             </el-form-item>
             <el-form-item label="Prerequisite" prop="prerequisite">
-              <el-input v-model="courseForm.prerequisite" autosize type="textarea"
+              <el-input v-model="courseCCForm.prerequisite" autosize type="textarea"
                         placeholder="Please input"/>
             </el-form-item>
             <el-form-item label="Marker responsibility" prop="markerResponsibility">
-              <el-input v-model="courseForm.markerResponsibility" autosize type="textarea"
+              <el-input v-model="courseCCForm.markerResponsibility" autosize type="textarea"
                         placeholder="Please input"/>
             </el-form-item>
             <el-form-item label="Tutor responsibility" prop="tutorResponsibility">
-              <el-input v-model="courseForm.tutorResponsibility" autosize type="textarea"
+              <el-input v-model="courseCCForm.tutorResponsibility" autosize type="textarea"
                         placeholder="Please input"/>
             </el-form-item>
           </div>
@@ -320,34 +320,34 @@ const courseEditModalOpened = ref(false);
 
 type courseFormCCType = {
   needTutors: boolean;
-  estimatedNumOfStudents: string | number;
-  numOfTutorialsPerWeek: string | number;
+  estimatedNumOfStudents: null | number;
+  numOfTutorialsPerWeek: null | number;
   canPreAssign: boolean;
-  numOfAssignments: string | number;
+  numOfAssignments: null | number;
   markerResponsibility: string;
   courseName: string;
   tutorResponsibility: string;
-  numOfLabsPerWeek: string | number;
-  totalAvailableHours: string | number;
+  numOfLabsPerWeek: null | number;
+  totalAvailableHours: null | number;
   needMarkers: boolean;
-  currentlyNumOfStudents: string | number;
+  currentlyNumOfStudents: null | number;
   prerequisite: string;
 }
 
 
-const courseForm = reactive<courseFormCCType>({
+const courseCCForm = reactive<courseFormCCType>({
   needTutors: false,
-  estimatedNumOfStudents: '',
-  numOfTutorialsPerWeek: '',
+  estimatedNumOfStudents: null,
+  numOfTutorialsPerWeek: null,
   canPreAssign: false,
-  numOfAssignments: '',
+  numOfAssignments: null,
   markerResponsibility: '',
   courseName: '',
   tutorResponsibility: '',
-  numOfLabsPerWeek: '',
-  totalAvailableHours: '',
+  numOfLabsPerWeek: null,
+  totalAvailableHours: null,
   needMarkers: false,
-  currentlyNumOfStudents: '',
+  currentlyNumOfStudents: null,
   prerequisite: '',
 })
 
@@ -356,7 +356,7 @@ const editCourseLoading = ref(false)
 
 const handleCourseEdit = () => {
   editCourseLoading.value = true;
-  put(`/api/courseManagement/${route.params.courseId}`, {data: courseForm}).then(() => {
+  put(`/api/courseManagement/${route.params.courseId}`, {data: courseCCForm}).then(() => {
     getCourseInfo();
   }).then(() => {
     courseEditModalOpened.value = false;
@@ -385,20 +385,19 @@ const handleCourseEdit = () => {
 const getCourseInfo = () => {
   get('api/getCourse/' + route.params.courseId).then((res) => {
     courseInformation.value = res
-
-    courseForm.needTutors = res.needTutors
-    courseForm.estimatedNumOfStudents = res.estimatedNumOfStudents
-    courseForm.numOfTutorialsPerWeek = res.numOfTutorialsPerWeek
-    courseForm.canPreAssign = res.canPreAssign
-    courseForm.numOfAssignments = res.numOfAssignments
-    courseForm.markerResponsibility = res.markerResponsibility
-    courseForm.courseName = res.courseName
-    courseForm.tutorResponsibility = res.tutorResponsibility
-    courseForm.numOfLabsPerWeek = res.numOfLabsPerWeek
-    courseForm.totalAvailableHours = res.totalAvailableHours
-    courseForm.needMarkers = res.needMarkers
-    courseForm.currentlyNumOfStudents = res.currentlyNumOfStudents
-    courseForm.prerequisite = res.prerequisite
+    courseCCForm.needTutors = res.needTutors
+    courseCCForm.estimatedNumOfStudents = res.estimatedNumOfStudents
+    courseCCForm.numOfTutorialsPerWeek = res.numOfTutorialsPerWeek
+    courseCCForm.canPreAssign = res.canPreAssign
+    courseCCForm.numOfAssignments = res.numOfAssignments
+    courseCCForm.markerResponsibility = res.markerResponsibility
+    courseCCForm.courseName = res.courseName
+    courseCCForm.tutorResponsibility = res.tutorResponsibility
+    courseCCForm.numOfLabsPerWeek = res.numOfLabsPerWeek
+    courseCCForm.totalAvailableHours = res.totalAvailableHours
+    courseCCForm.needMarkers = res.needMarkers
+    courseCCForm.currentlyNumOfStudents = res.currentlyNumOfStudents
+    courseCCForm.prerequisite = res.prerequisite
 
   })
 }
