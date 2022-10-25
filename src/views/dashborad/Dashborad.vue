@@ -6,6 +6,7 @@ import {Collection, Document, User, Guide, DocumentChecked} from '@element-plus/
 import {onBeforeMount, ref, watch} from "vue";
 import {get} from "@/utils/request";
 import {useAsyncState} from "@vueuse/core";
+import {ElMessage} from "element-plus";
 
 const value = ref('1')
 const value_semester = ref<number>()
@@ -43,21 +44,26 @@ const semesterID = ref<any>()
 
 async function GetCourse(termID: Number) {
   dashboardLoading.value = true
-  semesterID.value=termID
+  semesterID.value = termID
   get('/api/getCurrentUserEnrollByTerm/' + termID).then(res => {
     courseList.value = []
     res.forEach((item: any) => {
       if (item.roleName === 'courseCoordinator') {
         item.path = `course-coordinator/${item.courseID}`
         courseList.value.push(item)
-      } else if ((item.roleName === 'tutor')||(item.roleName === 'marker') ){
+      } else if ((item.roleName === 'tutor') || (item.roleName === 'marker')) {
         item.path = `tutor-marker/${item.courseID}/${semesterID.value}`
         courseList.value.push(item)
-      }
-      else {
-        item.path =`/`
+      } else {
+        item.path = `/`
         courseList.value.push(item)
       }
+    })
+    dashboardLoading.value = false
+  }).catch((err) => {
+    ElMessage({
+      type: 'error',
+      message: err.response.data.message,
     })
     dashboardLoading.value = false
   })
@@ -69,10 +75,17 @@ onBeforeMount(() => {
   executeCurrentTerm().then(() => {
     if (stateCurrentTerm.value === null || stateCurrentTerm.value === undefined || stateCurrentTerm.value.length === 0) {
       noCourse.value = true
+      dashboardLoading.value = false
       return
     }
     value_semester.value = stateCurrentTerm.value[0].termID
     GetCourse(value_semester.value)
+  }).catch((err) => {
+    ElMessage({
+      type: 'error',
+      message: err.response.data.message,
+    })
+    dashboardLoading.value = false
   })
   executeTerm()
 })
@@ -86,99 +99,101 @@ watch(courseList, (courseList) => {
 
 </script>
 <template>
-  <div class="page-container">
-    <div>
-      <el-select placeholder="Select Term" v-model="value_semester" v-loading="isLoadingTerm" no-data-text="No Term">
-        <el-option-group label="Current Terms">
-          <el-option
-              v-for="item in stateCurrentTerm"
-              :key="item.termID"
-              :label="item.termName"
-              :value="item.termID"
-              @click="GetCourse(value_semester)"
-          />
-        </el-option-group>
-        <el-option-group label="Your Terms">
-          <el-option
-              v-for="item in stateTerm"
-              :key="item.termID"
-              :label="item.termName"
-              :value="item.termID"
-              @click="GetCourse(value_semester)"/>
-        </el-option-group>
-      </el-select>
-    </div>
-    <div v-loading.fullscreen.lock="dashboardLoading">
+  <div v-loading="dashboardLoading">
+    <div class="page-container">
       <div>
-        <div class="course-container">
-          <div v-for="item in courseList">
-            <router-link :to="{path:item.path, query:{role:item.roleName,termID:semesterID.value}}">
-              <CourseCard :course="item"/>
-            </router-link>
+        <el-select placeholder="Select Term" v-model="value_semester" v-loading="isLoadingTerm" no-data-text="No Term">
+          <el-option-group label="Current Terms">
+            <el-option
+                v-for="item in stateCurrentTerm"
+                :key="item.termID"
+                :label="item.termName"
+                :value="item.termID"
+                @click="GetCourse(value_semester)"
+            />
+          </el-option-group>
+          <el-option-group label="Your Terms">
+            <el-option
+                v-for="item in stateTerm"
+                :key="item.termID"
+                :label="item.termName"
+                :value="item.termID"
+                @click="GetCourse(value_semester)"/>
+          </el-option-group>
+        </el-select>
+      </div>
+      <div>
+        <div>
+          <div class="course-container">
+            <div v-for="item in courseList">
+              <router-link :to="{path:item.path, query:{role:item.roleName,termID:semesterID.value}}">
+                <CourseCard :course="item"/>
+              </router-link>
+            </div>
+          </div>
+        </div>
+
+        <div v-permission="2">
+          <div class="working-hour-card-wrapper">
+            <WorkingHourCard v-model:termID="value_semester" v-if="!noCourse"/>
           </div>
         </div>
       </div>
-
-      <div v-permission="2">
-        <div class="working-hour-card-wrapper">
-          <WorkingHourCard v-model:termID="value_semester" v-if="!noCourse"/>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <div v-show="noCourse">
-    <br/>
-    <el-row justify="center" style="color: #acb9c6">There are no courses enrolled in the term</el-row>
-    <br/>
-    <div class="center-button-group">
-      <div class="button-wrapper" v-permission="1">
-        <el-button @click="$router.push('courseList')" class="big-button" type="primary" plain>
-          <el-icon :size="90">
-            <Collection/>
-          </el-icon>
-          Browse Courses
-        </el-button>
-      </div>
-      <div class="button-wrapper" v-permission="2">
-        <el-button @click="$router.push('applicationlist')" class="big-button" type="primary" plain>
-          <el-icon :size="90">
-            <Document/>
-          </el-icon>
-          Start Applications
-        </el-button>
-      </div>
-      <div class="button-wrapper" v-permission="3">
-        <el-button @click="$router.push('manageuser')" class="big-button" type="primary" plain>
-          <el-icon :size="90">
-            <User/>
-          </el-icon>
-          Manage Users
-        </el-button>
-      </div>
-      <div class="button-wrapper" v-permission="5">
-        <el-button @click="$router.push('managecourse')" class="big-button" type="primary" plain>
-          <el-icon :size="90">
-            <Collection/>
-          </el-icon>
-          Manage Courses
-        </el-button>
-      </div>
-      <div class="button-wrapper" v-permission="5">
-        <el-button @click="$router.push('manageEnrolment')" class="big-button" type="primary" plain>
-          <el-icon :size="90">
-            <Guide/>
-          </el-icon>
-          Manage Enrolment
-        </el-button>
-      </div>
-      <div class="button-wrapper" v-permission="5">
-        <el-button @click="$router.push('applicationapproval')" class="big-button" type="primary" plain>
-          <el-icon :size="90">
-            <DocumentChecked/>
-          </el-icon>
-          Application Approval
-        </el-button>
+    <div v-show="noCourse">
+      <br/>
+      <el-row justify="center" style="color: #acb9c6">There are no courses enrolled in the term</el-row>
+      <br/>
+      <div class="center-button-group">
+        <div class="button-wrapper" v-permission="1">
+          <el-button @click="$router.push('courseList')" class="big-button" type="primary" plain>
+            <el-icon :size="90">
+              <Collection/>
+            </el-icon>
+            Browse Courses
+          </el-button>
+        </div>
+        <div class="button-wrapper" v-permission="2">
+          <el-button @click="$router.push('applicationlist')" class="big-button" type="primary" plain>
+            <el-icon :size="90">
+              <Document/>
+            </el-icon>
+            Start Applications
+          </el-button>
+        </div>
+        <div class="button-wrapper" v-permission="3">
+          <el-button @click="$router.push('manageuser')" class="big-button" type="primary" plain>
+            <el-icon :size="90">
+              <User/>
+            </el-icon>
+            Manage Users
+          </el-button>
+        </div>
+        <div class="button-wrapper" v-permission="5">
+          <el-button @click="$router.push('managecourse')" class="big-button" type="primary" plain>
+            <el-icon :size="90">
+              <Collection/>
+            </el-icon>
+            Manage Courses
+          </el-button>
+        </div>
+        <div class="button-wrapper" v-permission="5">
+          <el-button @click="$router.push('manageEnrolment')" class="big-button" type="primary" plain>
+            <el-icon :size="90">
+              <Guide/>
+            </el-icon>
+            Manage Enrolment
+          </el-button>
+        </div>
+        <div class="button-wrapper" v-permission="5">
+          <el-button @click="$router.push('applicationapproval')" class="big-button" type="primary" plain>
+            <el-icon :size="90">
+              <DocumentChecked/>
+            </el-icon>
+            Application Approval
+          </el-button>
+        </div>
       </div>
     </div>
   </div>
@@ -243,7 +258,6 @@ a {
     display: none;
   }
 }
-
 
 
 </style>
