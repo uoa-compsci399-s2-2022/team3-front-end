@@ -1406,6 +1406,7 @@ const applicationLimitGlobalChange = () => {
     @media (max-width: 540px) {
       .manage-course-subtitle {
         flex-direction: column;
+        align-items: unset;
         row-gap: 10px;
 
         .el-input {
