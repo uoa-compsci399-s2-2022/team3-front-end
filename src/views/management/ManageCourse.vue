@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import {Delete, get, post, put} from '@/utils/request';
 import {ElButton, ElMessage, ElPopconfirm, FormInstance, FormRules, TableV2FixedDir} from 'element-plus';
-import {computed, reactive, Ref, ref, watch} from 'vue'
+import {computed, onBeforeMount, reactive, Ref, ref, watch} from 'vue'
 import type {Column} from 'element-plus'
 import {watchDebounced} from '@vueuse/core';
 import ImportCourseTemplate from "@/components/ImportCourseTemplate.vue";
@@ -11,6 +11,9 @@ import {dateFormat, datetimeFormat} from "@/utils/datetimeFormat";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
+import {useRouter} from "vue-router";
+
+const router = useRouter()
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -57,6 +60,8 @@ type term = {
   defaultMarkerDeadLine: string;
   defaultTutorDeadLine: string;
   payday: Array<any>;
+  markerApplicationLimit: number;
+  tutorApplicationLimit: number;
 }
 
 /**
@@ -105,10 +110,12 @@ let editTerm = ref<any>(null)
 const handleTermEdit = (index: number, row: term) => {
   termEditModalOpened.value = true
   termDTO.termName = row.termName;
-  dateRange.value = [new Date(row.startDate) , new Date(row.endDate)];
+  dateRange.value = [new Date(row.startDate), new Date(row.endDate)];
   termDTO.isAvailable = row.isAvailable;
   defaultMarkerDeadLine.value = new Date(row.defaultMarkerDeadLine);
   defaultTutorDeadLine.value = new Date(row.defaultTutorDeadLine);
+  termDTO.markerApplicationLimit = row.markerApplicationLimit;
+  termDTO.tutorApplicationLimit = row.tutorApplicationLimit;
   // dateRange.value = [new Date(row.startDate), new Date(row.endDate)];
   // // if two deadline exists
   // if (row.defaultMarkerDeadLine && row.defaultTutorDeadLine) {
@@ -254,6 +261,8 @@ const termDTO = reactive<term>({
   defaultMarkerDeadLine: "",
   defaultTutorDeadLine: "",
   payday: [],
+  markerApplicationLimit: 2,
+  tutorApplicationLimit: 2,
 })
 
 
@@ -278,6 +287,8 @@ const handleTermAdd = () => {
           termDTO.isAvailable = false
           termDTO.defaultMarkerDeadLine = ""
           termDTO.defaultTutorDeadLine = ""
+          termDTO.tutorApplicationLimit = 2
+          termDTO.markerApplicationLimit = 2
           termDTO.payday = []
           dateRange.value = null
           defaultMarkerDeadLine.value = null
@@ -778,6 +789,94 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
   return datetimeFormat(cellValue);
 }
 
+const ApplicationLimitFormatter = (row: any, column: any, cellValue: any) => {
+  if (cellValue === 0) {
+    return 'No limit'
+  } else if (cellValue === 1) {
+    return 'Only one application'
+  } else {
+    return 'Global setting'
+  }
+}
+
+
+const applicationLimit = ref([
+  {
+    value: 0,
+    label: 'No Limit'
+  },
+  {
+    value: 1,
+    label: 'Only one application'
+  },
+  {
+    value: 2,
+    label: 'Global setting'
+  }
+])
+
+const settingLoading = ref(false)
+const applicationLimitGlobal = ref(false)
+
+const getSetting = () => {
+  settingLoading.value = true;
+  get('api/setting').then((res) => {
+    applicationLimitGlobal.value = res.onlyOneTimeApplication
+    settingLoading.value = false
+  }).catch((e) => {
+    ElMessage({
+      message: e.response.data['message'],
+      type: 'error'
+    })
+    settingLoading.value = false
+  })
+}
+
+
+onBeforeMount(() => {
+  getSetting();
+})
+
+const refresh = () => {
+  getTermList()
+  getSetting()
+}
+
+
+const applicationLimitGlobalChange = () => {
+  const newVal = applicationLimitGlobal.value
+  settingLoading.value = true;
+  if (typeof newVal === "boolean") {
+    put('api/setting', {
+      data: {onlyOneTimeApplication: newVal}
+    }).then((res) => {
+      refresh()
+      ElMessage({
+        message: 'Update setting success',
+        type: 'success'
+      })
+    }).catch((e) => {
+      refresh()
+      if (e.response.status === 401) {
+        router.push('/login')
+        return
+      }
+      if (e.response.status === 403) {
+        ElMessage({
+          message: 'Unauthorized Access',
+          type: 'error'
+        })
+        return;
+      }
+      ElMessage({
+        message: e.response.data['message'],
+        type: 'error'
+      })
+
+    })
+  }
+}
+
 </script>
 
 <template>
@@ -785,6 +884,16 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
     <section>
       <div class="manage-course-subtitle">
         <h2>Terms</h2>
+        <span style="margin: 0 15px; color: #79797c">Global Setting: </span>
+        <el-switch
+            v-model="applicationLimitGlobal"
+            :loading="settingLoading"
+            class="mb-2"
+            style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+            active-text="Only apply for each position once per term"
+            inactive-text="Apply unlimitedly"
+            @change="applicationLimitGlobalChange"
+        />
         <el-button type="primary" plain @click="() => {termModalOpened = true}" class="add-term">Add Term
         </el-button>
       </div>
@@ -802,6 +911,10 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
           <el-table-column label="Start Date" prop="startDate" :formatter="dateFormatter"/>
           <el-table-column label="End Date" prop="endDate" :formatter="dateFormatter"/>
           <el-table-column label="Is available" prop="isAvailable"/>
+          <el-table-column label="Marker application limit" prop="markerApplicationLimit"
+                           :formatter="ApplicationLimitFormatter"/>
+          <el-table-column label="Tutor application limit" prop="tutorApplicationLimit"
+                           :formatter="ApplicationLimitFormatter"/>
           <el-table-column label="Marker DeadLine" prop="defaultMarkerDeadLine" :formatter="dateTimeFormatter"/>
           <el-table-column label="Tutor deadline" prop="defaultTutorDeadLine" :formatter="dateTimeFormatter"/>
           <el-table-column align="right">
@@ -883,6 +996,28 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-text="Y"
                        inactive-text="N"/>
           </div>
+          <div class="modal-content-switch">
+            <span>Marker Application Limit</span>
+            <el-select v-model="termDTO.markerApplicationLimit" placeholder="Marker Application Limit" style="max-width: 180px">
+              <el-option
+                  v-for="item in applicationLimit"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+              />
+            </el-select>
+          </div>
+          <div class="modal-content-switch">
+            <span>Tutor Application Limit</span>
+            <el-select v-model="termDTO.tutorApplicationLimit" placeholder="Tutor Application Limit" style="max-width: 180px">
+              <el-option
+                  v-for="item in applicationLimit"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+              />
+            </el-select>
+          </div>
           <el-date-picker v-model="defaultMarkerDeadLine" type="datetime"
                           placeholder="Pick a Date for Marker deadline" style="width:100%;"/>
           <el-date-picker v-model="defaultTutorDeadLine" type="datetime"
@@ -917,6 +1052,28 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
             <el-switch v-model="termDTO.isAvailable" inline-prompt
                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-text="Y"
                        inactive-text="N"/>
+          </div>
+          <div class="modal-content-switch">
+            <span>Marker Application Limit</span>
+            <el-select v-model="termDTO.markerApplicationLimit" placeholder="Marker Application Limit" style="max-width: 180px">
+              <el-option
+                  v-for="item in applicationLimit"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+              />
+            </el-select>
+          </div>
+          <div class="modal-content-switch">
+            <span>Tutor Application Limit</span>
+            <el-select v-model="termDTO.tutorApplicationLimit" placeholder="Tutor Application Limit" style="max-width: 180px">
+              <el-option
+                  v-for="item in applicationLimit"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+              />
+            </el-select>
           </div>
           <el-date-picker v-model="defaultMarkerDeadLine" type="datetime"
                           placeholder="Pick a Date for Marker deadline" style="width:100%;"/>
@@ -1108,7 +1265,8 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
     </div>
   </teleport>
 
-  <ImportCourseTemplate v-model:importVisible="importVisible" v-model:term="onSelect" v-model:termName="onSelectName" @getCourseList="getCourseList"/>
+  <ImportCourseTemplate v-model:importVisible="importVisible" v-model:term="onSelect" v-model:termName="onSelectName"
+                        @getCourseList="getCourseList"/>
   <FullScreenManageCourse v-model:fullScreenCourseVisible="fullScreenCourseVisible" v-model:onSelectName="onSelectName"
                           v-model:searchCourse="searchCourse" v-model:importShowEvent="importShowEvent"
                           @handleCourseAdd="handleCourseAdd" v-model:filter-courses="filterCourses"
@@ -1215,6 +1373,7 @@ const dateTimeFormatter = (row: any, column: any, cellValue: any) => {
     .manage-course-subtitle {
       display: flex;
       width: 100%;
+      align-items: center;
 
       .currentTermAlert {
         margin-left: 5px;

@@ -86,3 +86,5 @@ type applicationApprovalList = {
 
 
 type EChartsOption = echarts.EChartsOption
+
+
