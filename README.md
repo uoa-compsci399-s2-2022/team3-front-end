@@ -6,7 +6,9 @@
 
 Marker & Tutor Management System - One COMPSCI399 Project
 
+## Our Website
 
+https://uoamtms.com/
 
 ## Project management tool
 
@@ -164,13 +166,6 @@ New Course is added, you can delete / modify or add another course as you wish.
 <img src=".\public\tutorial-images\image-20221023182044687.png" alt="image-20221023180008092" style="zoom:50%;" />
 
 
-
-## Online Demo
-
-[Click](https://www.uoamtms.com/) to check the demo online!
-
-
-
 ## Future Work
 
 1. **Automatically assigning function**
@@ -194,7 +189,3 @@ New Course is added, you can delete / modify or add another course as you wish.
 5. [Vue3 documentation](https://vuejs.org/)
 6. [vue-router documentation](https://router.vuejs.org/installation.html)
 7. [Axios Tutorials](https://masteringjs.io/axios)
-<<<<<<< HEAD
-=======
-
->>>>>>> 0110b661cd7ba903cfedef4c50589eb843265f28
