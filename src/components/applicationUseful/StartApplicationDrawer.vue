@@ -26,7 +26,7 @@
     Please select your application type:
     <br/><br/>
     <el-row justify="center">
-      <el-select v-model="typeValue" class="m-2" placeholder="Terms" size="large">
+      <el-select v-model="typeValue" class="m-2" placeholder="Application types" size="large">
         <el-option
             v-for="item in typeList"
             :key="item.value"
