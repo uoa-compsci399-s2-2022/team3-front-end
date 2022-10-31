@@ -339,7 +339,7 @@
             <el-popover
                 placement="right"
                 :title="item.courseNum + ' - ' + item.courseName"
-                :width="550"
+                :width="600"
                 trigger="hover"
                 :hide-after="0"
             >
@@ -351,21 +351,21 @@
                 >
                   <span style="float: left">{{ item.courseNum }}</span>
                   <span class="course-select-option"
-                        style="float: right">Available Hour: {{item.currentAvailableHours}}</span>
+                        style="float: right">UAEH: {{item.currentAvailableHours}}</span>
                 </el-option>
               </template>
               <el-alert
                   v-show="closedCourseAvailableHoursAlert"
-                  title="Available Hours"
+                  title="UAEH"
                   type="info"
                   effect="dark"
                   style="margin-bottom: 7px"
-                  description="This number of Available Hours means(for this course): Total Available Hours - Pre assigned Tutor & Marker Hours - the total estimated hours that have been accepted and enrolled(include: No Published & Published)"
+                  description="This number of Unpublished Available Estimated Hours means(for this course): Total Available Hours - Pre assigned Tutor & Marker Hours - the total estimated hours that have been accepted and enrolled(include: No Published & Published)"
                   show-icon
                   @close="setClosedCourseAvailableHoursAlert"
               />
               <el-descriptions border :column="2" style="margin-bottom: 5px">
-                <el-descriptions-item label="Published Available Hours" label-align="center"
+                <el-descriptions-item label="Published Available Estimated Hours" label-align="center"
                                       align="center">
                   <span style="color: #0b416d; font-weight: bold">{{ item.currentPublishedAvailableHours }}</span>
                 </el-descriptions-item>
